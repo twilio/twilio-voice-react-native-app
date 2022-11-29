@@ -41,13 +41,6 @@ android/app/google-services.json
 #
 ios/Pods
 
-# node.js
-#
-node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-
 # BUCK
 buck-out/
 \.buckd/
@@ -75,6 +68,4 @@ temp/
 
 # e2e tests
 src/e2e-tests-token.ts
-
 coverage/
-
