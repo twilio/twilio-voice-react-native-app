@@ -1,0 +1,6 @@
+{
+  "ext": "*.ts",
+  "exec": "tsc && node build/src/",
+  "watch": "src/",
+  "ignore": ["src/__tests__", "src/__mocks__"]
+}
