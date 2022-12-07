@@ -1,66 +1,27 @@
-# Twilio Voice React Native App
+# Twilio Voice React Native Reference
 
-This is a React Native App that demonstrates [Twilio Voice React Native SDK](https://github.com/twilio/twilio-voice-react-native) usage.
+## What is this Project?
 
-## Prerequisites
+The Twilio Voice React Native Reference App is an example implementation of the Twilio Voice React Native SDK and serves to inspire developers who want to leverage the power of Twilio Programmable Voice in their React Native applications.
 
-- [React Native CLI](https://reactnative.dev/docs/environment-setup)
-- [Yarn](https://yarnpkg.com/getting-started)
-- Token - Create a file, `e2e-tests-token.ts` under `example/src` directory with the following content.
-  ```ts
-  export const token = 'my-token-goes-here';
+* See the Twilio Voice React Native SDK [here](https://github.com/twilio/twilio-voice-react-native)
+
+## Before you use this Project
+
+You should have the React Native development environment set up and have a firm understanding of Twilio Programmable Voice.
+
+Please follow the official React Native guides to set up your environment, and additionally the Twilio Programmable Voice documentation. TODO LINKS
+
+### Structure
+
+* A React Native application under:
+  ```
+  app/
   ```
 
-## Setup
-
-1. Clone this repository
-  ```sh
-  git clone https://github.com/twilio/twilio-voice-react-native.git
+* A backend server under:
   ```
-2. Switch to the root directory
-  ```sh
-  cd twilio-voice-react-native
-  ```
-3. Install SDK dependencies
-  ```sh
-  yarn install
-  ```
-4. Build the constants files for each platform
-  ```sh
-  yarn run build:constants
-  ```
-5. Switch to the example directory
-  ```sh
-  cd example
-  ```
-6. Install app dependencies
-  ```sh
-  yarn install
-  ```
-7. Install pods for iOS
-  ```sh
-  cd ios
-  pod install
+  server/
   ```
 
-## Running the app
-
-Switch to the example directory
-```sh
-cd example
-```
-
-Start metro bundler:
-```sh
-yarn start
-```
-
-On a different terminal window, run on Android:
-```sh
-yarn run android
-```
-
-On a different terminal window, run on iOS:
-```sh
-yarn run ios
-```
+Please see the `README.md` files within each sub-folder for more information about that component.

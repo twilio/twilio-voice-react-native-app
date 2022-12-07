@@ -1,8 +1,8 @@
 {
   "name": "twilio-voice-react-native-example",
-  "description": "Example app for twilio-voice-react-native",
-  "version": "0.0.1",
   "private": true,
+  "version": "0.0.1",
+  "description": "Example app for twilio-voice-react-native",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",

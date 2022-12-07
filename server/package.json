@@ -1,0 +1,11 @@
+{
+  "name": "twilio-voice-react-native-reference-server",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Twilio Voice React Native Reference Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Michael Huynh (mhuynh@twilio.com)"
+}
