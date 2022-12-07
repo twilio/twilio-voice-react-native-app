@@ -1,7 +1,7 @@
-import { jwt } from 'twilio';
 import { Request, RequestHandler, Response } from 'express';
-import { retrieveAuthentication } from '../middleware/sample-auth';
+import { jwt } from 'twilio';
 import { TwilioCredentials } from '../common/types';
+import { retrieveAuthentication } from '../middlewares/sample-auth';
 
 export function createTokenRoute(
   twilioCredentials: TwilioCredentials

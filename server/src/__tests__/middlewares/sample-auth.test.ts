@@ -1,10 +1,9 @@
-import { createSampleAuthenticationMiddleware } from '../../middleware/sample-auth';
+import { createSampleAuthenticationMiddleware } from '../../middlewares/sample-auth';
+import { warn } from '../../utils/log';
 
-let mockedWarn: jest.Mock<typeof console.warn>;
+jest.mock('../../utils/log');
 
-beforeEach(() => {
-  console.warn = mockedWarn = jest.fn();
-});
+const mockWarn = jest.mocked(warn);
 
 describe('createSampleAuthenticationMiddleware()', () => {
   it('returns a middleware function', () => {
@@ -13,8 +12,9 @@ describe('createSampleAuthenticationMiddleware()', () => {
   });
 
   it('warns that the middleware is unsuitable for production', () => {
+    mockWarn.mockClear();
     createSampleAuthenticationMiddleware();
-    expect(mockedWarn.mock.calls).toHaveLength(1);
+    expect(mockWarn.mock.calls).toHaveLength(1);
   })
 
   describe('the middleware function', () => {
@@ -22,7 +22,12 @@ describe('createSampleAuthenticationMiddleware()', () => {
       const mockReq = {
         body: { username: 'alice', password: 'supersecretpassword1234' },
       };
-      const mockRes: { status: jest.Mock; send: jest.Mock } = {
+      const mockRes: {
+        locals: Record<any, any>;
+        status: jest.Mock;
+        send: jest.Mock
+      } = {
+        locals: {},
         status: jest.fn(() => mockRes),
         send: jest.fn(() => mockRes),
       };
@@ -37,7 +42,12 @@ describe('createSampleAuthenticationMiddleware()', () => {
       const mockReq = {
         body: { username: 'alice', password: 'nottherightpassword' },
       };
-      const mockRes: { status: jest.Mock; send: jest.Mock } = {
+      const mockRes: {
+        locals: Record<any, any>;
+        status: jest.Mock;
+        send: jest.Mock
+      } = {
+        locals: {},
         status: jest.fn(() => mockRes),
         send: jest.fn(() => mockRes),
       };
@@ -45,7 +55,7 @@ describe('createSampleAuthenticationMiddleware()', () => {
       const auth = createSampleAuthenticationMiddleware();
       auth(mockReq as any, mockRes as any, mockNext);
       expect(mockRes.status.mock.calls).toEqual([[403]]);
-      expect(mockRes.send.mock.calls).toEqual([['Invalid credentials.']]);
+      expect(mockRes.send.mock.calls).toEqual([['Credentials invalid.']]);
     });
   });
 });
