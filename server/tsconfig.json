@@ -100,17 +100,5 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     // "skipLibCheck": true                              /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["./build"],
-  /**
-   * Bug in TS.
-   * tsc registers a filesystem listener to files within a watch directory,
-   * i.e. the src/ folder itself is recursively watched, attaching a watcher
-   * to src/*. A watcher is ALSO registered to src/index.ts, causing multiple
-   * watch events to occur.
-   */
-  "watchOptions": {
-    "watchFile": "useFsEventsOnParentDirectory",
-    "watchDirectory": "dynamicPriorityPolling",
-    "fallbackPolling": "dynamicPriority"
-  }
+  "exclude": ["./build"]
 }

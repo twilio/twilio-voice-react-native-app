@@ -1,11 +1,12 @@
-import { twiml } from 'twilio';
 import { Request, RequestHandler, Response } from 'express';
-import { retrieveAuthentication } from '../middleware/sample-auth';
+import { twiml } from 'twilio';
 import { TwilioCredentials } from '../common/types';
+import { retrieveAuthentication } from '../middlewares/sample-auth';
 
 export function createTwimlRoute(
   twilioCredentials: TwilioCredentials
 ): RequestHandler {
+  const { VoiceResponse } = twiml;
   return function twimlRoute(req: Request, res: Response) {
     const authentication = retrieveAuthentication(res);
 
@@ -17,11 +18,11 @@ export function createTwimlRoute(
     const { to } = req.body;
 
     if (typeof to !== 'string') {
-      res.status(401).send();
+      res.status(401).send('Missing "to".');
       return;
     }
 
-    const twimlResponse = new twiml.VoiceResponse();
+    const twimlResponse = new VoiceResponse();
 
     twimlResponse.dial().client(to);
 

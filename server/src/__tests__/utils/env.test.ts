@@ -1,4 +1,4 @@
-import { getEnvVar, getPort } from '../../util/env';
+import { getEnvVar, getPort, getTwilioCredentials } from '../../utils/env';
 import * as dotenv from 'dotenv';
 
 const mockDotenv = jest.mocked(dotenv);
@@ -7,12 +7,21 @@ const mockDotenv = jest.mocked(dotenv);
 // alterations can occur
 const env: NodeJS.ProcessEnv = process.env;
 
-beforeEach(() => {
-  // Restore the process environment before each test
-  process.env = env;
-});
+const mockEnv = {
+  ACCOUNT_SID: 'ACCOUNT_SID',
+  API_KEY_SID: 'API_KEY_SID',
+  API_KEY_SECRET: 'API_KEY_SECRET',
+  CALLER_ID: 'CALLER_ID',
+  OUTGOING_APPLICATION_SID: 'OUTGOING_APPLICATION_SID',
+  PUSH_CREDENTIAL_SID: 'PUSH_CREDENTIAL_SID',
+};
 
 describe('env', () => {
+  beforeEach(() => {
+    // Restore the process environment before each test
+    process.env = env;
+  });
+
   it('should have used dotenv', () => {
     expect(mockDotenv.config.mock.calls).toEqual([[]]);
   });
@@ -46,5 +55,18 @@ describe('env', () => {
       const res = getPort();
       expect(res).toEqual(3003);
     })
+  });
+
+  describe('getTwilioCredentials()', () => {
+    it('returns full credentials if all env vars are present', () => {
+      process.env = mockEnv;
+      const res = getTwilioCredentials();
+      expect(res).toBeDefined();
+    });
+
+    it('returns undefined if some env vars are not present', () => {
+      const res = getTwilioCredentials();
+      expect(res).toBeUndefined();
+    });
   });
 });

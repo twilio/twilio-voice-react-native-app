@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { warn } from '../utils/log';
 
 /**
  * ======================
@@ -7,7 +8,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
  *
  * This authentication middleware is _NOT_ fit for production deployments!
  *
- * Please consider a robust and industry standard solution to authenticate and
+ * Please consider a robust industry standard solution to authenticate and
  * authorize users for sensitive routes.
  *
  * This _sample_ middleware is meant _solely_ for development environments.
@@ -64,7 +65,7 @@ function authenticateMiddleware(req: Request, res: Response, next: NextFunction)
   }
 
   if (SAMPLE_DATABASE.get(username) !== password) {
-    res.status(403).send('Invalid credentials.');
+    res.status(403).send('Credentials invalid.');
     return;
   }
 
@@ -85,7 +86,7 @@ export function createSampleAuthenticationMiddleware(): RequestHandler {
    *
    * TODO, use console.error or .warn?
    */
-  console.warn([
+  warn([
     '',
     '==========================================================',
     'Warning!',
