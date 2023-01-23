@@ -4,7 +4,35 @@ import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 public class MainActivity extends ReactActivity {
+  private static final String TAG = "MainActivity";
+  private static final int MIC_PERMISSION_REQUEST_CODE = 1;
+
+  private boolean checkPermissionForMicrophone() {
+    int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+    return resultMic == PackageManager.PERMISSION_GRANTED;
+  }
+
+  private void requestPermissionForMicrophone() {
+    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
+      Log.d(TAG, "Microphone permissions needed. Please allow in your application settings.");
+    } else {
+      ActivityCompat.requestPermissions(
+        this,
+        new String[]{Manifest.permission.RECORD_AUDIO},
+        MIC_PERMISSION_REQUEST_CODE);
+    }
+  }
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
@@ -23,6 +51,15 @@ public class MainActivity extends ReactActivity {
   @Override
   protected ReactActivityDelegate createReactActivityDelegate() {
     return new MainActivityDelegate(this, getMainComponentName());
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    if (!checkPermissionForMicrophone()) {
+      requestPermissionForMicrophone();
+    }
   }
 
   public static class MainActivityDelegate extends ReactActivityDelegate {
