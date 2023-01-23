@@ -16,9 +16,9 @@ export function createTokenRoute(
     }
 
     const accessToken = new AccessToken(
-      twilioCredentials.accountSid,
-      twilioCredentials.apiKeySid,
-      twilioCredentials.apiKeySecret,
+      twilioCredentials.ACCOUNT_SID,
+      twilioCredentials.API_KEY_SID,
+      twilioCredentials.API_KEY_SECRET,
       {
         identity: authentication.username,
       }
@@ -26,8 +26,8 @@ export function createTokenRoute(
 
     const voiceGrant = new VoiceGrant({
       incomingAllow: true,
-      outgoingApplicationSid: twilioCredentials.outgoingApplicationSid,
-      pushCredentialSid: twilioCredentials.pushCredentialSid,
+      outgoingApplicationSid: twilioCredentials.OUTGOING_APPLICATION_SID,
+      pushCredentialSid: twilioCredentials.PUSH_CREDENTIAL_SID,
     });
 
     accessToken.addGrant(voiceGrant);

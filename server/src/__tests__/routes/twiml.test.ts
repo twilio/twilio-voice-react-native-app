@@ -8,12 +8,12 @@ const mockedRetrieveAuthentication = jest.mocked(retrieveAuthentication);
 const mockedVoiceResponse = jest.mocked(twiml.VoiceResponse);
 
 const mockTwilioCredentials = {
-  accountSid: 'mock-twiliocredentials-accountsid',
-  apiKeySid: 'mock-twiliocredentials-apikeysid',
-  apiKeySecret: 'mock-twiliocredentials-apikeysecret',
-  outgoingApplicationSid: 'mock-twiliocredentials-outgoingapplicationsid',
-  phoneNumber: 'mock-twiliocredentials-phonenumber',
-  pushCredentialSid: 'mock-twiliocredentials-pushcredentialsid',
+  ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
+  API_KEY_SID: 'mock-twiliocredentials-apikeysid',
+  API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
+  OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
+  CALLER_ID: 'mock-twiliocredentials-phonenumber',
+  PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
 };
 
 beforeEach(() => {

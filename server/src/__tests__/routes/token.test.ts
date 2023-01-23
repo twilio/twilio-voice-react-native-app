@@ -9,12 +9,12 @@ const mockedAccessToken = jest.mocked(jwt.AccessToken);
 const mockedVoiceGrant = jest.mocked(jwt.AccessToken.VoiceGrant);
 
 const mockTwilioCredentials = {
-  accountSid: 'mock-twiliocredentials-accountsid',
-  apiKeySid: 'mock-twiliocredentials-apikeysid',
-  apiKeySecret: 'mock-twiliocredentials-apikeysecret',
-  outgoingApplicationSid: 'mock-twiliocredentials-outgoingapplicationsid',
-  phoneNumber: 'mock-twiliocredentials-phonenumber',
-  pushCredentialSid: 'mock-twiliocredentials-pushcredentialsid',
+  ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
+  API_KEY_SID: 'mock-twiliocredentials-apikeysid',
+  API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
+  OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
+  CALLER_ID: 'mock-twiliocredentials-phonenumber',
+  PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
 };
 
 beforeEach(() => {
@@ -74,9 +74,9 @@ describe('createTokenRoute()', () => {
         tokenRoute(mockReq as any, mockRes as any, mockNext);
 
         expect(mockedAccessToken.mock.calls).toEqual([[
-          mockTwilioCredentials.accountSid,
-          mockTwilioCredentials.apiKeySid,
-          mockTwilioCredentials.apiKeySecret,
+          mockTwilioCredentials.ACCOUNT_SID,
+          mockTwilioCredentials.API_KEY_SID,
+          mockTwilioCredentials.API_KEY_SECRET,
           {
             identity: 'foobar',
           }
@@ -88,8 +88,8 @@ describe('createTokenRoute()', () => {
 
         expect(mockedVoiceGrant.mock.calls).toEqual([[{
           incomingAllow: true,
-          outgoingApplicationSid: mockTwilioCredentials.outgoingApplicationSid,
-          pushCredentialSid: mockTwilioCredentials.pushCredentialSid,
+          outgoingApplicationSid: mockTwilioCredentials.OUTGOING_APPLICATION_SID,
+          pushCredentialSid: mockTwilioCredentials.PUSH_CREDENTIAL_SID,
         }]]);
       });
 
