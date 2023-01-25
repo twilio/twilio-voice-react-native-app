@@ -1,8 +1,8 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import { tokenSlice } from './token';
-import { outgoingCallSlice } from './outgoingCall';
+import { callReducer } from './call';
 
 export const voiceReducer = combineReducers({
   [tokenSlice.name]: tokenSlice.reducer,
-  [outgoingCallSlice.name]: outgoingCallSlice.reducer,
+  call: callReducer,
 });

@@ -1,12 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetch, defaultUrl } from '../util/fetch';
-import { AsyncStoreSlice, createTypedAsyncThunk } from './common';
+import { AsyncStoreSlice } from './app';
 
-export const authenticateUser = createTypedAsyncThunk(
+export const authenticateUser = createAsyncThunk(
   'user/authenticate',
   async (
     { username, password }: { username: string; password: string },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     const res = await fetch(`${defaultUrl}/auth`, {
       method: 'POST',
