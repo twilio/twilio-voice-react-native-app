@@ -33,3 +33,8 @@ or
 yarn ios
 ```
 for your respective target platform.
+
+TODO
+talk about libraries i used
+redux toolkit etc
+state management

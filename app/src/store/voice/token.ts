@@ -1,32 +1,26 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetch, defaultUrl } from '../../util/fetch';
-import { AsyncStoreSlice, createTypedAsyncThunk } from '../common';
+import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
 
-export const getToken = createTypedAsyncThunk(
-  'voice/getToken',
-  async (_, { getState }) => {
-    const { user } = getState();
-    if (user?.status !== 'fulfilled') {
-      console.log(user?.status);
-      throw new Error();
-    }
+export const getToken = createAsyncThunk<
+  string,
+  void,
+  { state: State; dispatch: Dispatch }
+>('voice/getToken', async () => {
+  const res = await fetch(`${defaultUrl}/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username: 'alice',
+      password: 'supersecretpassword1234',
+    }),
+  });
 
-    const { username, password } = user;
-    const res = await fetch(`${defaultUrl}/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    });
-
-    const token: string = await res.text();
-    return token;
-  },
-);
+  const token: string = await res.text();
+  return token;
+});
 
 export type TokenState = AsyncStoreSlice<{ value: string }>;
 
