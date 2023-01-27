@@ -6,7 +6,10 @@ const SelectAudioDeviceSource = require('../../../assets/icons/speaker.png');
 
 export type Props = { disabled?: boolean; onPress: () => void };
 
-const MuteButton: React.FC<Props> = ({ disabled, onPress }) => (
+const SelectAudioOutputDeviceButton: React.FC<Props> = ({
+  disabled,
+  onPress,
+}) => (
   <Button size={96} disabled={disabled} onPress={onPress}>
     <Image
       source={SelectAudioDeviceSource}
@@ -22,4 +25,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MuteButton;
+export default SelectAudioOutputDeviceButton;

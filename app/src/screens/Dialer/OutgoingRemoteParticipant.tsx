@@ -8,7 +8,7 @@ export type Props = {
   outgoingIdentity: string;
 };
 
-const OutgoingRecipient: React.FC<Props> = ({
+const OutgoingRemoteParticipant: React.FC<Props> = ({
   isOutgoingClient,
   setOutgoingIdentity,
   outgoingPstn,
@@ -56,4 +56,4 @@ const pstnStyle = {
   ...styles.pstn,
 };
 
-export default OutgoingRecipient;
+export default OutgoingRemoteParticipant;

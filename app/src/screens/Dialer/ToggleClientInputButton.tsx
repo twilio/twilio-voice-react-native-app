@@ -9,7 +9,10 @@ export type Props = {
   onPress: () => void;
 };
 
-const BackspaceButton: React.FC<Props> = ({ isOutgoingClient, onPress }) => (
+const ToggleClientInputButton: React.FC<Props> = ({
+  isOutgoingClient,
+  onPress,
+}) => (
   <Button size={96} onPress={onPress}>
     <Image source={TypeSource} resizeMode="contain" style={styles.image} />
     <Text style={styles.text}>{isOutgoingClient ? 'PSTN' : 'Client'}</Text>
@@ -27,4 +30,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BackspaceButton;
+export default ToggleClientInputButton;

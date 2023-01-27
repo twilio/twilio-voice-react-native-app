@@ -19,6 +19,7 @@ export const getToken = createAsyncThunk<
   });
 
   const token: string = await res.text();
+
   return token;
 });
 
