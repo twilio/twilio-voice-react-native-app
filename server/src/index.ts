@@ -14,7 +14,7 @@ async function main() {
     return;
   }
 
-  const port = getPort() ?? 3003;
+  const port = getPort() ?? 3030;
 
   const app = createExpressApp(twilioCredentials);
 
