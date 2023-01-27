@@ -140,7 +140,7 @@ const Call: React.FC = () => {
     animate();
 
     return () => {
-      if (timeoutId) {
+      if (timeoutId !== null) {
         clearInterval(timeoutId);
       }
     };

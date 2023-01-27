@@ -7,7 +7,7 @@ export type Props = React.PropsWithChildren<{
   disabled?: boolean;
 }>;
 
-const IconButton: React.FC<Props> = ({ children, size, onPress, disabled }) => {
+const Button: React.FC<Props> = ({ children, size, onPress, disabled }) => {
   const containerStyle = React.useMemo(
     () => ({
       ...styles.container,
@@ -38,4 +38,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IconButton;
+export default Button;

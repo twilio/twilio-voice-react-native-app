@@ -2,13 +2,17 @@ import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 import Button from '../../components/Button';
 
-const MakeCallSource = require('../../../assets/icons/make-call.png');
+const MakeOutgoingCallSource = require('../../../assets/icons/make-call.png');
 
 export type Props = { onPress: () => void };
 
 const MakeOutgoingCallButton: React.FC<Props> = ({ onPress }) => (
   <Button size={96} onPress={onPress}>
-    <Image source={MakeCallSource} resizeMode="contain" style={styles.image} />
+    <Image
+      source={MakeOutgoingCallSource}
+      resizeMode="contain"
+      style={styles.image}
+    />
   </Button>
 );
 

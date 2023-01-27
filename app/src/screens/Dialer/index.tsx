@@ -11,7 +11,7 @@ import { makeOutgoingCall } from '../../store/voice/call/outgoingCall';
 import { getToken } from '../../store/voice/token';
 import { type StackNavigationProp } from '../../types';
 
-const OutgoingDialer: React.FC = () => {
+const Dialer: React.FC = () => {
   const dispatch = useTypedDispatch();
   const navigation = useNavigation<StackNavigationProp<'App'>>();
   const [outgoingPstn, setOutgoingPstn] = React.useState<string>('');
@@ -116,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OutgoingDialer;
+export default Dialer;
