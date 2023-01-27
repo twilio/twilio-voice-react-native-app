@@ -16,15 +16,29 @@ export function createTwimlRoute(
     }
 
     const { to } = req.body;
-
     if (typeof to !== 'string') {
-      res.status(401).send('Missing "to".');
+      res.status(400).send('Missing "to".');
       return;
     }
 
-    const twimlResponse = new VoiceResponse();
+    const recipientType = (['client', 'number'] as const).find(
+      (r) => r === req.body.recipientType,
+    );
+    if (typeof recipientType === 'undefined') {
+      res.status(400).send('Recipient type invalid.');
+      return;
+    }
 
-    twimlResponse.dial().client(to);
+    const callerId = recipientType === 'number'
+      ? twilioCredentials.CALLER_ID
+      : req.body.From;
+
+    const twimlResponse = new VoiceResponse();
+    const dial = twimlResponse.dial({
+      answerOnBridge: true,
+      callerId,
+    });
+    dial[recipientType](to);
 
     res.header('Content-Type', 'text/xml')
       .status(200)
