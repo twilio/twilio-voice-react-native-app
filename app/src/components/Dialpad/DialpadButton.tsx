@@ -25,10 +25,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: 'black',
   },
   subtitle: {
     fontSize: 16,
-    fontWeight: 'normal',
+    fontWeight: '300',
+    color: 'black',
   },
 });
 

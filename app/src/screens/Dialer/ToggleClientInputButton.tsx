@@ -12,7 +12,7 @@ export type Props = {
 const BackspaceButton: React.FC<Props> = ({ isOutgoingClient, onPress }) => (
   <Button size={96} onPress={onPress}>
     <Image source={TypeSource} resizeMode="contain" style={styles.image} />
-    <Text style={styles.text}>{isOutgoingClient ? 'Client' : 'PSTN'}</Text>
+    <Text style={styles.text}>{isOutgoingClient ? 'PSTN' : 'Client'}</Text>
   </Button>
 );
 
@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 10,
     fontWeight: '300',
+    color: 'black',
   },
 });
 

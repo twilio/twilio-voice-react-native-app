@@ -19,9 +19,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
+    color: 'black',
     fontSize: 24,
   },
   subtitle: {
+    color: 'black',
     fontSize: 12,
   },
 });
