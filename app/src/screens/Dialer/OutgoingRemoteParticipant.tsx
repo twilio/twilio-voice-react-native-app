@@ -37,10 +37,12 @@ const OutgoingRecipient: React.FC<Props> = ({
 const styles = StyleSheet.create({
   container: {},
   title: {
+    color: 'black',
     fontSize: 24,
     textAlign: 'center',
   },
   subtitle: {
+    color: 'black',
     fontSize: 12,
     textAlign: 'center',
   },
