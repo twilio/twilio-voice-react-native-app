@@ -1,8 +1,8 @@
 {
-  "name": "twilio-voice-react-native-reference-server",
+  "name": "twilio-voice-react-native-app-server",
   "private": true,
   "version": "0.0.0",
-  "description": "Twilio Voice React Native Reference Server",
+  "description": "Twilio Voice React Native App Server",
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
