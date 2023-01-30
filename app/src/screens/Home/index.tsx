@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 const Home: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text>Ahoy!</Text>
+      <Text style={styles.title}>Ahoy!</Text>
     </View>
   );
 };
@@ -12,9 +12,15 @@ const Home: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
     height: '100%',
+  },
+  title: {
+    fontSize: 48,
+    flexGrow: 1,
+    textAlignVertical: 'center',
+    color: 'black',
   },
 });
 

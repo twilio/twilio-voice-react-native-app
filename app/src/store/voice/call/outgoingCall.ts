@@ -18,19 +18,13 @@ export const makeOutgoingCall = createAsyncThunk<
   }
 >(
   'voice/makeOutgoingCall',
-  async ({ to }, { getState, dispatch, rejectWithValue }) => {
-    // const to = 'client-web';
-    const recipientType = 'client';
-
+  async ({ to, recipientType }, { getState, dispatch, rejectWithValue }) => {
     const token = getState().voice.token;
 
     if (token?.status !== 'fulfilled') {
       return rejectWithValue('TOKEN_UNFULFILLED');
     }
 
-    /**
-     * TODO adjust for built in server instead of voicejs softphone
-     */
     const outgoingCall = await voice.connect(token.value, {
       To: to,
       answerOnBridge: true,
