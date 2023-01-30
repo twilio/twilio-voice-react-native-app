@@ -1,4 +1,6 @@
-import { createSampleAuthenticationMiddleware } from '../../middlewares/sample-auth';
+import {
+  createSampleAuthenticationMiddleware
+} from '../../middlewares/sample-auth';
 import { warn } from '../../utils/log';
 
 jest.mock('../../utils/log');

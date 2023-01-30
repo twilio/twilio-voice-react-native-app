@@ -11,6 +11,7 @@ export const jwt: { AccessToken: jest.Mock & { VoiceGrant: jest.Mock } } = {
 
 const dial = jest.fn().mockReturnValue({
   client: jest.fn(),
+  number: jest.fn(),
 });
 
 const voiceResponseToString = jest.fn().mockReturnValue('mock-voiceresponse-tostring-foobar');

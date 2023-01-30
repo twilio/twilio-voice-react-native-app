@@ -51,7 +51,11 @@ export function retrieveAuthentication(res: Response): Authentication | undefine
  * @param res Express response object to respond to the request
  * @param next the "next" function for Express to run
  */
-function authenticateMiddleware(req: Request, res: Response, next: NextFunction): void {
+function authenticateMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
   const { password, username } = req.body;
 
   if (typeof password !== 'string') {

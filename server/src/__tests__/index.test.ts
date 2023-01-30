@@ -26,7 +26,7 @@ describe('main', () => {
       expect(env.getPort.mock.calls).toEqual([[]]);
     });
 
-    it('should listen on 3003 if not set', () => {
+    it('should listen on 3030 if not set', () => {
       env.getPort.mockReturnValueOnce(undefined);
 
       runServer();
@@ -35,7 +35,7 @@ describe('main', () => {
       const app = server.createExpressApp.mock.results[0].value;
       expect(app.listen.mock.calls).toHaveLength(1);
       const [[port]] = app.listen.mock.calls;
-      expect(port).toBe(3003);
+      expect(port).toBe(3030);
     });
 
     it('should listen on the port if set', () => {

@@ -107,20 +107,50 @@ describe('/twiml', () => {
     });
   });
 
-  describe('responds with status code 401', () => {
+  describe('responds with status code 400', () => {
     it('if "to" is missing', async () => {
       const response = await twimlRouteTest()
         .send({ username: 'alice', password: 'supersecretpassword1234' });
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
       expect(response.headers['content-type']).toMatch(/text/);
       expect(response.text).toBe('Missing "to".');
+    });
+
+    it('if "recipientType" is missing', async () => {
+      const response = await twimlRouteTest()
+        .send({
+          username: 'alice',
+          password: 'supersecretpassword1234',
+          to: 'bob'
+        });
+      expect(response.status).toBe(400);
+      expect(response.headers['content-type']).toMatch(/text/);
+      expect(response.text).toBe('Invalid "recipientType".');
+    });
+
+    it('if "recipientType" is invalid', async () => {
+      const response = await twimlRouteTest()
+        .send({
+          username: 'alice',
+          password: 'supersecretpassword1234',
+          to: 'bob',
+          recipientType: 'foobar'
+        });
+      expect(response.status).toBe(400);
+      expect(response.headers['content-type']).toMatch(/text/);
+      expect(response.text).toBe('Invalid "recipientType".');
     });
   });
 
   describe('responds with status code 200', () => {
     it('if a valid username and password are present', async () => {
       const response = await twimlRouteTest()
-        .send({ username: 'alice', password: 'supersecretpassword1234', to: 'bob' });
+        .send({
+          username: 'alice',
+          password: 'supersecretpassword1234',
+          to: 'bob',
+          recipientType: 'client'
+        });
       expect(response.status).toBe(200);
       expect(response.headers['content-type']).toMatch(/xml/);
       expect(response.text).toBeDefined();

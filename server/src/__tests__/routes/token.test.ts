@@ -88,7 +88,8 @@ describe('createTokenRoute()', () => {
 
         expect(mockedVoiceGrant.mock.calls).toEqual([[{
           incomingAllow: true,
-          outgoingApplicationSid: mockTwilioCredentials.OUTGOING_APPLICATION_SID,
+          outgoingApplicationSid:
+            mockTwilioCredentials.OUTGOING_APPLICATION_SID,
           pushCredentialSid: mockTwilioCredentials.PUSH_CREDENTIAL_SID,
         }]]);
       });
@@ -114,7 +115,9 @@ describe('createTokenRoute()', () => {
         expect(mockRes.status.mock.calls).toEqual([[200]]);
         const mockToJwt = mockedAccessToken.mock.results[0].value.toJwt;
         expect(mockToJwt.mock.calls).toEqual([[]]);
-        expect(mockRes.send.mock.calls).toEqual([['mock-accesstoken-tojwt-foobar']]);
+        expect(mockRes.send.mock.calls).toEqual([
+          ['mock-accesstoken-tojwt-foobar'],
+        ]);
       });
     });
   });

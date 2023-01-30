@@ -25,7 +25,7 @@ export function createTwimlRoute(
       (r) => r === req.body.recipientType,
     );
     if (typeof recipientType === 'undefined') {
-      res.status(400).send('Recipient type invalid.');
+      res.status(400).send('Invalid "recipientType".');
       return;
     }
 
