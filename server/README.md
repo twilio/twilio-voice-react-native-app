@@ -9,7 +9,7 @@ The App portion of this project can be found [here](https://github.com/twilio/tw
 ## Before you use this Project
 
 * Please ensure that you have the latest version LTS version of Node.js, found [here](https://nodejs.org/en/).
-* A Node package manager. Examples in this README will use Yarn.
+* A Node package manager. Examples in this README will use the latest version of Yarn v1.
 
 ## How to use this Project
 
