@@ -3,7 +3,7 @@ import { getPort, getTwilioCredentials } from './utils/env';
 import { log, warn } from './utils/log';
 
 async function main() {
-  log('Ahoy! Starting Twilio Voice React Native Reference server...');
+  log('Ahoy! Starting Twilio Voice React Native server...');
 
   const twilioCredentials = getTwilioCredentials();
   if (typeof twilioCredentials === 'undefined') {
@@ -21,7 +21,7 @@ async function main() {
   app.listen(
     port,
     () => log(
-      'Twilio Voice React Native Reference server succesfully started on ' +
+      'Twilio Voice React Native server succesfully started on ' +
       `port "${port}".`
     ),
   );
