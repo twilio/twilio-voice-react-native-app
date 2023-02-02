@@ -1,3 +1,4 @@
+import { AudioDevice as TwilioAudioDevice } from '@twilio/voice-react-native-sdk';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -8,6 +9,10 @@ import {
   muteActiveCall,
   sendDtmfActiveCall,
 } from '../../store/voice/call/activeCall';
+import {
+  getAudioDevices,
+  selectAudioDevice,
+} from '../../store/voice/audioDevices';
 import RemoteParticipant from './RemoteParticipant';
 import HangupButton from './HangupButton';
 import MuteButton from './MuteButton';
@@ -23,6 +28,9 @@ const Call: React.FC = () => {
   );
   const [activeCallTime, setActiveCallTime] = React.useState<number | null>(
     null,
+  );
+  const audioDevices = useSelector<State, State['voice']['audioDevices']>(
+    (store) => store.voice.audioDevices,
   );
   const title = React.useMemo<string>(() => {
     if (activeCall?.status !== 'fulfilled') {
@@ -109,19 +117,74 @@ const Call: React.FC = () => {
     return [() => dispatch(disconnectActiveCall()), false];
   }, [dispatch, activeCall]);
 
-  const [handleSpeaker, isSpeakerDisabled] = React.useMemo(() => {
-    const noOp = () => {};
+  const [handleSpeaker, isSpeakerDisabled, isSpeakerActive] =
+    React.useMemo(() => {
+      const noOp = () => {};
 
-    if (activeCall?.status !== 'fulfilled') {
-      return [noOp, true];
-    }
+      if (activeCall?.status !== 'fulfilled') {
+        return [noOp, true, false];
+      }
 
-    if (activeCall.callInfo.state === 'disconnected') {
-      return [noOp, true];
-    }
+      if (activeCall.callInfo.state === 'disconnected') {
+        return [noOp, true, false];
+      }
 
-    return [noOp, false];
-  }, [activeCall]);
+      if (audioDevices?.status !== 'fulfilled') {
+        return [noOp, true, false];
+      }
+
+      const earpieceDevice = audioDevices.audioDevices.find(
+        (dev) => dev.type === TwilioAudioDevice.Type.Earpiece,
+      );
+
+      const speakerDevice = audioDevices.audioDevices.find(
+        (dev) => dev.type === TwilioAudioDevice.Type.Speaker,
+      );
+
+      if (
+        typeof earpieceDevice === 'undefined' ||
+        typeof speakerDevice === 'undefined'
+      ) {
+        return [noOp, true, false];
+      }
+
+      if (audioDevices.selectedDevice === null) {
+        return [
+          () =>
+            dispatch(
+              selectAudioDevice({ audioDeviceUuid: earpieceDevice.uuid }),
+            ),
+          false,
+          false,
+        ];
+      }
+
+      if (audioDevices.selectedDevice.type === TwilioAudioDevice.Type.Speaker) {
+        return [
+          () =>
+            dispatch(
+              selectAudioDevice({ audioDeviceUuid: earpieceDevice.uuid }),
+            ),
+          false,
+          false,
+        ];
+      }
+
+      if (
+        audioDevices.selectedDevice.type === TwilioAudioDevice.Type.Earpiece
+      ) {
+        return [
+          () =>
+            dispatch(
+              selectAudioDevice({ audioDeviceUuid: speakerDevice.uuid }),
+            ),
+          false,
+          true,
+        ];
+      }
+
+      return [noOp, false, false];
+    }, [dispatch, audioDevices, activeCall]);
 
   React.useEffect(() => {
     let timeoutId: number | null;
@@ -145,6 +208,13 @@ const Call: React.FC = () => {
       }
     };
   }, [activeCall]);
+
+  /**
+   * Refresh the list of audio devices when the call screen is mounted.
+   */
+  React.useEffect(() => {
+    dispatch(getAudioDevices());
+  }, [dispatch]);
 
   const dialpadView = React.useMemo(
     () => (
@@ -182,6 +252,7 @@ const Call: React.FC = () => {
             onPress={() => setIsDialpadVisible(true)}
           />
           <SelectAudioOutputDeviceButton
+            active={isSpeakerActive}
             disabled={isSpeakerDisabled}
             onPress={handleSpeaker}
           />
@@ -198,6 +269,7 @@ const Call: React.FC = () => {
       handleMute,
       isDialpadDisabled,
       isSpeakerDisabled,
+      isSpeakerActive,
       handleSpeaker,
       isHangupButtonDisabled,
       handleHangup,
