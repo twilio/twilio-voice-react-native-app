@@ -1,12 +1,12 @@
-# Reference App
+# Twilio Voice React Native SDK Reference App
 
-The React Native Voice SDK Reference App is an application showcasing the features of the Twilio React Native Voice SDK and serves to inspire developers and give them an example of how to implement the Twilio Voice React Native SDK.
+The **Twilio Voice React Native SDK Reference App** is an application showcasing the features of the **Twilio Voice React Native SDK**. The **Reference App** serves to inspire developers and give them an example of how to implement the **Twilio React Native Voice SDK**.
 
-* See the Twilio Voice React Native SDK [here](https://github.com/twilio/twilio-voice-react-native).
+* See the **Twilio Voice React Native SDK** [here](https://github.com/twilio/twilio-voice-react-native).
 
 ## Features
 
-The Reference App showcases the following possibilities using Twilio Voice:
+The **Reference App** showcases the following possibilities using **Twilio Voice**:
 * Login flow for authenticating and authorizing users
 * Dialpad for making outgoing calls
 * Registration and notifications for incoming calls
@@ -24,11 +24,11 @@ Ensure that you are within the `app/` folder.
 ```
 cd app/
 ```
-Afterwards, ensure that the dependencies are fetched.
+Fetch the dependencies.
 ```
 yarn install
 ```
-You can then start a build and the Metro bundler at the same time by using the command
+Start a native build and the Metro bundler at the same time by using the command
 ```
 yarn android
 ```
@@ -44,7 +44,7 @@ With any substantially complex application, opinionated design practices are for
 
 ### Directory Structure
 
-Smaller reusable components are found in the `src/components/` folder, where larger compilations of those smaller components can be found in `src/screens/`. The intent of a component, such as `Dialer` or `Home`, in the `src/screens/` folder is that it is "connected" to the application state through React-Redux and React Navigation, whereas components in the `src/components/` folder receive all information they need through their props.
+Smaller reusable components are found in the `src/components/` folder, where larger compilations of those smaller components can be found in `src/screens/`. The intent of a component, such as `Dialer` or `Home`, in the `src/screens/` folder is that it is "connected" to the application state through React-Redux and React Navigation, whereas components in the `src/components/` folder are state-less.
 
 ### Application State Mangagement
 
