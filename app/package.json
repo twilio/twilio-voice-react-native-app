@@ -1,30 +1,54 @@
 {
-  "name": "twilio-voice-react-native-example",
-  "private": true,
+  "name": "TwilioVoiceReactNativeReferenceApp",
   "version": "0.0.1",
-  "description": "Example app for twilio-voice-react-native",
+  "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start"
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "16.13.1",
-    "react-native": "0.63.4"
+    "@react-navigation/bottom-tabs": "^6.5.3",
+    "@react-navigation/native": "^6.1.2",
+    "@react-navigation/native-stack": "^6.9.8",
+    "@reduxjs/toolkit": "^1.9.1",
+    "@twilio/voice-react-native-sdk": "^1.0.0-preview.1",
+    "react": "18.1.0",
+    "react-native": "0.70.6",
+    "react-native-safe-area-context": "^4.5.0",
+    "react-native-screens": "^3.19.0",
+    "react-redux": "^8.0.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
+    "@babel/core": "^7.12.9",
     "@babel/runtime": "^7.12.5",
-    "@types/jest": "^27.0.2",
-    "babel-plugin-module-resolver": "^4.0.0",
-    "detox": "^19.7.1",
-    "detox-cli": "^19.0.0",
-    "dotenv": "^8.2.0",
-    "jest": "^27.2.4",
-    "jest-circus": "^27.2.4",
-    "jest-html-reporter": "^3.4.1",
-    "jest-junit": "^13.0.0",
-    "metro-react-native-babel-preset": "^0.64.0",
-    "ts-jest": "^28.0.7"
+    "@react-native-community/eslint-config": "^2.0.0",
+    "@tsconfig/react-native": "^2.0.2",
+    "@types/jest": "^26.0.23",
+    "@types/react": "^18.0.21",
+    "@types/react-native": "^0.70.6",
+    "@types/react-test-renderer": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.32.0",
+    "jest": "^26.6.3",
+    "metro-react-native-babel-preset": "0.72.3",
+    "react-test-renderer": "18.1.0",
+    "typescript": "^4.8.3"
+  },
+  "jest": {
+    "preset": "react-native",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }
