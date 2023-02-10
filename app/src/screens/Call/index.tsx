@@ -19,49 +19,17 @@ import MuteButton from './MuteButton';
 import SelectAudioOutputDeviceButton from './SelectAudioOutputDeviceButton';
 import ShowDialpadButton from './ShowDialpadButton';
 import HideDialpadButton from './HideDialpadButton';
+import { useActiveCall } from '../../hooks/activeCall';
 
 const Call: React.FC = () => {
   const dispatch = useTypedDispatch();
-  // todo determine active call heuristic
-  const activeCall = useSelector<State, State['voice']['call']['outgoingCall']>(
-    (store) => store.voice.call.outgoingCall,
-  );
-  const [activeCallTime, setActiveCallTime] = React.useState<number | null>(
-    null,
-  );
+
+  const { activeCall, remoteParticipantId, callStatus } = useActiveCall();
+
   const audioDevices = useSelector<State, State['voice']['audioDevices']>(
     (store) => store.voice.audioDevices,
   );
-  const title = React.useMemo<string>(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return '';
-    }
 
-    return activeCall.to || '';
-  }, [activeCall]);
-  const subtitle = React.useMemo<string>(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return '';
-    }
-
-    const state = activeCall.callInfo.state;
-    if (state !== 'connected') {
-      return state || '';
-    }
-
-    if (!activeCallTime) {
-      return '';
-    }
-
-    const totalSeconds = Math.floor(activeCallTime / 1000);
-    const totalMinutes = Math.floor(totalSeconds / 60);
-    const remainderSeconds = Math.floor(totalSeconds % 60);
-
-    const minutesRepr = String(totalMinutes).padStart(2, '0');
-    const secondsRepr = String(remainderSeconds).padStart(2, '0');
-
-    return `${String(minutesRepr)}:${secondsRepr}`;
-  }, [activeCall, activeCallTime]);
   const [isDialpadVisible, setIsDialpadVisible] =
     React.useState<boolean>(false);
 
@@ -186,29 +154,6 @@ const Call: React.FC = () => {
       return [noOp, false, false];
     }, [dispatch, audioDevices, activeCall]);
 
-  React.useEffect(() => {
-    let timeoutId: number | null;
-
-    const animate = () =>
-      requestAnimationFrame(() => {
-        if (
-          activeCall?.status !== 'fulfilled' ||
-          typeof activeCall.initialConnectTimestamp === 'undefined'
-        ) {
-          return;
-        }
-        setActiveCallTime(Date.now() - activeCall.initialConnectTimestamp);
-        timeoutId = setTimeout(animate, 250);
-      });
-    animate();
-
-    return () => {
-      if (timeoutId !== null) {
-        clearInterval(timeoutId);
-      }
-    };
-  }, [activeCall]);
-
   /**
    * Refresh the list of audio devices when the call screen is mounted.
    */
@@ -280,7 +225,7 @@ const Call: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.containerSpacer} />
       <View style={styles.remoteParticipant}>
-        <RemoteParticipant title={title} subtitle={subtitle} />
+        <RemoteParticipant title={remoteParticipantId} subtitle={callStatus} />
       </View>
       {isDialpadVisible ? dialpadView : callControlView}
       <View style={styles.containerSpacer} />

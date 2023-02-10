@@ -4,10 +4,10 @@ import Button from '../../components/Button';
 
 const MakeOutgoingCallSource = require('../../../assets/icons/make-call.png');
 
-export type Props = { onPress: () => void };
+export type Props = { disabled?: boolean; onPress: () => void };
 
-const MakeOutgoingCallButton: React.FC<Props> = ({ onPress }) => (
-  <Button size={96} onPress={onPress}>
+const MakeOutgoingCallButton: React.FC<Props> = ({ disabled, onPress }) => (
+  <Button disabled={disabled} size={96} onPress={onPress}>
     <Image
       source={MakeOutgoingCallSource}
       resizeMode="contain"

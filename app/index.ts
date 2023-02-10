@@ -7,6 +7,6 @@ import { name as appName } from './app.json';
  * initialize our application state and bind to the twilio-voice-react-native
  * SDK.
  */
-import './util/voice';
+import './src/util/voice';
 
 AppRegistry.registerComponent(appName, () => App);
