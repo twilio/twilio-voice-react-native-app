@@ -1,3 +1,4 @@
+import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -10,6 +11,7 @@ import { useTypedDispatch } from '../../store/app';
 import { makeOutgoingCall } from '../../store/voice/call/outgoingCall';
 import { getToken } from '../../store/voice/token';
 import { type StackNavigationProp } from '../../types';
+import { useActiveCall } from '../../hooks/activeCall';
 
 const Dialer: React.FC = () => {
   const dispatch = useTypedDispatch();
@@ -18,6 +20,7 @@ const Dialer: React.FC = () => {
   const [outgoingIdentity, setOutgoingIdentity] = React.useState<string>('');
   const [isOutgoingClient, setIsOutgoingClient] =
     React.useState<boolean>(false);
+  const { activeCall } = useActiveCall();
 
   const handleDialpadInput = React.useCallback(
     (dialpadInput: string) => {
@@ -34,6 +37,23 @@ const Dialer: React.FC = () => {
   const handleToggleClientInputPress = React.useCallback(() => {
     setIsOutgoingClient((currentIsOutgoingClient) => !currentIsOutgoingClient);
   }, []);
+
+  const isCallDisabled = React.useMemo(() => {
+    switch (activeCall?.status) {
+      case undefined:
+        return false;
+      case 'fulfilled':
+        return activeCall.callInfo.state !== TwilioCall.State.Disconnected;
+      case 'pending':
+        return true;
+      case 'rejected':
+        return false;
+    }
+  }, [activeCall]);
+
+  const isDialpadDisabled = React.useMemo(() => {
+    return isCallDisabled || isOutgoingClient;
+  }, [isCallDisabled, isOutgoingClient]);
 
   const handleCallPress = React.useCallback(async () => {
     const to = isOutgoingClient ? outgoingIdentity : outgoingPstn;
@@ -57,9 +77,10 @@ const Dialer: React.FC = () => {
     }
   }, [dispatch, navigation, isOutgoingClient, outgoingPstn, outgoingIdentity]);
 
-  const disabledBackspaceButton = React.useMemo(() => {
-    return isOutgoingClient || outgoingPstn.length === 0;
-  }, [isOutgoingClient, outgoingPstn]);
+  const isBackspaceDisabled = React.useMemo(() => {
+    return isCallDisabled || isOutgoingClient || outgoingPstn.length === 0;
+  }, [isCallDisabled, isOutgoingClient, outgoingPstn]);
+
   const handleBackspacePress = React.useCallback(() => {
     setOutgoingPstn((currentOutgoingPstn) =>
       currentOutgoingPstn.length > 0
@@ -79,16 +100,20 @@ const Dialer: React.FC = () => {
           outgoingIdentity={outgoingIdentity}
         />
       </View>
-      <Dialpad disabled={isOutgoingClient} onPress={handleDialpadInput} />
+      <Dialpad disabled={isDialpadDisabled} onPress={handleDialpadInput} />
       <View style={styles.buttons}>
         <ToggleClientInputButton
+          disabled={isCallDisabled}
           isOutgoingClient={isOutgoingClient}
           onPress={handleToggleClientInputPress}
         />
-        <MakeOutgoingCallButton onPress={handleCallPress} />
+        <MakeOutgoingCallButton
+          disabled={isCallDisabled}
+          onPress={handleCallPress}
+        />
         <BackspaceButton
           onPress={handleBackspacePress}
-          disabled={disabledBackspaceButton}
+          disabled={isBackspaceDisabled}
         />
       </View>
       <View style={styles.spacer} />

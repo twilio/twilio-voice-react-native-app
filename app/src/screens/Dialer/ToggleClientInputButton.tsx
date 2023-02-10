@@ -5,15 +5,17 @@ import Button from '../../components/Button';
 const TypeSource = require('../../../assets/icons/type.png');
 
 export type Props = {
+  disabled?: boolean;
   isOutgoingClient: boolean;
   onPress: () => void;
 };
 
 const ToggleClientInputButton: React.FC<Props> = ({
+  disabled,
   isOutgoingClient,
   onPress,
 }) => (
-  <Button size={96} onPress={onPress}>
+  <Button disabled={disabled} size={96} onPress={onPress}>
     <Image source={TypeSource} resizeMode="contain" style={styles.image} />
     <Text style={styles.text}>{isOutgoingClient ? 'PSTN' : 'Client'}</Text>
   </Button>
