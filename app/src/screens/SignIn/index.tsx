@@ -2,6 +2,9 @@ import React from 'react';
 import { useAuth0 } from 'react-native-auth0';
 import { StyleSheet, View, Button, Image, Text } from 'react-native';
 
+const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
+const HelloFigure = require('../../../assets/icons/hello-figure.png');
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#F4F4F6',
@@ -46,10 +49,7 @@ const SignIn: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image
-          source={require('../../../assets/icons/logo-twilio-red.png')}
-          resizeMode="contain"
-        />
+        <Image source={TwilioLogo} resizeMode="contain" />
       </View>
       <View style={styles.body}>
         <Text style={styles.text}>
@@ -58,10 +58,7 @@ const SignIn: React.FC = () => {
         <Button title="Log in" color="#0263E0" onPress={onLogin} />
       </View>
       <View style={styles.helloFigureContainer}>
-        <Image
-          source={require('../../../assets/icons/hello-figure.png')}
-          resizeMode="contain"
-        />
+        <Image source={HelloFigure} resizeMode="contain" />
       </View>
     </View>
   );

@@ -8,6 +8,8 @@ import {
   TouchableHighlight,
 } from 'react-native';
 
+const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#F4F4F6',
@@ -55,10 +57,7 @@ const Home: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image
-          source={require('../../../assets/icons/logo-twilio-red.png')}
-          resizeMode="contain"
-        />
+        <Image source={TwilioLogo} resizeMode="contain" />
       </View>
       <View style={styles.body}>
         <Text>Ahoy!</Text>
