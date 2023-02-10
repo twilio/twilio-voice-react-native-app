@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/app';
 import StackNavigator from './screens/StackNavigator';
 import { Auth0Provider } from 'react-native-auth0';
-import config from './auth0-config';
+import config from '../config';
 
 const App = () => {
   return (

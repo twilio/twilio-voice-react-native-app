@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth0 } from 'react-native-auth0';
 import { StyleSheet, View, Button, Image, Text } from 'react-native';
+import config from '../../../config';
 
 const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
 const HelloFigure = require('../../../assets/icons/hello-figure.png');
@@ -41,9 +42,9 @@ const SignIn: React.FC = () => {
 
   const onLogin = async () => {
     try {
-      await authorize({ scope: 'openid profile email' });
+      await authorize({ scope: config.auth0Scope });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
   return (
