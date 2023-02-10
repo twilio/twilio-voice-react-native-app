@@ -16,6 +16,8 @@ The **Reference App** showcases the following possibilities using **Twilio Voice
 
 ### Prerequisites
 
+Please follow the Reference Server instructions in conjunction with these steps.
+
 Please ensure that you have a React Native development environment set up for the platform(s) you want to build for. Please see the official React Native documentation [here](https://reactnative.dev/docs/0.70/environment-setup).
 
 ### Launching the App
@@ -37,6 +39,23 @@ or
 yarn ios
 ```
 for your respective target platform.
+
+### Hooking it up with the Server
+
+Once the Reference Server is up and running, the Reference App can be directed to it by modifying the following line in `app/src/util/fetch.ts`.
+```
+const defaultUrl = ...;
+```
+
+If developing locally and running the Reference Server locally, consider using a tool like `ngrok` to proxy the server endpoints. Once proxied, change `defaultUrl` to the `ngrok` URL endpoints.
+
+See more info about `ngrok` [here](https://ngrok.com/).
+
+If the Reference Server is deployed to a cloud service (some examples include Google App Engine, Amazon EC2, or similar), then point `defaultUrl` to the deployed service URL.
+
+See some of the following cloud services for production deployment:
+* Google App Engine [here](https://cloud.google.com/).
+* Amazon EC2 [here](https://aws.amazon.com/).
 
 ## Design Patterns
 
