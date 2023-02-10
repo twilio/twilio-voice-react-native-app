@@ -20,7 +20,7 @@ const Dialer: React.FC = () => {
   const [outgoingIdentity, setOutgoingIdentity] = React.useState<string>('');
   const [isOutgoingClient, setIsOutgoingClient] =
     React.useState<boolean>(false);
-  const { activeCall } = useActiveCall();
+  const activeCall = useActiveCall();
 
   const handleDialpadInput = React.useCallback(
     (dialpadInput: string) => {
