@@ -50,7 +50,7 @@ const Home: React.FC = () => {
     try {
       await clearSession();
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
