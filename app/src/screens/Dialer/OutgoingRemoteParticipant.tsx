@@ -1,25 +1,26 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { RecipientType } from '../../types';
 
 export type Props = {
-  isOutgoingClient: boolean;
-  setOutgoingIdentity: (id: string) => void;
   outgoingPstn: string;
   outgoingIdentity: string;
+  recipientType: RecipientType;
+  setOutgoingIdentity: (id: string) => void;
 };
 
 const OutgoingRemoteParticipant: React.FC<Props> = ({
-  isOutgoingClient,
-  setOutgoingIdentity,
   outgoingPstn,
   outgoingIdentity,
+  recipientType,
+  setOutgoingIdentity,
 }) => {
   const formattedPstn = React.useMemo(() => {
     return outgoingPstn.length > 0 ? `+${outgoingPstn}` : '';
   }, [outgoingPstn]);
   return (
     <View style={styles.container}>
-      {isOutgoingClient ? (
+      {recipientType === 'client' ? (
         <TextInput
           autoFocus={true}
           defaultValue={outgoingIdentity}
