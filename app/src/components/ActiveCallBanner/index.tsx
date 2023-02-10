@@ -11,14 +11,12 @@ export type Props = {
 
 const ActiveCallBanner: React.FC<Props> = ({ subtitle, title, onPress }) => (
   <TouchableOpacity style={styles.container} onPress={onPress}>
-    <View style={styles.title}>
-      <Image
-        style={styles.titleImage}
-        source={ActiveCallSource}
-        resizeMode="contain"
-      />
-      <Text style={styles.titleText}>{title}</Text>
-    </View>
+    <Image
+      style={styles.titleImage}
+      source={ActiveCallSource}
+      resizeMode="contain"
+    />
+    <Text style={styles.titleText}>{title}</Text>
     <View style={styles.spacer} />
     <Text style={styles.subtitle}>{subtitle}</Text>
   </TouchableOpacity>
@@ -52,10 +50,12 @@ const styles = StyleSheet.create({
   titleImage: {
     maxHeight: '50%',
     maxWidth: '50%',
+    margin: 4,
   },
   titleText: {
     color: 'black',
     fontSize: 16,
+    padding: 4,
   },
 });
 
