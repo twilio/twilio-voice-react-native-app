@@ -1,15 +1,13 @@
 import React from 'react';
 import { Image, StyleSheet, Text } from 'react-native';
-import Button from '../../components/Button';
+import Button, { type Props as ButtonProps } from '../../components/Button';
 import { type RecipientType } from '../../types';
 
 const TypeSource = require('../../../assets/icons/type.png');
 
 export type Props = {
-  disabled?: boolean;
   recipientType: RecipientType;
-  onPress: () => void;
-};
+} & Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const ToggleClientInputButton: React.FC<Props> = ({
   disabled,
