@@ -4,6 +4,13 @@ import { setOutgoingCallInfo } from './outgoingCall';
 import { type State, type Dispatch } from '../../app';
 import { callMap } from '../../../util/voice';
 
+/**
+ * NOTE(mhuynh):
+ * This typing is subject to change once we determine active call heuristics
+ * with the completion of incoming call.
+ */
+export type ActiveCall = State['voice']['call']['outgoingCall'];
+
 export type ActiveCallState = null | {
   initialConnectTimestamp?: number;
   callInfo: CallInfo;

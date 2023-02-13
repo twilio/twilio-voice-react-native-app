@@ -1,10 +1,10 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import Button from '../../components/Button';
+import Button, { type Props as ButtonProps } from '../../components/Button';
 
 const ShowDialpadSource = require('../../../assets/icons/dialpad-dark.png');
 
-export type Props = { disabled?: boolean; onPress: () => void };
+export type Props = Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const ShowDialpadButton: React.FC<Props> = ({ disabled, onPress }) => (
   <Button size={96} disabled={disabled} onPress={onPress}>

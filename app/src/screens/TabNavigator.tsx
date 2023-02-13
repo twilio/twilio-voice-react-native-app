@@ -7,7 +7,11 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import ActiveCallBanner from '../components/ActiveCallBanner';
-import { useActiveCall } from '../hooks/activeCall';
+import {
+  useActiveCall,
+  useActiveCallRemoteParticipant,
+  useActiveCallStatus,
+} from '../hooks/activeCall';
 import Home from './Home';
 import Dialer from './Dialer';
 import { type TabParamList, type StackNavigationProp } from '../types';
@@ -62,7 +66,9 @@ const TabNavigator: React.FC = () => {
     navigation.navigate('Call');
   }, [navigation]);
 
-  const { activeCall, remoteParticipantId, callStatus } = useActiveCall();
+  const activeCall = useActiveCall();
+  const remoteParticipant = useActiveCallRemoteParticipant(activeCall);
+  const callStatus = useActiveCallStatus(activeCall);
 
   const banner = React.useMemo(() => {
     if (activeCall?.status !== 'fulfilled') {
@@ -75,17 +81,12 @@ const TabNavigator: React.FC = () => {
 
     return (
       <ActiveCallBanner
-        title={remoteParticipantId}
+        title={remoteParticipant}
         subtitle={callStatus}
         onPress={handleActiveCallBannerPress}
       />
     );
-  }, [
-    activeCall,
-    remoteParticipantId,
-    callStatus,
-    handleActiveCallBannerPress,
-  ]);
+  }, [activeCall, remoteParticipant, callStatus, handleActiveCallBannerPress]);
 
   const screen = React.useMemo(
     () => (

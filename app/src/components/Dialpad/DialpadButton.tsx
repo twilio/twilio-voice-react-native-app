@@ -1,13 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
-import Button from '../Button';
+import Button, { type Props as ButtonProps } from '../Button';
 
 export type Props = {
-  disabled?: boolean;
   title: string;
   subtitle: string;
-  onPress: () => void;
-};
+} & Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const DialpadButton: React.FC<Props> = ({
   disabled,
