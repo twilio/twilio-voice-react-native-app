@@ -1,11 +1,16 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-export type Props = React.PropsWithChildren<{
-  size: number;
-  onPress: () => void;
-  disabled?: boolean;
-}>;
+type InheritedTouchableOpacityProps = Pick<
+  TouchableOpacity['props'],
+  'disabled' | 'onPress'
+>;
+
+export type Props = React.PropsWithChildren<
+  {
+    size: number;
+  } & InheritedTouchableOpacityProps
+>;
 
 const Button: React.FC<Props> = ({ children, size, onPress, disabled }) => {
   const containerStyle = React.useMemo(

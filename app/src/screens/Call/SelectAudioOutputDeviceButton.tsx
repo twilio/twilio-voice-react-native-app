@@ -1,15 +1,13 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import Button from '../../components/Button';
+import Button, { type Props as ButtonProps } from '../../components/Button';
 
 const SelectAudioDeviceSource = require('../../../assets/icons/speaker.png');
 const ActiveSelectAudioDeviceSource = require('../../../assets/icons/speaker-active.png');
 
 export type Props = {
   active?: boolean;
-  disabled?: boolean;
-  onPress: () => void;
-};
+} & Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const SelectAudioOutputDeviceButton: React.FC<Props> = ({
   active,

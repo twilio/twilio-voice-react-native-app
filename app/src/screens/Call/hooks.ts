@@ -32,14 +32,12 @@ const useCallDialpad = (
   const [isVisible, setIsVisible] = React.useState<boolean>(false);
 
   const [handle, isDisabled] = React.useMemo(() => {
-    const noOp = () => {};
-
     if (activeCall?.status !== 'fulfilled') {
-      return [noOp, true];
+      return [undefined, true];
     }
 
     if (activeCall.callInfo.state === 'disconnected') {
-      return [noOp, true];
+      return [undefined, true];
     }
 
     return [
@@ -64,19 +62,17 @@ const useCallMute = (
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
   const [handle, isDisabled, isActive] = React.useMemo(() => {
-    const noOp = () => {};
-
     if (activeCall?.status !== 'fulfilled') {
-      return [noOp, true, false];
+      return [undefined, true, false];
     }
 
     if (activeCall.callInfo.state === 'disconnected') {
-      return [noOp, true, false];
+      return [undefined, true, false];
     }
 
     const isMuted = activeCall.callInfo.isMuted;
     if (typeof isMuted === 'undefined') {
-      return [noOp, true, false];
+      return [undefined, true, false];
     }
 
     return [() => dispatch(muteActiveCall({ mute: !isMuted })), false, isMuted];
@@ -96,14 +92,12 @@ const useCallHangup = (
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
   const [handle, isDisabled] = React.useMemo(() => {
-    const noOp = () => {};
-
     if (activeCall?.status !== 'fulfilled') {
-      return [noOp, true];
+      return [undefined, true];
     }
 
     if (activeCall.callInfo.state === 'disconnected') {
-      return [noOp, true];
+      return [undefined, true];
     }
 
     return [() => dispatch(disconnectActiveCall()), false];
@@ -125,18 +119,16 @@ const useSelectAudioOutputDevice = (
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
   const [handle, isDisabled, isActive] = React.useMemo(() => {
-    const noOp = () => {};
-
     if (activeCall?.status !== 'fulfilled') {
-      return [noOp, true, false];
+      return [undefined, true, false];
     }
 
     if (activeCall.callInfo.state === 'disconnected') {
-      return [noOp, true, false];
+      return [undefined, true, false];
     }
 
     if (audioDevices?.status !== 'fulfilled') {
-      return [noOp, true, false];
+      return [undefined, true, false];
     }
 
     const earpieceDevice = audioDevices.audioDevices.find(
@@ -151,7 +143,7 @@ const useSelectAudioOutputDevice = (
       typeof earpieceDevice === 'undefined' ||
       typeof speakerDevice === 'undefined'
     ) {
-      return [noOp, true, false];
+      return [undefined, true, false];
     }
 
     if (audioDevices.selectedDevice === null) {
@@ -181,7 +173,7 @@ const useSelectAudioOutputDevice = (
       ];
     }
 
-    return [noOp, false, false];
+    return [undefined, false, false];
   }, [dispatch, audioDevices, activeCall]);
 
   /**
