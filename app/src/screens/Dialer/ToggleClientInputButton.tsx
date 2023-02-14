@@ -1,23 +1,24 @@
 import React from 'react';
 import { Image, StyleSheet, Text } from 'react-native';
-import Button from '../../components/Button';
+import Button, { type Props as ButtonProps } from '../../components/Button';
+import { type RecipientType } from '../../types';
 
 const TypeSource = require('../../../assets/icons/type.png');
 
 export type Props = {
-  disabled?: boolean;
-  isOutgoingClient: boolean;
-  onPress: () => void;
-};
+  recipientType: RecipientType;
+} & Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const ToggleClientInputButton: React.FC<Props> = ({
   disabled,
-  isOutgoingClient,
   onPress,
+  recipientType,
 }) => (
   <Button disabled={disabled} size={96} onPress={onPress}>
     <Image source={TypeSource} resizeMode="contain" style={styles.image} />
-    <Text style={styles.text}>{isOutgoingClient ? 'PSTN' : 'Client'}</Text>
+    <Text style={styles.text}>
+      {recipientType === 'pstn' ? 'PSTN' : 'Client'}
+    </Text>
   </Button>
 );
 
