@@ -1,10 +1,10 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import Button from '../../components/Button';
+import Button, { type Props as ButtonProps } from '../../components/Button';
 
 const BackspaceSource = require('../../../assets/icons/backspace.png');
 
-export type Props = { disabled: boolean; onPress: () => void };
+export type Props = Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const BackspaceButton: React.FC<Props> = ({ disabled, onPress }) => (
   <Button size={96} disabled={disabled} onPress={onPress}>
