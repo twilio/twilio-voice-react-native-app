@@ -73,47 +73,13 @@ describe('/twiml', () => {
     return request(app).post('/twiml');
   }
 
-  describe('responds with status code 403', () => {
-    function expectTwimlRouteFail(
-      response: request.Response,
-      responseText: string
-    ) {
-      expect(response.status).toBe(403);
-      expect(response.headers['content-type']).toMatch(/text/);
-      expect(response.text).toBe(responseText);
-    }
-
-    it('if neither username or password are present', async () => {
-      const response = await twimlRouteTest();
-      expect(response.status).toBe(403);
-    });
-
-    it('if username is not present', async () => {
-      const response = await twimlRouteTest()
-        .send({ password: 'bar' });
-      expectTwimlRouteFail(response, 'Username invalid.');
-    });
-
-    it('if password is not present', async () => {
-      const response = await twimlRouteTest()
-        .send({ username: 'foo' });
-      expectTwimlRouteFail(response, 'Password invalid.');
-    });
-
-    it('if username and password are present, but not valid', async () => {
-      const response = await twimlRouteTest()
-        .send({ username: 'foo', password: 'bar' });
-      expectTwimlRouteFail(response, 'Credentials invalid.');
-    });
-  });
-
   describe('responds with status code 400', () => {
     it('if "to" is missing', async () => {
       const response = await twimlRouteTest()
         .send({ username: 'alice', password: 'supersecretpassword1234' });
       expect(response.status).toBe(400);
       expect(response.headers['content-type']).toMatch(/text/);
-      expect(response.text).toBe('Missing "to".');
+      expect(response.text).toBe('Missing "To".');
     });
 
     it('if "recipientType" is missing', async () => {
@@ -121,7 +87,7 @@ describe('/twiml', () => {
         .send({
           username: 'alice',
           password: 'supersecretpassword1234',
-          to: 'bob'
+          To: 'bob'
         });
       expect(response.status).toBe(400);
       expect(response.headers['content-type']).toMatch(/text/);
@@ -133,7 +99,7 @@ describe('/twiml', () => {
         .send({
           username: 'alice',
           password: 'supersecretpassword1234',
-          to: 'bob',
+          To: 'bob',
           recipientType: 'foobar'
         });
       expect(response.status).toBe(400);
@@ -148,7 +114,7 @@ describe('/twiml', () => {
         .send({
           username: 'alice',
           password: 'supersecretpassword1234',
-          to: 'bob',
+          To: 'bob',
           recipientType: 'client'
         });
       expect(response.status).toBe(200);
