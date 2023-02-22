@@ -3,7 +3,7 @@ import { twiml } from 'twilio';
 import { TwilioCredentials } from '../common/types';
 
 export function createTwimlRoute(
-  twilioCredentials: TwilioCredentials
+  twilioCredentials: TwilioCredentials,
 ): RequestHandler {
   const { VoiceResponse } = twiml;
   return function twimlRoute(req: Request, res: Response) {
@@ -21,9 +21,8 @@ export function createTwimlRoute(
       return;
     }
 
-    const callerId = recipientType === 'number'
-      ? twilioCredentials.CALLER_ID
-      : req.body.From;
+    const callerId =
+      recipientType === 'number' ? twilioCredentials.CALLER_ID : req.body.From;
 
     const twimlResponse = new VoiceResponse();
     const dial = twimlResponse.dial({
@@ -32,8 +31,9 @@ export function createTwimlRoute(
     });
     dial[recipientType](to);
 
-    res.header('Content-Type', 'text/xml')
+    res
+      .header('Content-Type', 'text/xml')
       .status(200)
       .send(twimlResponse.toString());
-  }
+  };
 }

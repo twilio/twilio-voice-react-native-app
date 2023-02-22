@@ -1,10 +1,8 @@
 import { createTwimlRoute } from '../../routes/twiml';
-import { retrieveAuthentication } from '../../middlewares/sample-auth';
 import { twiml } from 'twilio';
 
 jest.mock('../../middlewares/sample-auth');
 
-const mockedRetrieveAuthentication = jest.mocked(retrieveAuthentication);
 const mockedVoiceResponse = jest.mocked(twiml.VoiceResponse);
 
 const mockTwilioCredentials = {
@@ -16,11 +14,6 @@ const mockTwilioCredentials = {
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
 };
 
-beforeEach(() => {
-  mockedRetrieveAuthentication.mockReset();
-  jest.clearAllMocks();
-});
-
 describe('createTwimlRoute()', () => {
   it('returns a route function', () => {
     const twimlRoute = createTwimlRoute(mockTwilioCredentials);
@@ -30,11 +23,11 @@ describe('createTwimlRoute()', () => {
   describe('twimlRoute()', () => {
     let twimlRoute: ReturnType<typeof createTwimlRoute>;
     let mockReq: {
-      body: Record<any, any>,
+      body: Record<any, any>;
     };
     let mockRes: {
       header: jest.Mock;
-      locals: Record<any, any>,
+      locals: Record<any, any>;
       status: jest.Mock;
       send: jest.Mock;
     };
@@ -88,10 +81,14 @@ describe('createTwimlRoute()', () => {
 
         const mockVoiceResponse = mockedVoiceResponse.mock.results[0].value;
         const mockDialFn = mockVoiceResponse.dial;
-        expect(mockDialFn.mock.calls).toEqual([[{
-          answerOnBridge: true,
-          callerId: undefined,
-        }]]);
+        expect(mockDialFn.mock.calls).toEqual([
+          [
+            {
+              answerOnBridge: true,
+              callerId: undefined,
+            },
+          ],
+        ]);
         expect(mockDialFn.mock.results).toHaveLength(1);
 
         const mockDial = mockDialFn.mock.results[0].value;
@@ -106,10 +103,14 @@ describe('createTwimlRoute()', () => {
 
         const mockVoiceResponse = mockedVoiceResponse.mock.results[0].value;
         const mockDialFn = mockVoiceResponse.dial;
-        expect(mockDialFn.mock.calls).toEqual([[{
-          answerOnBridge: true,
-          callerId: 'mock-twiliocredentials-phonenumber',
-        }]]);
+        expect(mockDialFn.mock.calls).toEqual([
+          [
+            {
+              answerOnBridge: true,
+              callerId: 'mock-twiliocredentials-phonenumber',
+            },
+          ],
+        ]);
         expect(mockDialFn.mock.results).toHaveLength(1);
 
         const mockDial = mockDialFn.mock.results[0].value;
