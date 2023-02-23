@@ -1,8 +1,6 @@
 import { createTwimlRoute } from '../../routes/twiml';
 import { twiml } from 'twilio';
 
-jest.mock('../../middlewares/sample-auth');
-
 const mockedVoiceResponse = jest.mocked(twiml.VoiceResponse);
 
 const mockTwilioCredentials = {
@@ -13,6 +11,10 @@ const mockTwilioCredentials = {
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
 };
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('createTwimlRoute()', () => {
   it('returns a route function', () => {
