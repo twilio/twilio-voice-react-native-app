@@ -1,27 +1,19 @@
 import { Request, RequestHandler, Response } from 'express';
 import { jwt } from 'twilio';
 import { TwilioCredentials } from '../common/types';
-import { retrieveAuthentication } from '../middlewares/sample-auth';
 
 export function createTokenRoute(
-  twilioCredentials: TwilioCredentials
+  twilioCredentials: TwilioCredentials,
 ): RequestHandler {
-  const { AccessToken, AccessToken: { VoiceGrant } } = jwt;
+  const {
+    AccessToken,
+    AccessToken: { VoiceGrant },
+  } = jwt;
   return function tokenRoute(_req: Request, res: Response) {
-    const authentication = retrieveAuthentication(res);
-
-    if (typeof authentication === 'undefined') {
-      res.status(403).send('Unauthenticated request.');
-      return;
-    }
-
     const accessToken = new AccessToken(
       twilioCredentials.ACCOUNT_SID,
       twilioCredentials.API_KEY_SID,
       twilioCredentials.API_KEY_SECRET,
-      {
-        identity: authentication.username,
-      }
     );
 
     const voiceGrant = new VoiceGrant({
@@ -32,8 +24,9 @@ export function createTokenRoute(
 
     accessToken.addGrant(voiceGrant);
 
-    res.header('Content-Type', 'text/plain')
+    res
+      .header('Content-Type', 'text/plain')
       .status(200)
       .send(accessToken.toJwt());
-  }
+  };
 }
