@@ -8,6 +8,7 @@ import { createLogMiddleware } from './middlewares/log';
 export function createExpressApp(twilioCredentials: TwilioCredentials) {
   const app = express();
 
+  app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
   app.use(createLogMiddleware());
@@ -20,7 +21,6 @@ export function createExpressApp(twilioCredentials: TwilioCredentials) {
   app.post('/token', tokenRouter);
 
   const twimlRouter = Router();
-  twimlRouter.use(authMiddleware);
   twimlRouter.use(createTwimlRoute(twilioCredentials));
   app.post('/twiml', twimlRouter);
 
