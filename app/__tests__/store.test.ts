@@ -37,9 +37,6 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
 it('works good', async () => {
   console.log(app.store.getState());
 
-  fetchMock.mockResolvedValueOnce({ status: 200 });
-  console.log(app.store.getState());
-
   fetchMock.mockResolvedValueOnce({
     text: jest.fn().mockResolvedValueOnce('foo'),
   });
