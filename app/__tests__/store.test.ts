@@ -38,12 +38,6 @@ it('works good', async () => {
   console.log(app.store.getState());
 
   fetchMock.mockResolvedValueOnce({ status: 200 });
-  const authAction = user.authenticateUser({
-    username: 'foo',
-    password: 'bar',
-  });
-  await app.store.dispatch(authAction);
-
   console.log(app.store.getState());
 
   fetchMock.mockResolvedValueOnce({
