@@ -44,7 +44,7 @@ describe('createTwimlRoute()', () => {
       twimlRoute = createTwimlRoute(mockTwilioCredentials);
       mockReq = {
         body: {
-          to: 'mock-req-to-foobar',
+          To: 'mock-req-to-foobar',
           recipientType: 'client',
         },
       };
@@ -57,100 +57,80 @@ describe('createTwimlRoute()', () => {
       mockNext = jest.fn();
     });
 
-    describe('for unauthenticated requests', () => {
-      it('returns status code 403', () => {
-        twimlRoute(mockReq as any, mockRes as any, mockNext);
+    it('responds with status code 400 if "To" is missing', () => {
+      mockReq.body.To = undefined;
 
-        expect(mockedRetrieveAuthentication.mock.calls).toHaveLength(1);
-        expect(mockedRetrieveAuthentication.mock.calls[0][0]).toBe(mockRes);
-        expect(mockNext.mock.calls).toEqual([]);
-        expect(mockRes.status.mock.calls).toEqual([[403]]);
-        expect(mockRes.send.mock.calls).toEqual([['Unauthenticated request.']]);
-      });
+      twimlRoute(mockReq as any, mockRes as any, mockNext);
+
+      expect(mockRes.status.mock.calls).toEqual([[400]]);
+      expect(mockRes.send.mock.calls).toEqual([['Missing "To".']]);
     });
 
-    describe('for authenticated requests', () => {
-      beforeEach(() => {
-        mockedRetrieveAuthentication.mockImplementationOnce(() => ({
-          username: 'foobar',
-        }));
+    it('responds with status code 400 if "recipientType" is invalid', () => {
+      mockReq.body.recipientType = undefined;
+
+      twimlRoute(mockReq as any, mockRes as any, mockNext);
+
+      expect(mockRes.status.mock.calls).toEqual([[400]]);
+      expect(mockRes.send.mock.calls).toEqual([['Invalid "recipientType".']]);
+    });
+
+    describe('when all body values are present', () => {
+      it('constructs a voice response', () => {
+        twimlRoute(mockReq as any, mockRes as any, mockNext);
+        expect(mockedVoiceResponse.mock.calls).toEqual([[]]);
       });
 
-      it('responds with status code 400 if "to" is missing', () => {
-        mockReq.body.to = undefined;
+      it('dials a client', () => {
+        mockReq.body.recipientType = 'client';
+        twimlRoute(mockReq as any, mockRes as any, mockNext);
+        expect(mockedVoiceResponse.mock.results).toHaveLength(1);
 
+        const mockVoiceResponse = mockedVoiceResponse.mock.results[0].value;
+        const mockDialFn = mockVoiceResponse.dial;
+        expect(mockDialFn.mock.calls).toEqual([[{
+          answerOnBridge: true,
+          callerId: undefined,
+        }]]);
+        expect(mockDialFn.mock.results).toHaveLength(1);
+
+        const mockDial = mockDialFn.mock.results[0].value;
+        const mockClientFn = mockDial.client;
+        expect(mockClientFn.mock.calls).toEqual([[mockReq.body.To]]);
+      });
+
+      it('dials a number', () => {
+        mockReq.body.recipientType = 'number';
+        twimlRoute(mockReq as any, mockRes as any, mockNext);
+        expect(mockedVoiceResponse.mock.results).toHaveLength(1);
+
+        const mockVoiceResponse = mockedVoiceResponse.mock.results[0].value;
+        const mockDialFn = mockVoiceResponse.dial;
+        expect(mockDialFn.mock.calls).toEqual([[{
+          answerOnBridge: true,
+          callerId: 'mock-twiliocredentials-phonenumber',
+        }]]);
+        expect(mockDialFn.mock.results).toHaveLength(1);
+
+        const mockDial = mockDialFn.mock.results[0].value;
+        const mockNumberFn = mockDial.number;
+        expect(mockNumberFn.mock.calls).toEqual([[mockReq.body.To]]);
+      });
+
+      it('responds with twiml', () => {
         twimlRoute(mockReq as any, mockRes as any, mockNext);
 
-        expect(mockRes.status.mock.calls).toEqual([[400]]);
-        expect(mockRes.send.mock.calls).toEqual([['Missing "to".']]);
-      });
+        expect(mockedVoiceResponse.mock.results).toHaveLength(1);
+        const mockVoiceResponse = mockedVoiceResponse.mock.results[0].value;
+        const mockVoiceResponseToString = mockVoiceResponse.toString;
+        expect(mockVoiceResponseToString.mock.calls).toEqual([[]]);
+        const toStringRes = mockVoiceResponseToString.mock.results[0].value;
 
-      it('responds with status code 400 if "recipientType" is invalid', () => {
-        mockReq.body.recipientType = undefined;
-
-        twimlRoute(mockReq as any, mockRes as any, mockNext);
-
-        expect(mockRes.status.mock.calls).toEqual([[400]]);
-        expect(mockRes.send.mock.calls).toEqual([['Invalid "recipientType".']]);
-      });
-
-      describe('when all body values are present', () => {
-        it('constructs a voice response', () => {
-          twimlRoute(mockReq as any, mockRes as any, mockNext);
-          expect(mockedVoiceResponse.mock.calls).toEqual([[]]);
-        });
-
-        it('dials a client', () => {
-          mockReq.body.recipientType = 'client';
-          twimlRoute(mockReq as any, mockRes as any, mockNext);
-          expect(mockedVoiceResponse.mock.results).toHaveLength(1);
-
-          const mockVoiceResponse = mockedVoiceResponse.mock.results[0].value;
-          const mockDialFn = mockVoiceResponse.dial;
-          expect(mockDialFn.mock.calls).toEqual([[{
-            answerOnBridge: true,
-            callerId: undefined,
-          }]]);
-          expect(mockDialFn.mock.results).toHaveLength(1);
-
-          const mockDial = mockDialFn.mock.results[0].value;
-          const mockClientFn = mockDial.client;
-          expect(mockClientFn.mock.calls).toEqual([[mockReq.body.to]]);
-        });
-
-        it('dials a number', () => {
-          mockReq.body.recipientType = 'number';
-          twimlRoute(mockReq as any, mockRes as any, mockNext);
-          expect(mockedVoiceResponse.mock.results).toHaveLength(1);
-
-          const mockVoiceResponse = mockedVoiceResponse.mock.results[0].value;
-          const mockDialFn = mockVoiceResponse.dial;
-          expect(mockDialFn.mock.calls).toEqual([[{
-            answerOnBridge: true,
-            callerId: 'mock-twiliocredentials-phonenumber',
-          }]]);
-          expect(mockDialFn.mock.results).toHaveLength(1);
-
-          const mockDial = mockDialFn.mock.results[0].value;
-          const mockNumberFn = mockDial.number;
-          expect(mockNumberFn.mock.calls).toEqual([[mockReq.body.to]]);
-        });
-
-        it('responds with twiml', () => {
-          twimlRoute(mockReq as any, mockRes as any, mockNext);
-
-          expect(mockedVoiceResponse.mock.results).toHaveLength(1);
-          const mockVoiceResponse = mockedVoiceResponse.mock.results[0].value;
-          const mockVoiceResponseToString = mockVoiceResponse.toString;
-          expect(mockVoiceResponseToString.mock.calls).toEqual([[]]);
-          const toStringRes = mockVoiceResponseToString.mock.results[0].value;
-
-          expect(mockRes.header.mock.calls).toEqual([
-            ['Content-Type', 'text/xml'],
-          ]);
-          expect(mockRes.status.mock.calls).toEqual([[200]]);
-          expect(mockRes.send.mock.calls).toEqual([[toStringRes]]);
-        });
+        expect(mockRes.header.mock.calls).toEqual([
+          ['Content-Type', 'text/xml'],
+        ]);
+        expect(mockRes.status.mock.calls).toEqual([[200]]);
+        expect(mockRes.send.mock.calls).toEqual([[toStringRes]]);
       });
     });
   });
