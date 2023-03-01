@@ -21,11 +21,7 @@ export function createExpressApp(twilioCredentials: TwilioCredentials) {
 
   const tokenRouter = Router();
   tokenRouter.use(createTokenRoute(twilioCredentials));
-  if (process.env.NODE_ENV === 'test') {
-    app.post('/token', tokenRouter);
-  } else {
-    app.post('/token', jwtCheck, tokenRouter);
-  }
+  app.post('/token', jwtCheck, tokenRouter);
 
   const twimlRouter = Router();
   twimlRouter.use(createTwimlRoute(twilioCredentials));

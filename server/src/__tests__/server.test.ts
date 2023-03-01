@@ -5,6 +5,7 @@ jest.unmock('express');
 jest.unmock('twilio');
 
 jest.mock('../utils/log');
+jest.mock('express-oauth2-jwt-bearer');
 
 const mockTwilioCredentials = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
