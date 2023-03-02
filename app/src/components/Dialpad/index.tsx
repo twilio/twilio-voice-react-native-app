@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import DialpadButton from './DialpadButton';
+import DialpadButton, {
+  type Props as DialpadButtonProps,
+} from './DialpadButton';
 
 const DIALPAD_DATA: [string, string][][] = [
   [
@@ -27,9 +29,8 @@ const DIALPAD_DATA: [string, string][][] = [
 
 export type Props = {
   data?: [string, string][][];
-  disabled?: boolean;
-  onPress: (value: string) => void;
-};
+  onPress?: (value: string) => void;
+} & Pick<DialpadButtonProps, 'disabled'>;
 
 const Dialpad: React.FC<Props> = ({
   disabled,
@@ -37,16 +38,19 @@ const Dialpad: React.FC<Props> = ({
   data = DIALPAD_DATA,
 }) => {
   const mapCol = React.useCallback(
-    ([title, subtitle]: [string, string], buttonIdx: number) => (
-      <View key={buttonIdx} style={styles.button}>
-        <DialpadButton
-          disabled={disabled}
-          title={title}
-          subtitle={subtitle}
-          onPress={() => onPress(title)}
-        />
-      </View>
-    ),
+    ([title, subtitle]: [string, string], buttonIdx: number) => {
+      const handle = onPress && (() => onPress(title));
+      return (
+        <View key={buttonIdx} style={styles.button}>
+          <DialpadButton
+            disabled={disabled}
+            title={title}
+            subtitle={subtitle}
+            onPress={handle}
+          />
+        </View>
+      );
+    },
     [disabled, onPress],
   );
 
