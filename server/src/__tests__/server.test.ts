@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { createExpressApp } from '../server';
+import * as auth0JwtCheck from '../../__mocks__/express-oauth2-jwt-bearer';
 
 jest.unmock('express');
 jest.unmock('twilio');
@@ -24,14 +25,31 @@ describe('/token', () => {
 
   describe('responds with status code 200', () => {
     it('if a valid username and password are present', async () => {
+      const auth = jest.spyOn(auth0JwtCheck, 'auth');
       const response = await tokenRouteTest().send({
         username: 'alice',
         password: 'supersecretpassword1234',
       });
+      expect(auth).toBeCalledTimes(1);
       expect(response.status).toBe(200);
       expect(response.headers['content-type']).toMatch(/text/);
       expect(response.text).toBeDefined();
       expect(response.text).not.toBe('');
+    });
+  });
+
+  describe('responds with status code 401', () => {
+    it('if auth0 middleware returns 401', async () => {
+      jest.spyOn(auth0JwtCheck, 'auth').mockImplementation(() =>
+        jest.fn((req: any, res: any, next: any) => {
+          throw Error(res.status(401));
+        }),
+      );
+      const response = await tokenRouteTest().send({
+        username: 'alice',
+        password: 'supersecretpassword1234',
+      });
+      expect(response.status).toBe(401);
     });
   });
 });
