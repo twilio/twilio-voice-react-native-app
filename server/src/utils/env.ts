@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import type { TwilioCredentials } from '../common/types';
+import type { ServerCredentials } from '../common/types';
 
 dotenv.config();
 
@@ -11,6 +11,8 @@ export enum EnvVars {
   OutgoingApplicationSid = 'OUTGOING_APPLICATION_SID',
   Port = 'PORT',
   PushCredentialSid = 'PUSH_CREDENTIAL_SID',
+  Auth0Audience = 'AUTH0_AUDIENCE',
+  Auth0IssuerBaseUrl = 'AUTH0_ISSUER_BASE_URL',
 }
 
 function validateNumber(envVar: string): number | undefined {
@@ -29,7 +31,7 @@ export function getPort() {
   return validateNumber(portStr);
 }
 
-export function getTwilioCredentials(): TwilioCredentials | undefined {
+export function getServerCredentials(): ServerCredentials | undefined {
   const envVars = [
     EnvVars.AccountSid,
     EnvVars.ApiKeySecret,
@@ -37,9 +39,9 @@ export function getTwilioCredentials(): TwilioCredentials | undefined {
     EnvVars.CallerId,
     EnvVars.OutgoingApplicationSid,
     EnvVars.PushCredentialSid,
-  ].map((envVarKey) => [
-    envVarKey, getEnvVar(envVarKey)
-  ]);
+    EnvVars.Auth0Audience,
+    EnvVars.Auth0IssuerBaseUrl,
+  ].map((envVarKey) => [envVarKey, getEnvVar(envVarKey)]);
 
   if (
     envVars.some(([_envVarKey, envVarVal]) => typeof envVarVal === 'undefined')

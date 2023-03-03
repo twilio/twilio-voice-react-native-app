@@ -4,13 +4,15 @@ import { jwt } from 'twilio';
 const mockedAccessToken = jest.mocked(jwt.AccessToken);
 const mockedVoiceGrant = jest.mocked(jwt.AccessToken.VoiceGrant);
 
-const mockTwilioCredentials = {
+const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
+  AUTH0_AUDIENCE: 'mock-auth0-audience',
+  AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
 
 beforeEach(() => {
@@ -19,7 +21,7 @@ beforeEach(() => {
 
 describe('createTokenRoute()', () => {
   it('returns a route function', () => {
-    const tokenRoute = createTokenRoute(mockTwilioCredentials);
+    const tokenRoute = createTokenRoute(mockServerConfig);
     expect(typeof tokenRoute).toBe('function');
   });
 
@@ -35,7 +37,7 @@ describe('createTokenRoute()', () => {
     let mockNext: jest.Mock;
 
     beforeEach(() => {
-      tokenRoute = createTokenRoute(mockTwilioCredentials);
+      tokenRoute = createTokenRoute(mockServerConfig);
       mockReq = {};
       mockRes = {
         header: jest.fn(() => mockRes),
@@ -51,9 +53,9 @@ describe('createTokenRoute()', () => {
 
       expect(mockedAccessToken.mock.calls).toEqual([
         [
-          mockTwilioCredentials.ACCOUNT_SID,
-          mockTwilioCredentials.API_KEY_SID,
-          mockTwilioCredentials.API_KEY_SECRET,
+          mockServerConfig.ACCOUNT_SID,
+          mockServerConfig.API_KEY_SID,
+          mockServerConfig.API_KEY_SECRET,
         ],
       ]);
     });
@@ -65,9 +67,8 @@ describe('createTokenRoute()', () => {
         [
           {
             incomingAllow: true,
-            outgoingApplicationSid:
-              mockTwilioCredentials.OUTGOING_APPLICATION_SID,
-            pushCredentialSid: mockTwilioCredentials.PUSH_CREDENTIAL_SID,
+            outgoingApplicationSid: mockServerConfig.OUTGOING_APPLICATION_SID,
+            pushCredentialSid: mockServerConfig.PUSH_CREDENTIAL_SID,
           },
         ],
       ]);

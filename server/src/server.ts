@@ -1,17 +1,16 @@
 import express, { Router } from 'express';
-import type { TwilioCredentials } from './common/types';
+import type { ServerCredentials } from './common/types';
 import { createTokenRoute } from './routes/token';
 import { createTwimlRoute } from './routes/twiml';
 import { createLogMiddleware } from './middlewares/log';
 import { auth } from 'express-oauth2-jwt-bearer';
-import config from '../config';
 
-export function createExpressApp(twilioCredentials: TwilioCredentials) {
+export function createExpressApp(serverConfig: ServerCredentials) {
   const app = express();
 
   const jwtCheck = auth({
-    audience: config.audience,
-    issuerBaseURL: config.issuerBaseURL,
+    audience: serverConfig.AUTH0_AUDIENCE,
+    issuerBaseURL: serverConfig.AUTH0_ISSUER_BASE_URL,
   });
 
   app.use(express.urlencoded({ extended: false }));
@@ -20,11 +19,11 @@ export function createExpressApp(twilioCredentials: TwilioCredentials) {
   app.use(createLogMiddleware());
 
   const tokenRouter = Router();
-  tokenRouter.use(createTokenRoute(twilioCredentials));
+  tokenRouter.use(createTokenRoute(serverConfig));
   app.post('/token', jwtCheck, tokenRouter);
 
   const twimlRouter = Router();
-  twimlRouter.use(createTwimlRoute(twilioCredentials));
+  twimlRouter.use(createTwimlRoute(serverConfig));
   app.post('/twiml', twimlRouter);
 
   return app;

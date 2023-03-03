@@ -12,7 +12,7 @@ export const getToken = createAsyncThunk<
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify({
       username: 'alice',

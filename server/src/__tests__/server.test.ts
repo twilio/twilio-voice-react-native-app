@@ -8,18 +8,20 @@ jest.unmock('twilio');
 jest.mock('../utils/log');
 jest.mock('express-oauth2-jwt-bearer');
 
-const mockTwilioCredentials = {
+const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
+  AUTH0_AUDIENCE: 'mock-auth0-audience',
+  AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
 
 describe('/token', () => {
   function tokenRouteTest() {
-    const app = createExpressApp(mockTwilioCredentials);
+    const app = createExpressApp(mockServerConfig);
     return request(app).post('/token');
   }
 
@@ -56,7 +58,7 @@ describe('/token', () => {
 
 describe('/twiml', () => {
   function twimlRouteTest() {
-    const app = createExpressApp(mockTwilioCredentials);
+    const app = createExpressApp(mockServerConfig);
     return request(app).post('/twiml');
   }
 
