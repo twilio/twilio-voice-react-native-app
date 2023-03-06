@@ -2,6 +2,8 @@ import React from 'react';
 import { useAuth0 } from 'react-native-auth0';
 import { StyleSheet, View, Button, Image, Text } from 'react-native';
 import config from '../../../config';
+import { useDispatch } from 'react-redux';
+import { setAccessToken } from '../../store/user';
 
 const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
 const HelloFigure = require('../../../assets/icons/hello-figure.png');
@@ -38,15 +40,22 @@ const styles = StyleSheet.create({
 });
 
 const SignIn: React.FC = () => {
-  const { authorize } = useAuth0();
+  const { authorize, getCredentials } = useAuth0();
+  const dispatch = useDispatch();
 
   const onLogin = async () => {
     try {
-      await authorize({ scope: config.auth0Scope });
+      await authorize({
+        scope: config.auth0Scope,
+        audience: config.audience,
+      });
+      const { accessToken } = await getCredentials();
+      dispatch(setAccessToken(accessToken));
     } catch (e) {
       console.error(e);
     }
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>

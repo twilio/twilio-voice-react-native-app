@@ -8,3 +8,12 @@ export interface TwilioCredentials {
   readonly [EnvVars.CallerId]: string;
   readonly [EnvVars.PushCredentialSid]: string;
 }
+
+export interface Auth0Credentials {
+  readonly [EnvVars.Auth0Audience]: string;
+  readonly [EnvVars.Auth0IssuerBaseUrl]: string;
+}
+
+export interface ServerCredentials
+  extends TwilioCredentials,
+    Auth0Credentials {}
