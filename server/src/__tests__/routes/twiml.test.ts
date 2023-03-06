@@ -3,13 +3,15 @@ import { twiml } from 'twilio';
 
 const mockedVoiceResponse = jest.mocked(twiml.VoiceResponse);
 
-const mockTwilioCredentials = {
+const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
+  AUTH0_AUDIENCE: 'mock-auth0-audience',
+  AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
 
 beforeEach(() => {
@@ -18,7 +20,7 @@ beforeEach(() => {
 
 describe('createTwimlRoute()', () => {
   it('returns a route function', () => {
-    const twimlRoute = createTwimlRoute(mockTwilioCredentials);
+    const twimlRoute = createTwimlRoute(mockServerConfig);
     expect(typeof twimlRoute).toBe('function');
   });
 
@@ -36,7 +38,7 @@ describe('createTwimlRoute()', () => {
     let mockNext: jest.Mock;
 
     beforeEach(() => {
-      twimlRoute = createTwimlRoute(mockTwilioCredentials);
+      twimlRoute = createTwimlRoute(mockServerConfig);
       mockReq = {
         body: {
           To: 'mock-req-to-foobar',

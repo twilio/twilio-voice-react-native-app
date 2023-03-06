@@ -1,4 +1,4 @@
-import { getEnvVar, getPort, getTwilioCredentials } from '../../utils/env';
+import { getEnvVar, getPort, getServerCredentials } from '../../utils/env';
 import * as dotenv from 'dotenv';
 
 const mockDotenv = jest.mocked(dotenv);
@@ -14,6 +14,8 @@ const mockEnv = {
   CALLER_ID: 'CALLER_ID',
   OUTGOING_APPLICATION_SID: 'OUTGOING_APPLICATION_SID',
   PUSH_CREDENTIAL_SID: 'PUSH_CREDENTIAL_SID',
+  AUTH0_AUDIENCE: 'AUTH0_AUDIENCE',
+  AUTH0_ISSUER_BASE_URL: 'AUTH0_ISSUER_BASE_URL',
 };
 
 describe('env', () => {
@@ -43,7 +45,7 @@ describe('env', () => {
     it('returns undefined when the port env var is missing', () => {
       process.env = {};
       expect(getPort()).toBe(undefined);
-    })
+    });
 
     it('returns undefined on an invalid port', () => {
       process.env = { PORT: 'foobar' };
@@ -54,18 +56,18 @@ describe('env', () => {
       process.env = { PORT: '3003' };
       const res = getPort();
       expect(res).toEqual(3003);
-    })
+    });
   });
 
-  describe('getTwilioCredentials()', () => {
+  describe('getServerCredentials()', () => {
     it('returns full credentials if all env vars are present', () => {
       process.env = mockEnv;
-      const res = getTwilioCredentials();
+      const res = getServerCredentials();
       expect(res).toBeDefined();
     });
 
     it('returns undefined if some env vars are not present', () => {
-      const res = getTwilioCredentials();
+      const res = getServerCredentials();
       expect(res).toBeUndefined();
     });
   });
