@@ -29,5 +29,3 @@ export type StackNavigationProp<T extends keyof StackParamList> =
     NativeStackNavigationProp<StackParamList, T>,
     BottomTabNavigationProp<TabParamList>
   >;
-
-export type RecipientType = 'client' | 'pstn';

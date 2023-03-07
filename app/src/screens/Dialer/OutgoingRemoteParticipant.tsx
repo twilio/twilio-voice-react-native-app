@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { RecipientType } from '../../types';
+import { type RecipientType } from '../../store/voice/call/outgoingCall';
 
 export type Props = {
   outgoingPstn: string;

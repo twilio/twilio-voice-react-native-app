@@ -2,9 +2,12 @@ import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { useTypedDispatch } from '../../store/app';
-import { makeOutgoingCall as makeOutgoingCallAction } from '../../store/voice/call/outgoingCall';
+import {
+  makeOutgoingCall as makeOutgoingCallAction,
+  type RecipientType,
+} from '../../store/voice/call/outgoingCall';
 import { getToken } from '../../store/voice/token';
-import { type RecipientType, type StackNavigationProp } from '../../types';
+import { type StackNavigationProp } from '../../types';
 import { useActiveCall } from '../../hooks/activeCall';
 
 /**
@@ -17,7 +20,7 @@ const useDialpad = (
   recipientType: RecipientType,
   isDialerDisabled: boolean,
 ) => {
-  const isRecipientTypePstn = recipientType === 'pstn';
+  const isRecipientTypePstn = recipientType === 'number';
 
   const [outgoingPstn, setOutgoingPstn] = React.useState<string>('');
 
@@ -34,7 +37,7 @@ const useDialpad = (
   );
 
   const isInputDisabled = React.useMemo(() => {
-    return isDialerDisabled || recipientType !== 'pstn';
+    return isDialerDisabled || recipientType !== 'number';
   }, [isDialerDisabled, recipientType]);
 
   const isBackspaceDisabled = React.useMemo(() => {
@@ -75,10 +78,10 @@ const useOutgoingRemoteParticipant = () => {
  * @returns - Handlers and state for the recipient type.
  */
 const useToggleRecipientType = () => {
-  const [type, setType] = React.useState<'client' | 'pstn'>('pstn');
+  const [type, setType] = React.useState<RecipientType>('number');
 
   const handleToggle = React.useCallback(() => {
-    setType((currentType) => (currentType === 'client' ? 'pstn' : 'client'));
+    setType((currentType) => (currentType === 'client' ? 'number' : 'client'));
   }, []);
 
   return { handleToggle, type };
