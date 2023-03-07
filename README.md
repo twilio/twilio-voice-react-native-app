@@ -2,13 +2,6 @@
 
 This project consists of a backend server and React Native app demonstrating best practices for developing a Twilio Programmable Voice application.
 
-## Prerequisites
-
-- Understanding of [Twilio Programmable Voice](https://www.twilio.com/docs/voice/sdks)
-- [React Native Development Environment](https://reactnative.dev/docs/environment-setup)
-- Latest LTS version of [NodeJS](https://nodejs.org/en/)
-- A Node package manager. Examples in this project will use the latest version of [Yarn v1](https://classic.yarnpkg.com/lang/en/).
-
 ## Features
 
 * Dialpad for making outgoing calls
@@ -17,6 +10,13 @@ This project consists of a backend server and React Native app demonstrating bes
 * Active call screen to interact with and control ongoing calls
 * Login flow for authenticating and authorizing users<sup>*</sup>
 * Registration and notifications for incoming calls<sup>*</sup>
+
+## Prerequisites
+
+- Understanding of [Twilio Programmable Voice](https://www.twilio.com/docs/voice/sdks)
+- [React Native Development Environment](https://reactnative.dev/docs/environment-setup)
+- Latest LTS version of [NodeJS](https://nodejs.org/en/)
+- A Node package manager. Examples in this project will use the latest version of [Yarn v1](https://classic.yarnpkg.com/lang/en/).
 
 <sup>*</sup> Planned for a future release.
 
