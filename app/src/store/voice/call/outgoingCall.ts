@@ -29,7 +29,6 @@ export const makeOutgoingCall = createAsyncThunk<
 
     const outgoingCall = await voice.connect(token.value, {
       To: to,
-      answerOnBridge: true,
       recipientType,
     });
 
