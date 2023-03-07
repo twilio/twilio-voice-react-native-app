@@ -1,18 +1,26 @@
 # Twilio Voice React Native Reference
 
-## What is this Project?
+This project consists of a backend server and React Native app demonstrating best practices for developing a Twilio Programmable Voice application.
 
-The Twilio Voice React Native Reference App is an example implementation of the Twilio Voice React Native SDK and serves to inspire developers who want to leverage the power of Twilio Programmable Voice in their React Native applications.
+## Prerequisites
 
-* See the Twilio Voice React Native SDK [here](https://github.com/twilio/twilio-voice-react-native).
+- Understanding of [Twilio Programmable Voice](https://www.twilio.com/docs/voice/sdks)
+- [React Native Development Environment](https://reactnative.dev/docs/environment-setup)
+- Latest LTS version of [NodeJS](https://nodejs.org/en/)
+- A Node package manager. Examples in this project will use the latest version of [Yarn v1](https://classic.yarnpkg.com/lang/en/).
 
-## Before you use this Project
+## Features
 
-You should have the React Native development environment set up and have a firm understanding of Twilio Programmable Voice.
+* Dialpad for making outgoing calls
+  * Call to a phone number
+  * Call to a Twilio Client<sup>*</sup>
+* Active call screen to interact with and control ongoing calls
+* Login flow for authenticating and authorizing users<sup>*</sup>
+* Registration and notifications for incoming calls<sup>*</sup>
 
-Please follow the official React Native guides to set up your environment, and additionally the Twilio Programmable Voice documentation. TODO LINKS
+<sup>*</sup> Planned for a future release.
 
-### Structure
+## Structure
 
 * A React Native application under:
   ```
@@ -25,3 +33,14 @@ Please follow the official React Native guides to set up your environment, and a
   ```
 
 Please see the `README.md` files within each sub-folder for more information about that component.
+
+## Related
+
+- [Twilio Voice React Native](https://github.com/twilio/twilio-voice-react-native)
+- [Twilio Voice JS](https://github.com/twilio/twilio-voice.js)
+- [Twilio Voice iOS](https://github.com/twilio/voice-quickstart-ios)
+- [Twilio Voice Android](https://github.com/twilio/voice-quickstart-android)
+
+## License
+
+See [LICENSE](LICENSE)

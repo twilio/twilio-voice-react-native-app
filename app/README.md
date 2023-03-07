@@ -1,24 +1,6 @@
 # Twilio Voice React Native SDK Reference App
 
-The **Twilio Voice React Native SDK Reference App** is an application showcasing the features of the **Twilio Voice React Native SDK**. The **Reference App** serves to inspire developers and give them an example of how to implement the **Twilio React Native Voice SDK**.
-
-* See the **Twilio Voice React Native SDK** [here](https://github.com/twilio/twilio-voice-react-native).
-
-## Features
-
-The **Reference App** showcases the following possibilities using **Twilio Voice**:
-* Login flow for authenticating and authorizing users
-* Dialpad for making outgoing calls
-* Registration and notifications for incoming calls
-* Active call screen to interact with and control ongoing calls
-
-## Using the App
-
-### Prerequisites
-
-Please follow the Reference Server instructions in conjunction with these steps.
-
-Please ensure that you have a React Native development environment set up for the platform(s) you want to build for. Please see the official React Native documentation [here](https://reactnative.dev/docs/0.70/environment-setup).
+The Twilio Voice React Native Reference App is an example implementation of the Twilio Voice React Native SDK and serves to inspire developers who want to leverage the power of Twilio Programmable Voice in their React Native applications. See the Twilio Voice React Native SDK [here](https://github.com/twilio/twilio-voice-react-native).
 
 ### Launching the App
 
@@ -30,6 +12,12 @@ Fetch the dependencies.
 ```
 yarn install
 ```
+Install iOS dependencies if running on iOS
+```
+cd ios
+pod install
+cd ../
+```
 Start a native build and the Metro bundler at the same time by using the command
 ```
 yarn android
@@ -40,7 +28,7 @@ yarn ios
 ```
 for your respective target platform.
 
-### Hooking it up with the Server
+### Setting it up with the Server
 
 Once the Reference Server is up and running, the Reference App can be directed to it by modifying the following line in `app/src/util/fetch.ts`.
 ```
@@ -63,11 +51,11 @@ With any substantially complex application, opinionated design practices are for
 
 ### Directory Structure
 
-Smaller reusable components are found in the `src/components/` folder, where larger compilations of those smaller components can be found in `src/screens/`. The intent of a component, such as `Dialer` or `Home`, in the `src/screens/` folder is that it is "connected" to the application state through React-Redux and React Navigation, whereas components in the `src/components/` folder are state-less.
+Smaller reusable components are found in the `src/components/` folder, where larger compilations of those smaller components can be found in `src/screens/`. The intent of a component, such as `Dialer` or `Home`, in the `src/screens/` folder is that it is connected to the application state through React-Redux and React Navigation, whereas components in the `src/components/` folder are state-less.
 
 ### Application State Mangagement
 
-Redux-Toolkit is leveraged to maintain the majority of the application state. Some components might maintain an internal state (e.g. the Dialer screen for the identity and type of the recipient) where it makes sense. Data that needs to be accessible globally is made available through the Redux store. State slices are written using the "ducks" file pattern where the actions and reducers are found in the same file.
+Redux-Toolkit is leveraged to maintain the majority of the application state. Some components might maintain an internal state (e.g. the Dialer screen for the identity and type of the recipient) where it makes sense. Data that needs to be accessible globally is made available through the Redux store. State slices are written using the [ducks file pattern](https://github.com/erikras/ducks-modular-redux) where the actions and reducers are found in the same file.
 
 See the Redux documentation [here](https://redux.js.org/introduction/getting-started).
 
