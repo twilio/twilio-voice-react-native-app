@@ -22,7 +22,7 @@ const Dialer: React.FC = () => {
       <View style={styles.remoteParticipant}>
         <OutgoingRemoteParticipant
           outgoingIdentity={outgoingRemoteParticipant.clientIdentity}
-          outgoingPstn={dialpad.outgoingPstn}
+          outgoingNumber={dialpad.outgoingNumber}
           recipientType={recipient.type}
           setOutgoingIdentity={outgoingRemoteParticipant.setClientIdentity}
         />
