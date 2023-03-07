@@ -1,23 +1,23 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { RecipientType } from '../../types';
+import { type RecipientType } from '../../store/voice/call/outgoingCall';
 
 export type Props = {
-  outgoingPstn: string;
+  outgoingNumber: string;
   outgoingIdentity: string;
   recipientType: RecipientType;
   setOutgoingIdentity: (id: string) => void;
 };
 
 const OutgoingRemoteParticipant: React.FC<Props> = ({
-  outgoingPstn,
+  outgoingNumber,
   outgoingIdentity,
   recipientType,
   setOutgoingIdentity,
 }) => {
-  const formattedPstn = React.useMemo(() => {
-    return outgoingPstn.length > 0 ? `+${outgoingPstn}` : '';
-  }, [outgoingPstn]);
+  const formattedNumber = React.useMemo(() => {
+    return outgoingNumber.length > 0 ? `+${outgoingNumber}` : '';
+  }, [outgoingNumber]);
   return (
     <View style={styles.container}>
       {recipientType === 'client' ? (
@@ -28,7 +28,7 @@ const OutgoingRemoteParticipant: React.FC<Props> = ({
           style={styles.title}
         />
       ) : (
-        <Text style={pstnStyle}>{formattedPstn}</Text>
+        <Text style={numberStyle}>{formattedNumber}</Text>
       )}
       <Text style={styles.subtitle} />
     </View>
@@ -47,14 +47,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
   },
-  pstn: {
+  number: {
     padding: 10.5,
   },
 });
 
-const pstnStyle = {
+const numberStyle = {
   ...styles.title,
-  ...styles.pstn,
+  ...styles.number,
 };
 
 export default OutgoingRemoteParticipant;
