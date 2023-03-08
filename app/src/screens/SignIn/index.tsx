@@ -1,9 +1,8 @@
 import React from 'react';
-import { useAuth0 } from 'react-native-auth0';
 import { StyleSheet, View, Button, Image, Text } from 'react-native';
-import config from '../../../config';
 import { useDispatch } from 'react-redux';
-import { setAccessToken } from '../../store/user';
+import { login } from '../../store/user';
+import { Dispatch } from '../../store/app';
 
 const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
 const HelloFigure = require('../../../assets/icons/hello-figure.png');
@@ -40,20 +39,10 @@ const styles = StyleSheet.create({
 });
 
 const SignIn: React.FC = () => {
-  const { authorize, getCredentials } = useAuth0();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<Dispatch>();
 
-  const onLogin = async () => {
-    try {
-      await authorize({
-        scope: config.auth0Scope,
-        audience: config.audience,
-      });
-      const { accessToken } = await getCredentials();
-      dispatch(setAccessToken(accessToken));
-    } catch (e) {
-      console.error(e);
-    }
+  const handleLogin = () => {
+    dispatch(login());
   };
 
   return (
@@ -65,7 +54,7 @@ const SignIn: React.FC = () => {
         <Text style={styles.text}>
           Welcome to Twilio's Voice SDK Reference App. Log in to get started!
         </Text>
-        <Button title="Log in" color="#0263E0" onPress={onLogin} />
+        <Button title="Log in" color="#0263E0" onPress={handleLogin} />
       </View>
       <View style={styles.helloFigureContainer}>
         <Image source={HelloFigure} resizeMode="contain" />
