@@ -43,8 +43,7 @@ const SignIn: React.FC = () => {
 
   React.useEffect(() => {
     dispatch(checkLoginStatus());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   const handleLogin = () => {
     dispatch(login());
