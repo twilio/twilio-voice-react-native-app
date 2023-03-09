@@ -28,6 +28,14 @@ export const userSlice = createSlice({
     builder.addCase(logout.fulfilled, (state) => {
       state.accessToken = '';
     });
+    builder.addCase(checkLoginStatus.fulfilled, (state, action) => {
+      state.accessToken =
+        action.payload?.accessToken === undefined
+          ? ''
+          : action.payload.accessToken;
+      state.email =
+        action.payload?.email === undefined ? '' : action.payload.email;
+    });
   },
 });
 
@@ -41,6 +49,22 @@ interface LoginResponse {
   email: string;
 }
 
+export const checkLoginStatus = createAsyncThunk<LoginResponse | undefined>(
+  'user/checkLoginStatus',
+  async () => {
+    const credentials = await auth0.credentialsManager.getCredentials();
+    if (credentials) {
+      const user = await auth0.auth.userInfo({
+        token: credentials.accessToken,
+      });
+      return {
+        accessToken: credentials.accessToken,
+        email: user.email,
+      };
+    }
+  },
+);
+
 export const login = createAsyncThunk<LoginResponse | undefined>(
   'user/login',
   async () => {
@@ -49,10 +73,16 @@ export const login = createAsyncThunk<LoginResponse | undefined>(
         scope: config.auth0Scope,
         audience: config.audience,
       });
+
+      if (typeof credentials.idToken === 'undefined') {
+        throw new Error('ID_TOKEN_UNDEFINED');
+      }
+
+      auth0.credentialsManager.saveCredentials(credentials as any);
+
       const user = await auth0.auth.userInfo({
         token: credentials.accessToken,
       });
-
       return {
         accessToken: credentials.accessToken,
         email: user.email,
@@ -66,6 +96,7 @@ export const login = createAsyncThunk<LoginResponse | undefined>(
 export const logout = createAsyncThunk<void>('user/logout', async () => {
   try {
     await auth0.webAuth.clearSession();
+    await auth0.credentialsManager.clearCredentials();
   } catch (e) {
     console.error(e);
   }
