@@ -28,8 +28,10 @@ export const makeOutgoingCall = createAsyncThunk<
     }
 
     const outgoingCall = await voice.connect(token.value, {
-      To: to,
-      recipientType,
+      params: {
+        To: to,
+        recipientType,
+      },
     });
 
     // eslint-disable-next-line dot-notation
