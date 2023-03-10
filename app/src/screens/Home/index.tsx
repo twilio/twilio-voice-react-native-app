@@ -7,7 +7,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Dispatch, type State } from '../../store/app';
+import { type Dispatch, type State } from '../../store/app';
 import { logout } from '../../store/user';
 
 const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');

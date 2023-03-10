@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Button, Image, Text } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { login, checkLoginStatus } from '../../store/user';
-import { Dispatch } from '../../store/app';
+import { type Dispatch } from '../../store/app';
 
 const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
 const HelloFigure = require('../../../assets/icons/hello-figure.png');
