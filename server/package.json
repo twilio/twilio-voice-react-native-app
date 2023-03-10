@@ -1,8 +1,7 @@
 {
-  "name": "twilio-voice-react-native-app-server",
+  "name": "twilio-voice-react-native-reference-server",
   "private": true,
   "version": "0.0.0",
-  "description": "Twilio Voice React Native App Server",
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
@@ -10,7 +9,6 @@
     "watch": "nodemon",
     "test": "jest"
   },
-  "author": "Michael Huynh (mhuynh@twilio.com)",
   "devDependencies": {
     "@babel/core": "^7.20.5",
     "@babel/preset-env": "^7.20.2",

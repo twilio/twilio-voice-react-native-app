@@ -1,4 +1,4 @@
-# Twilio Voice React Native SDK Reference App
+# Twilio Voice React Native Reference App
 
 The Twilio Voice React Native Reference App is an example implementation of the Twilio Voice React Native SDK and serves to inspire developers who want to leverage the power of Twilio Programmable Voice in their React Native applications. See the Twilio Voice React Native SDK [here](https://github.com/twilio/twilio-voice-react-native).
 
