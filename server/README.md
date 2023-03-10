@@ -1,6 +1,6 @@
-# Twilio Voice React Native App Server
+# Twilio Voice React Native Reference Server
 
-The Twilio Voice React Native App Server is a supplementary backend service for the Twilio Voice React Native App. The instructions on how to use this server with the React Native App can be found [here](../app#setting-it-up-with-the-server).
+The Twilio Voice React Native Reference Server is a supplementary backend service for the Twilio Voice React Native App. The instructions on how to use this server with the React Native App can be found [here](../app#setting-it-up-with-the-server).
 
 ### Routes
 
