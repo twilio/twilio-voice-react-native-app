@@ -45,8 +45,12 @@ const SignIn: React.FC = () => {
     dispatch(checkLoginStatus());
   }, [dispatch]);
 
-  const handleLogin = () => {
-    dispatch(login());
+  const handleLogin = async () => {
+    const loginAction = await dispatch(login());
+    if (login.rejected.match(loginAction)) {
+      console.error(loginAction.error);
+      return;
+    }
   };
 
   return (

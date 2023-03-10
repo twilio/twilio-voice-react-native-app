@@ -10,15 +10,13 @@ import { type State } from '../store/app';
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const StackNavigator = () => {
-  const accessToken = useSelector(
-    (state: State) => state.voice.user.accessToken,
-  );
+  const user = useSelector((state: State) => state.voice.user);
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
       }}>
-      {accessToken ? (
+      {user?.status === 'fulfilled' && user.accessToken ? (
         <>
           <Stack.Screen
             name="App"

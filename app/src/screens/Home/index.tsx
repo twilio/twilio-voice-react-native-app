@@ -47,10 +47,14 @@ const styles = StyleSheet.create({
 
 const Home: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
-  const email = useSelector((state: State) => state.voice.user.email);
+  const user = useSelector((state: State) => state.voice.user);
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async () => {
+    const logoutAction = await dispatch(logout());
+    if (logout.rejected.match(logoutAction)) {
+      console.error(logoutAction.error);
+      return;
+    }
   };
 
   return (
@@ -66,7 +70,9 @@ const Home: React.FC = () => {
             <Text style={styles.logoutText}>Log out</Text>
           </TouchableHighlight>
         </View>
-        <Text style={styles.userText}>{email}</Text>
+        {user?.status === 'fulfilled' && (
+          <Text style={styles.userText}>{user.email}</Text>
+        )}
       </View>
     </View>
   );

@@ -6,23 +6,26 @@ export const getToken = createAsyncThunk<
   string,
   void,
   { state: State; dispatch: Dispatch }
->('voice/getToken', async (_, thunkAPI) => {
-  const accessToken = thunkAPI.getState().voice.user.accessToken;
-  const res = await fetch(`${defaultUrl}/token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify({
-      username: 'alice',
-      password: 'supersecretpassword1234',
-    }),
-  });
+>('voice/getToken', async (_, { getState }) => {
+  const user = getState().voice.user;
+  if (user?.status === 'fulfilled') {
+    const res = await fetch(`${defaultUrl}/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user?.accessToken}`,
+      },
+      body: JSON.stringify({
+        username: 'alice',
+        password: 'supersecretpassword1234',
+      }),
+    });
 
-  const token: string = await res.text();
+    const token: string = await res.text();
 
-  return token;
+    return token;
+  }
+  return '';
 });
 
 export type TokenState = AsyncStoreSlice<{ value: string }>;
