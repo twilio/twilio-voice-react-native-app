@@ -30,8 +30,8 @@ export const userSlice = createSlice({
       .addCase(login.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
       })
-      .addCase(login.rejected, () => {
-        return { status: 'rejected' };
+      .addCase(login.rejected, (_, action) => {
+        return { status: 'rejected', ...action.error };
       });
     builder
       .addCase(logout.pending, () => {
@@ -40,8 +40,8 @@ export const userSlice = createSlice({
       .addCase(logout.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
       })
-      .addCase(logout.rejected, () => {
-        return { status: 'rejected' };
+      .addCase(logout.rejected, (_, action) => {
+        return { status: 'rejected', ...action.error };
       });
   },
 });
