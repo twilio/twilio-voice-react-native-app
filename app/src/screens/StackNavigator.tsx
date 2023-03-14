@@ -1,21 +1,22 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Call from './Call';
 import TabNavigator from './TabNavigator';
 import { type StackParamList } from '../types';
-import { useAuth0 } from 'react-native-auth0';
 import SignIn from './SignIn';
+import { type State } from '../store/app';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const StackNavigator = () => {
-  const { user } = useAuth0();
+  const user = useSelector((state: State) => state.voice.user);
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
       }}>
-      {user ? (
+      {user?.status === 'fulfilled' && user.accessToken ? (
         <>
           <Stack.Screen
             name="App"

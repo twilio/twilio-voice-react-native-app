@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAuth0 } from 'react-native-auth0';
 import {
   StyleSheet,
   Text,
@@ -7,6 +6,9 @@ import {
   Image,
   TouchableHighlight,
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { type Dispatch, type State } from '../../store/app';
+import { logout } from '../../store/user';
 
 const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
 
@@ -44,13 +46,14 @@ const styles = StyleSheet.create({
 });
 
 const Home: React.FC = () => {
-  const { user, clearSession } = useAuth0();
+  const dispatch = useDispatch<Dispatch>();
+  const user = useSelector((state: State) => state.voice.user);
 
-  const onLogout = async () => {
-    try {
-      await clearSession();
-    } catch (e) {
-      console.error(e);
+  const handleLogout = async () => {
+    const logoutAction = await dispatch(logout());
+    if (logout.rejected.match(logoutAction)) {
+      console.error(logoutAction.error);
+      return;
     }
   };
 
@@ -63,11 +66,13 @@ const Home: React.FC = () => {
         <Text>Ahoy!</Text>
         <View style={styles.client}>
           <Text>Client ID:</Text>
-          <TouchableHighlight onPress={onLogout}>
+          <TouchableHighlight onPress={handleLogout}>
             <Text style={styles.logoutText}>Log out</Text>
           </TouchableHighlight>
         </View>
-        <Text style={styles.userText}>{user?.email}</Text>
+        {user?.status === 'fulfilled' && (
+          <Text style={styles.userText}>{user.email}</Text>
+        )}
       </View>
     </View>
   );
