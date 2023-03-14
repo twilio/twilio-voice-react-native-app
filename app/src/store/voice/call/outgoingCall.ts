@@ -8,9 +8,11 @@ import { voice, callMap } from '../../../util/voice';
 import { type AsyncStoreSlice, type State, type Dispatch } from '../../app';
 import { getCallInfo, type CallInfo } from './';
 
+export type RecipientType = 'client' | 'number';
+
 export const makeOutgoingCall = createAsyncThunk<
   CallInfo,
-  { recipientType: 'pstn' | 'client'; to: string },
+  { recipientType: RecipientType; to: string },
   {
     state: State;
     dispatch: Dispatch;
@@ -26,9 +28,10 @@ export const makeOutgoingCall = createAsyncThunk<
     }
 
     const outgoingCall = await voice.connect(token.value, {
-      To: to,
-      answerOnBridge: true,
-      recipientType,
+      params: {
+        To: to,
+        recipientType,
+      },
     });
 
     // eslint-disable-next-line dot-notation

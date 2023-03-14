@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, Text } from 'react-native';
 import Button, { type Props as ButtonProps } from '../../components/Button';
-import { type RecipientType } from '../../types';
+import { type RecipientType } from '../../store/voice/call/outgoingCall';
 
 const TypeSource = require('../../../assets/icons/type.png');
 
@@ -17,7 +17,7 @@ const ToggleClientInputButton: React.FC<Props> = ({
   <Button disabled={disabled} size={96} onPress={onPress}>
     <Image source={TypeSource} resizeMode="contain" style={styles.image} />
     <Text style={styles.text}>
-      {recipientType === 'pstn' ? 'PSTN' : 'Client'}
+      {recipientType === 'number' ? 'Number' : 'Client'}
     </Text>
   </Button>
 );
