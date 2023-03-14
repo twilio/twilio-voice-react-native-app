@@ -6,11 +6,16 @@ export const getToken = createAsyncThunk<
   string,
   void,
   { state: State; dispatch: Dispatch }
->('voice/getToken', async () => {
+>('voice/getToken', async (_, { getState }) => {
+  const user = getState().voice.user;
+  if (user?.status !== 'fulfilled') {
+    return '';
+  }
   const res = await fetch(`${defaultUrl}/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${user.accessToken}`,
     },
     body: JSON.stringify({
       username: 'alice',
