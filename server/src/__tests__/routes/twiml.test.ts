@@ -1,15 +1,19 @@
 import { createTwimlRoute } from '../../routes/twiml';
-import { twiml } from 'twilio';
+import { twiml, validateRequest } from 'twilio';
 
 const mockedVoiceResponse = jest.mocked(twiml.VoiceResponse);
 
+jest.mocked(validateRequest);
+
 const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
+  AUTH_TOKEN: 'mock-twiliocredentials-authtoken',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
+  TWIML_REQUEST_URL: 'mock-twiliocredentials-twimlrequesturl',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
@@ -27,6 +31,7 @@ describe('createTwimlRoute()', () => {
   describe('twimlRoute()', () => {
     let twimlRoute: ReturnType<typeof createTwimlRoute>;
     let mockReq: {
+      headers: Record<any, any>;
       body: Record<any, any>;
     };
     let mockRes: {
@@ -40,6 +45,9 @@ describe('createTwimlRoute()', () => {
     beforeEach(() => {
       twimlRoute = createTwimlRoute(mockServerConfig);
       mockReq = {
+        headers: {
+          'x-twilio-signature': 'mock-x-twilio-signature',
+        },
         body: {
           To: 'mock-req-to-foobar',
           recipientType: 'client',

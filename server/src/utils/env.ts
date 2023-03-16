@@ -6,11 +6,13 @@ dotenv.config();
 export enum EnvVars {
   AccountSid = 'ACCOUNT_SID',
   ApiKeySecret = 'API_KEY_SECRET',
+  AuthToken = 'AUTH_TOKEN',
   ApiKeySid = 'API_KEY_SID',
   CallerId = 'CALLER_ID',
   OutgoingApplicationSid = 'OUTGOING_APPLICATION_SID',
   Port = 'PORT',
   PushCredentialSid = 'PUSH_CREDENTIAL_SID',
+  TwimlRequestUrl = 'TWIML_REQUEST_URL',
   Auth0Audience = 'AUTH0_AUDIENCE',
   Auth0IssuerBaseUrl = 'AUTH0_ISSUER_BASE_URL',
 }
@@ -35,10 +37,12 @@ export function getServerCredentials(): ServerCredentials | undefined {
   const envVars = [
     EnvVars.AccountSid,
     EnvVars.ApiKeySecret,
+    EnvVars.AuthToken,
     EnvVars.ApiKeySid,
     EnvVars.CallerId,
     EnvVars.OutgoingApplicationSid,
     EnvVars.PushCredentialSid,
+    EnvVars.TwimlRequestUrl,
     EnvVars.Auth0Audience,
     EnvVars.Auth0IssuerBaseUrl,
   ].map((envVarKey) => [envVarKey, getEnvVar(envVarKey)]);
