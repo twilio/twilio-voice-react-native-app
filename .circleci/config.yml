@@ -65,14 +65,14 @@ jobs:
 
   app-test:
     executor: default
-      steps:
-        - attach_project
-        - run:
-            name: "App: unit tests"
-            command: |
-              cd app
-              yarn test
-              cd ..
+    steps:
+      - attach_project
+      - run:
+          name: "App: unit tests"
+          command: |
+            cd app
+            yarn test
+            cd ..
 
   app-lint:
     executor: default
@@ -87,14 +87,14 @@ jobs:
 
   app-typecheck:
     executor: default
-      steps:
-        - attach_project
-        - run:
-            name: "App: typecheck"
-            command: |
-              cd app
-              yarn typecheck
-              cd ..
+    steps:
+      - attach_project
+      - run:
+          name: "App: typecheck"
+          command: |
+            cd app
+            yarn typecheck
+            cd ..
 
   ###
   # Server jobs
