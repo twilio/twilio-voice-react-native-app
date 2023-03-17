@@ -1,5 +1,5 @@
 import { Request, RequestHandler, Response } from 'express';
-import { twiml, validateRequest } from 'twilio';
+import { twiml, validateExpressRequest } from 'twilio';
 import { ServerCredentials } from '../common/types';
 
 export function createTwimlRoute(
@@ -7,15 +7,7 @@ export function createTwimlRoute(
 ): RequestHandler {
   const { VoiceResponse } = twiml;
   return function twimlRoute(req: Request, res: Response) {
-    const twilioSignature = req.headers['x-twilio-signature'] as string;
-    const url = serverConfig.TWIML_REQUEST_URL;
-    const params = req.body;
-    const requestIsValid = validateRequest(
-      serverConfig.AUTH_TOKEN,
-      twilioSignature,
-      url,
-      params,
-    );
+    const requestIsValid = validateExpressRequest(req, serverConfig.AUTH_TOKEN);
 
     if (!requestIsValid) {
       return res.status(401).send('Unauthorized Twilio signature');

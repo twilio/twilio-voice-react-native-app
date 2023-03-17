@@ -7,7 +7,6 @@ export const getServerCredentials = jest.fn().mockReturnValue({
   callerId: 'mock-callerid-foobar',
   outgoingApplicationSid: 'mock-outgoingapplicationsid-foobar',
   pushCredentialSid: 'mock-pushcredentialsid-foobar',
-  twimlRequestUrl: 'mock-twimlrequesturl-foobar',
   auth0Audience: 'mock-auth0audience-foobar',
   auth0IssuerBaseUrl: 'mock-auth0IssuerBaseUrl-foobar',
 });

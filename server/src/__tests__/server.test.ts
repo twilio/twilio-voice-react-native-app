@@ -1,13 +1,13 @@
 import request from 'supertest';
 import { createExpressApp } from '../server';
 import * as auth0JwtCheck from 'express-oauth2-jwt-bearer';
-import { validateRequest } from 'twilio';
+import { validateExpressRequest } from 'twilio';
 
 jest.unmock('express');
 
 jest.mock('../utils/log');
 jest.mock('express-oauth2-jwt-bearer');
-jest.mocked(validateRequest);
+jest.mocked(validateExpressRequest);
 
 const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
@@ -17,7 +17,6 @@ const mockServerConfig = {
   OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
-  TWIML_REQUEST_URL: 'mock-twiliocredentials-twimlrequesturl',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
@@ -121,7 +120,7 @@ describe('/twiml', () => {
 
   describe('responds with status code 401', () => {
     it('if the twilio signature is unauthorized', async () => {
-      jest.mocked(validateRequest).mockReturnValue(false);
+      jest.mocked(validateExpressRequest).mockReturnValue(false);
       const response = await twimlRouteTest().send({
         username: 'alice',
         password: 'supersecretpassword1234',

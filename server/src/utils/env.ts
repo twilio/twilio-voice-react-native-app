@@ -12,7 +12,6 @@ export enum EnvVars {
   OutgoingApplicationSid = 'OUTGOING_APPLICATION_SID',
   Port = 'PORT',
   PushCredentialSid = 'PUSH_CREDENTIAL_SID',
-  TwimlRequestUrl = 'TWIML_REQUEST_URL',
   Auth0Audience = 'AUTH0_AUDIENCE',
   Auth0IssuerBaseUrl = 'AUTH0_ISSUER_BASE_URL',
 }
@@ -42,7 +41,6 @@ export function getServerCredentials(): ServerCredentials | undefined {
     EnvVars.CallerId,
     EnvVars.OutgoingApplicationSid,
     EnvVars.PushCredentialSid,
-    EnvVars.TwimlRequestUrl,
     EnvVars.Auth0Audience,
     EnvVars.Auth0IssuerBaseUrl,
   ].map((envVarKey) => [envVarKey, getEnvVar(envVarKey)]);

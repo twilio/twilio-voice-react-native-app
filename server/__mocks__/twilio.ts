@@ -27,4 +27,4 @@ export const twiml = {
   VoiceResponse,
 };
 
-export const validateRequest = jest.fn().mockReturnValue(true);
+export const validateExpressRequest = jest.fn().mockReturnValue(true);

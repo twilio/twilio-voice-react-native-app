@@ -8,7 +8,6 @@ export interface TwilioCredentials {
   readonly [EnvVars.OutgoingApplicationSid]: string;
   readonly [EnvVars.CallerId]: string;
   readonly [EnvVars.PushCredentialSid]: string;
-  readonly [EnvVars.TwimlRequestUrl]: string;
 }
 
 export interface Auth0Credentials {
