@@ -14,7 +14,7 @@ parameters:
 executors:
   default:
     docker:
-      - image: cimg/node:lts
+      - image: cimg/node:16.19
     working_directory: ~/project
 
 ###
