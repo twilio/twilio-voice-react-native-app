@@ -1,15 +1,15 @@
-import * as user from '../../src/store/user';
-import * as app from '../../src/store/app';
+import * as user from '../user';
+import * as app from '../app';
 
-import * as auth0 from '../../__mocks__/react-native-auth0';
+import * as auth0 from '../../../__mocks__/react-native-auth0';
 
 let MockCall: { Event: Record<string, string> };
 
-jest.mock('../../src/util/fetch', () => ({
+jest.mock('../../../src/util/fetch', () => ({
   fetch: jest.fn(),
 }));
 
-jest.mock('../../src/util/voice', () => ({
+jest.mock('../../../src/util/voice', () => ({
   voice: {
     connect: jest.fn(),
   },
