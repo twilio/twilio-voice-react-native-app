@@ -1,9 +1,7 @@
 import { createTwimlRoute } from '../../routes/twiml';
-import { twiml, validateExpressRequest } from 'twilio';
+import { twiml } from 'twilio';
 
 const mockedVoiceResponse = jest.mocked(twiml.VoiceResponse);
-
-jest.mocked(validateExpressRequest);
 
 const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
