@@ -6,6 +6,7 @@ const mockedVoiceGrant = jest.mocked(jwt.AccessToken.VoiceGrant);
 
 const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
+  AUTH_TOKEN: 'mock-twiliocredentials-authtoken',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',

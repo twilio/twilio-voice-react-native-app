@@ -9,6 +9,7 @@ const env: NodeJS.ProcessEnv = process.env;
 
 const mockEnv = {
   ACCOUNT_SID: 'ACCOUNT_SID',
+  AUTH_TOKEN: 'mock-twiliocredentials-authtoken',
   API_KEY_SID: 'API_KEY_SID',
   API_KEY_SECRET: 'API_KEY_SECRET',
   CALLER_ID: 'CALLER_ID',

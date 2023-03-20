@@ -6,6 +6,7 @@ dotenv.config();
 export enum EnvVars {
   AccountSid = 'ACCOUNT_SID',
   ApiKeySecret = 'API_KEY_SECRET',
+  AuthToken = 'AUTH_TOKEN',
   ApiKeySid = 'API_KEY_SID',
   CallerId = 'CALLER_ID',
   OutgoingApplicationSid = 'OUTGOING_APPLICATION_SID',
@@ -35,6 +36,7 @@ export function getServerCredentials(): ServerCredentials | undefined {
   const envVars = [
     EnvVars.AccountSid,
     EnvVars.ApiKeySecret,
+    EnvVars.AuthToken,
     EnvVars.ApiKeySid,
     EnvVars.CallerId,
     EnvVars.OutgoingApplicationSid,

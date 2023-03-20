@@ -5,6 +5,7 @@ const mockedVoiceResponse = jest.mocked(twiml.VoiceResponse);
 
 const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
+  AUTH_TOKEN: 'mock-twiliocredentials-authtoken',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
@@ -27,6 +28,7 @@ describe('createTwimlRoute()', () => {
   describe('twimlRoute()', () => {
     let twimlRoute: ReturnType<typeof createTwimlRoute>;
     let mockReq: {
+      headers: Record<any, any>;
       body: Record<any, any>;
     };
     let mockRes: {
@@ -40,6 +42,9 @@ describe('createTwimlRoute()', () => {
     beforeEach(() => {
       twimlRoute = createTwimlRoute(mockServerConfig);
       mockReq = {
+        headers: {
+          'x-twilio-signature': 'mock-x-twilio-signature',
+        },
         body: {
           To: 'mock-req-to-foobar',
           recipientType: 'client',

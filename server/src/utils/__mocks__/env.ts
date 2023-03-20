@@ -1,6 +1,7 @@
 export const getPort = jest.fn().mockReturnValue(3003);
 export const getServerCredentials = jest.fn().mockReturnValue({
   accountSid: 'mock-accountsid-foobar',
+  authToken: 'mock-authtoken-foobar',
   apiKeySid: 'mock-apikeysid-foobar',
   apiKeySecret: 'mock-apikeysecret-foobar',
   callerId: 'mock-callerid-foobar',

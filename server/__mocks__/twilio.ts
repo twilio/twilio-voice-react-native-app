@@ -14,7 +14,9 @@ const dial = jest.fn().mockReturnValue({
   number: jest.fn(),
 });
 
-const voiceResponseToString = jest.fn().mockReturnValue('mock-voiceresponse-tostring-foobar');
+const voiceResponseToString = jest
+  .fn()
+  .mockReturnValue('mock-voiceresponse-tostring-foobar');
 
 const VoiceResponse = jest.fn().mockReturnValue({
   dial,
@@ -24,3 +26,5 @@ const VoiceResponse = jest.fn().mockReturnValue({
 export const twiml = {
   VoiceResponse,
 };
+
+export const validateExpressRequest = jest.fn().mockReturnValue(true);
