@@ -1,4 +1,3 @@
-import * as user from '../src/store/user';
 import * as app from '../src/store/app';
 import * as token from '../src/store/voice/token';
 import * as outgoingCall from '../src/store/voice/call/outgoingCall';
