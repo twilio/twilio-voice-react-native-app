@@ -44,7 +44,6 @@ Create a new Auth0 `API` from the Auth0 user console, then enter your desired `N
 ## Structure
 
 * A React Native application under:
-
   ```
   app/
   ```
