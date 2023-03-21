@@ -2,35 +2,74 @@
 
 The Twilio Voice React Native Reference App is an example implementation of the Twilio Voice React Native SDK and serves to inspire developers who want to leverage the power of Twilio Programmable Voice in their React Native applications. See the Twilio Voice React Native SDK [here](https://github.com/twilio/twilio-voice-react-native).
 
+### Setting up Auth0
+
+Find the `Domain` and `Client ID` found in the `Settings` tab of your Auth0 Application
+
+![auth0nativesettings](https://user-images.githubusercontent.com/35968892/226489462-1236918f-d1e0-4c9b-944a-1d6175a862ab.png)
+
+Add the Application `Domain` and `Client ID` to the app config file
+
+```
+app/config.ts
+```
+
+Add the Application `Domain` to `manifestPlaceholders` in the build.gradle file
+
+```
+app/android/app/build.gradle
+```
+
+Find the `Identifier` found in the `Settings` tab of your Auth0 API
+
+![auth0apisettings](https://user-images.githubusercontent.com/35968892/226490159-d7991878-5f66-4b81-9bd7-c1d15b335648.png)
+
+Add the `Identifier` as `audience` in the app config file
+
+```
+app/config.ts
+```
+
 ### Launching the App
 
 Ensure that you are within the `app/` folder.
+
 ```
 cd app/
 ```
+
 Fetch the dependencies.
+
 ```
 yarn install
 ```
+
 Install iOS dependencies if running on iOS
+
 ```
 cd ios
 pod install
 cd ../
 ```
+
 Start a native build and the Metro bundler at the same time by using the command
+
 ```
 yarn android
 ```
+
 or
+
 ```
 yarn ios
 ```
+
 for your respective target platform.
 
 ### Setting it up with the Server
 
 Once the Reference Server is up and running, the Reference App can be directed to it by modifying the following line in `app/src/util/fetch.ts`.
+
 ```
 const defaultUrl = ...;
 ```
@@ -42,8 +81,9 @@ See more info about `ngrok` [here](https://ngrok.com/).
 If the Reference Server is deployed to a cloud service (some examples include Google App Engine, Amazon EC2, or similar), then point `defaultUrl` to the deployed service URL.
 
 See some of the following cloud services for production deployment:
-* Google App Engine [here](https://cloud.google.com/).
-* Amazon EC2 [here](https://aws.amazon.com/).
+
+- Google App Engine [here](https://cloud.google.com/).
+- Amazon EC2 [here](https://aws.amazon.com/).
 
 ## Design Patterns
 
