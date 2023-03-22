@@ -13,9 +13,9 @@ This project consists of a backend server and a React Native app that demonstrat
 * App to app calls
 * Registration and notifications for incoming calls
 
-![dialer](https://user-images.githubusercontent.com/22135968/223575482-53f733b4-c828-4dd1-b100-7cc945a52c9f.jpg)
-![active](https://user-images.githubusercontent.com/22135968/223575472-f112ab20-f11c-4f54-9432-3640ddbb0f1c.jpg)
-![login](https://user-images.githubusercontent.com/35968892/226741082-eb0ac83a-b16d-46a3-9ff3-a83167ed7267.png)
+![login](https://user-images.githubusercontent.com/35968892/227046749-f2d3cc70-cfee-44c6-ae22-9e7a1c71c9fb.png)
+![dialer](https://user-images.githubusercontent.com/35968892/227047077-b58f33b3-067a-4765-a645-75e1562f6607.png)
+![active](https://user-images.githubusercontent.com/35968892/227046999-598f765f-3496-4e0d-83de-c7995bd616ce.png)
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ This project consists of a backend server and a React Native app that demonstrat
 
 ## Setting Up Auth0 Authentication
 
-The Twilio Voice React Native Reference App implements Auth0 to demonstrate login flow for authenticating and authorizing users. Sign In to your Auth0 account and follow the steps below.
+The Twilio Voice React Native Reference App implements Auth0 to demonstrate login flow for authenticating and authorizing users. Sign in to your Auth0 account and follow the steps below.
 
 ### Auth0 for the app
 
@@ -35,25 +35,25 @@ The Twilio Voice React Native Reference App implements Auth0 to demonstrate logi
 
 ![auth0reactnative](https://user-images.githubusercontent.com/35968892/226486988-5dc0172d-0f46-4957-916b-385c2bdeaf8b.png)
 
-2. Navigate to the settings tab of your newly created Auth0 Application. You will now need to fill out the fields labeled `Allowed Callback Urls` and `Allowed Logout Urls`. Depending on your use case enter the ios format, android format, or both.
+2. Navigate to the settings tab of your newly created Auth0 Application. You will now need to fill out the fields labeled `Allowed Callback Urls` and `Allowed Logout Urls`. Depending on your use case enter the iOS format, Android format, or both.
 
 
-> Allowed Callback Url format ios
+> Allowed Callback Url format iOS
 ```
 com.twiliovoicereactnativereferenceapp://{YourDomain}/ios/com.twiliovoicereactnativereferenceapp/callback
 ```
 
-> Allowed Callback Url format android
+> Allowed Callback Url format Android
 ```
 com.twiliovoicereactnativereferenceapp://{YourDomain}/android/com.twiliovoicereactnativereferenceapp/callback
 ```
 
-> Allowed Logout Url format ios
+> Allowed Logout Url format iOS
 ```
 com.twiliovoicereactnativereferenceapp://{YourDomain}/ios/com.twiliovoicereactnativereferenceapp/callback
 ```
 
-> Allowed Logout Url format android
+> Allowed Logout Url format Android
 ```
 com.twiliovoicereactnativereferenceapp://{YourDomain}/android/com.twiliovoicereactnativereferenceapp/callback
 ```
