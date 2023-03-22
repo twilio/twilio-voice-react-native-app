@@ -21,9 +21,9 @@ This project consists of a backend server and a React Native app that demonstrat
 
 * Understanding of [Twilio Programmable Voice](https://www.twilio.com/docs/voice/sdks).
 * A [React Native Development Environment](https://reactnative.dev/docs/0.70/environment-setup).
-* Latest LTS version of [NodeJS](https://nodejs.org/en/).
+* An LTS version of [NodeJS](https://nodejs.org/en/) as specified [here](app/.node-version).
 * A Node package manager. Examples in this project will use the latest version of [Yarn v1]https://classic.yarnpkg.com/lang/en/.
-* Create an [Auth0 Account](https://auth0.com/signup?place=header&type=button&text=sign%20up)
+* An [Auth0 Account](https://auth0.com/signup?place=header&type=button&text=sign%20up)
 
 ## Setting Up Auth0 Authentication
 
