@@ -1,4 +1,4 @@
-const authorize = jest.fn().mockReturnValue({
+export const authorize = jest.fn().mockReturnValue({
   accessToken: 'test token',
   idToken: 'test id token',
 });
