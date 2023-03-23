@@ -35,41 +35,37 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
 jest.mock('react-native-auth0');
 
 describe('token store', () => {
-  describe('getToken', () => {
-    it('successfully gets a token', async () => {
-      fetchMock.mockResolvedValueOnce({
-        text: jest.fn().mockResolvedValueOnce('foo'),
-      });
-      await app.store.dispatch(user.login());
-      await app.store.dispatch(token.getToken());
-      expect(fetchMock).toBeCalledTimes(1);
-      expect(app.store.getState().voice.token).toEqual({
-        status: 'fulfilled',
-        value: 'foo',
-      });
+  it('successfully gets a token', async () => {
+    fetchMock.mockResolvedValueOnce({
+      text: jest.fn().mockResolvedValueOnce('foo'),
     });
-
-    it('returns empty string if no user', async () => {
-      jest.spyOn(auth0, 'authorize').mockReturnValue({ undefined });
-      await app.store.dispatch(user.login());
-      await app.store.dispatch(token.getToken());
-      expect(app.store.getState().voice.token).toEqual({
-        status: 'fulfilled',
-        value: '',
-      });
+    await app.store.dispatch(user.login());
+    await app.store.dispatch(token.getToken());
+    expect(fetchMock).toBeCalledTimes(1);
+    expect(app.store.getState().voice.token).toEqual({
+      status: 'fulfilled',
+      value: 'foo',
     });
   });
 
-  describe('tokenSlice', () => {
-    it('handles rejected case for fetch error', async () => {
-      jest.spyOn(auth0, 'authorize').mockReturnValue({
-        accessToken: 'test token',
-        idToken: 'test id token',
-      });
-      fetchMock.mockRejectedValueOnce(new Error('error'));
-      await app.store.dispatch(user.login());
-      await app.store.dispatch(token.getToken());
-      expect(app.store.getState().voice.token.status).toEqual('rejected');
+  it('returns empty string if no user', async () => {
+    jest.spyOn(auth0, 'authorize').mockReturnValue({ undefined });
+    await app.store.dispatch(user.login());
+    await app.store.dispatch(token.getToken());
+    expect(app.store.getState().voice.token).toEqual({
+      status: 'fulfilled',
+      value: '',
     });
+  });
+
+  it('handles rejected case for fetch error', async () => {
+    jest.spyOn(auth0, 'authorize').mockReturnValue({
+      accessToken: 'test token',
+      idToken: 'test id token',
+    });
+    fetchMock.mockRejectedValueOnce(new Error('error'));
+    await app.store.dispatch(user.login());
+    await app.store.dispatch(token.getToken());
+    expect(app.store.getState().voice.token.status).toEqual('rejected');
   });
 });

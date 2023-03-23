@@ -19,9 +19,6 @@ export const userSlice = createSlice({
       })
       .addCase(checkLoginStatus.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
-      })
-      .addCase(checkLoginStatus.rejected, () => {
-        return { status: 'rejected' };
       });
     builder
       .addCase(login.pending, () => {
@@ -31,7 +28,7 @@ export const userSlice = createSlice({
         return { status: 'fulfilled', ...action.payload };
       })
       .addCase(login.rejected, (_, action) => {
-        return { status: 'rejected', ...action.error };
+        return { status: 'rejected', error: action.payload };
       });
     builder
       .addCase(logout.pending, () => {
@@ -41,7 +38,7 @@ export const userSlice = createSlice({
         return { status: 'fulfilled', ...action.payload };
       })
       .addCase(logout.rejected, (_, action) => {
-        return { status: 'rejected', ...action.error };
+        return { status: 'rejected', error: action.payload };
       });
   },
 });
@@ -69,39 +66,43 @@ export const checkLoginStatus = createAsyncThunk<{
   }
 });
 
-export const login = createAsyncThunk<
-  { accessToken: string; email: string },
-  void,
-  { rejectValue: 'ID_TOKEN_UNDEFINED' }
->('user/login', async (_, { rejectWithValue }) => {
-  const credentials = await auth0.webAuth.authorize({
-    scope: config.auth0Scope,
-    audience: config.audience,
-  });
+export const login = createAsyncThunk<{ accessToken: string; email: string }>(
+  'user/login',
+  async (_, { rejectWithValue }) => {
+    try {
+      const credentials = await auth0.webAuth.authorize({
+        scope: config.auth0Scope,
+        audience: config.audience,
+      });
 
-  if (typeof credentials.idToken === 'undefined') {
-    return rejectWithValue('ID_TOKEN_UNDEFINED');
-  }
+      if (typeof credentials.idToken === 'undefined') {
+        return rejectWithValue('ID_TOKEN_UNDEFINED');
+      }
 
-  auth0.credentialsManager.saveCredentials(credentials as any);
+      auth0.credentialsManager.saveCredentials(credentials as any);
 
-  const user = await auth0.auth.userInfo({
-    token: credentials.accessToken,
-  });
-  return {
-    accessToken:
-      typeof credentials.accessToken === 'undefined'
-        ? ''
-        : credentials.accessToken,
-    email: typeof user.email === 'undefined' ? '' : user.email,
-  };
-});
+      const user = await auth0.auth.userInfo({
+        token: credentials.accessToken,
+      });
+      return {
+        accessToken: credentials.accessToken,
+        email: user.email,
+      };
+    } catch (error) {
+      return rejectWithValue('LOGIN_ERROR');
+    }
+  },
+);
 
 export const logout = createAsyncThunk<{ accessToken: string; email: string }>(
   'user/logout',
-  async () => {
-    await auth0.webAuth.clearSession();
-    await auth0.credentialsManager.clearCredentials();
-    return { accessToken: '', email: '' };
+  async (_, { rejectWithValue }) => {
+    try {
+      await auth0.webAuth.clearSession();
+      await auth0.credentialsManager.clearCredentials();
+      return { accessToken: '', email: '' };
+    } catch (error) {
+      return rejectWithValue('LOGOUT_ERROR');
+    }
   },
 );
