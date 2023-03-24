@@ -8,7 +8,9 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "detox:build": "detox build",
+    "detox:test": "detox test"
   },
   "dependencies": {
     "@react-navigation/bottom-tabs": "^6.5.3",

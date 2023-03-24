@@ -137,6 +137,18 @@ jobs:
             yarn typecheck
             cd ..
 
+  app-detox-android:
+    executor: android/android-machine
+    steps:
+      - attach_project
+      - run:
+          name: "App: Detox Android"
+          command: |
+            cd app
+            yarn detox:build --configuration android.emu.release
+            yarn detox:test --configuration android.emu.release
+            cd ..
+
   ###
   # Server jobs
   ###
@@ -187,6 +199,9 @@ workflows:
           requires:
             - app-cache-install-yarn-dependencies
       - app-typecheck:
+          requires:
+            - app-cache-install-yarn-dependencies
+      - app-detox-android:
           requires:
             - app-cache-install-yarn-dependencies
       # server jobs
