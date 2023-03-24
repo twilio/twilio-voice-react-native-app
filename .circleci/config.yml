@@ -1,6 +1,12 @@
 version: 2.1
 
 ###
+# Orbs
+###
+orbs:
+  android: circleci/android@2.2.0
+
+###
 # Parameters
 ###
 parameters:
@@ -25,14 +31,48 @@ commands:
     steps:
       - attach_workspace:
           at: ~/project
+
+  ##
+  # App commands
+  ##
   app-install-dependencies:
     steps:
       - run:
-          name: "App: install dependencies"
+          name: "App: install Yarn dependencies"
           command: |
             cd app
             yarn install --immutable
             cd ..
+
+  app-setup-cocoapods:
+    steps:
+      - run:
+          name: "App: setup Cocoapods"
+          command: |
+            sudo gem install cocoapods -v 1.11.3
+
+  app-install-pods:
+    steps:
+      - run:
+          name: "App: install Pods"
+          command: |
+            cd app
+            cd ios
+            pod install
+            cd ..
+            cd ..
+
+  app-install-applesimutils:
+    steps:
+      - run:
+          name: "App: install applesimutils"
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
+
+  ##
+  # Server commands
+  ##
   server-install-dependencies:
     steps:
       - run:
@@ -42,11 +82,12 @@ commands:
             yarn install --immutable
             cd ..
 
+
 jobs:
   ###
   # App jobs
   ###
-  app-cache-install-dependencies:
+  app-cache-install-yarn-dependencies:
     executor: default
     steps:
       - checkout
@@ -137,13 +178,8 @@ workflows:
   build-test:
     when: << pipeline.parameters.pr_workflow >>
     jobs:
-      # server jobs
-      - server-cache-install-dependencies
-      - server-test:
-          requires:
-            - server-cache-install-dependencies
       # app jobs
-      - app-cache-install-dependencies
+      - app-cache-install-yarn-dependencies
       - app-test:
           requires:
             - app-cache-install-dependencies
@@ -153,3 +189,8 @@ workflows:
       - app-typecheck:
           requires:
             - app-cache-install-dependencies
+      # server jobs
+      - server-cache-install-dependencies
+      - server-test:
+          requires:
+            - server-cache-install-dependencies
