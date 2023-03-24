@@ -138,7 +138,10 @@ jobs:
             cd ..
 
   app-detox-android:
-    executor: android/android-machine
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2023.02.1
     steps:
       - attach_project
       - run:
