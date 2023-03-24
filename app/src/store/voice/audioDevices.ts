@@ -1,8 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import {
-  type AudioDevice as TwilioAudioDevice,
-  Voice,
-} from '@twilio/voice-react-native-sdk';
+import { type AudioDevice as TwilioAudioDevice } from '@twilio/voice-react-native-sdk';
 import { voice, audioDeviceMap } from '../../util/voice';
 import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
 
