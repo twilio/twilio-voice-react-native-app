@@ -182,13 +182,13 @@ workflows:
       - app-cache-install-yarn-dependencies
       - app-test:
           requires:
-            - app-cache-install-dependencies
+            - app-cache-install-yarn-dependencies
       - app-lint:
           requires:
-            - app-cache-install-dependencies
+            - app-cache-install-yarn-dependencies
       - app-typecheck:
           requires:
-            - app-cache-install-dependencies
+            - app-cache-install-yarn-dependencies
       # server jobs
       - server-cache-install-dependencies
       - server-test:
