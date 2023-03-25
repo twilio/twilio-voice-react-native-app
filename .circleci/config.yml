@@ -145,10 +145,19 @@ jobs:
     steps:
       - attach_project
       - run:
-          name: "App: Detox Android"
+          name: "App: Detox build Android"
           command: |
             cd app
             yarn detox:build --configuration android.emu.release
+            cd ..
+      - android/create-avd:
+          avd-name: TwilioVoiceReactNativeReferenceApp_AVD
+          install: true
+          system-image: system-images;android-33;default;x86_64
+      - run:
+          name: "App: Detox test Android"
+          command: |
+            cd app
             yarn detox:test --configuration android.emu.release
             cd ..
 
