@@ -191,9 +191,6 @@ jobs:
       - attach_project
       - app-install-applesimutils
       - app-install-pods
-      - macos/preboot-simulator:
-          device: "iPhone 13"
-      - macos/wait-until-simulator-booted
       - app-detox-build:
           configuration: ios.sim.release
       - app-detox-test:
