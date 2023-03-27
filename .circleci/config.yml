@@ -156,6 +156,7 @@ jobs:
           system-image: system-images;android-29;default;x86_64
       - android/start-emulator:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
+          post-emulator-launch-assemble-command: ""
       - run:
           name: "App: Detox test Android"
           command: |
