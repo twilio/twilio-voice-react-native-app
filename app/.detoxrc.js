@@ -50,7 +50,7 @@ module.exports = {
     emulator: {
       type: 'android.emulator',
       device: {
-        avdName: '.*'
+        avdName: 'TwilioVoiceReactNativeReferenceApp_AVD'
       }
     }
   },
