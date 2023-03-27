@@ -5,6 +5,7 @@ version: 2.1
 ###
 orbs:
   android: circleci/android@2.2.0
+  macos: circleci/macos@2.3.4
 
 ###
 # Parameters
@@ -69,6 +70,32 @@ commands:
           command: |
             HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
             HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
+
+  app-detox-build:
+    parameters:
+      configuration:
+        description: The Detox config to build as defined in .detoxrc.js
+        type: string
+    steps:
+      - run:
+          name: "App: Detox build"
+          command: |
+            cd app
+            yarn detox:build --configuration << parameters.configuration >>
+            cd ..
+
+  app-detox-test:
+    parameters:
+      configuration:
+        description: The Detox config to test as defined in .detoxrc.js
+        type: string
+    steps:
+      - run:
+          name: "App: Detox test"
+          command: |
+            cd app
+            yarn detox:test --configuration << parameters.configuration >>
+            cd ..
 
   ##
   # Server commands
@@ -144,12 +171,8 @@ jobs:
       tag: 2023.02.1
     steps:
       - attach_project
-      - run:
-          name: "App: Detox build Android"
-          command: |
-            cd app
-            yarn detox:build --configuration android.emu.release
-            cd ..
+      - app-detox-build:
+          configuration: android.emu.release
       - android/create-avd:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
@@ -157,12 +180,24 @@ jobs:
       - android/start-emulator:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           post-emulator-launch-assemble-command: ""
-      - run:
-          name: "App: Detox test Android"
-          command: |
-            cd app
-            yarn detox:test --configuration android.emu.release
-            cd ..
+          restore-gradle-cache-post-emulator-launch: false
+      - app-detox-test:
+          configuration: android.emu.release
+
+  app-detox-ios:
+    macos:
+      xcode: 14.0.0
+    steps:
+      - attach_project
+      - app-install-applesimutils
+      - app-install-pods
+      - macos/preboot-simulator:
+          device: "iPhone 13"
+      - macos/wait-until-simulator-booted
+      - app-detox-build:
+          configuration: ios.sim.release
+      - app-detox-test:
+          configuration: ios.sim.release
 
   ###
   # Server jobs
@@ -217,6 +252,9 @@ workflows:
           requires:
             - app-cache-install-yarn-dependencies
       - app-detox-android:
+          requires:
+            - app-cache-install-yarn-dependencies
+      - app-detox-ios:
           requires:
             - app-cache-install-yarn-dependencies
       # server jobs
