@@ -32,8 +32,6 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   return { Call: MockCall };
 });
 
-jest.mock('react-native-auth0');
-
 describe('token store', () => {
   it('successfully gets a token', async () => {
     fetchMock.mockResolvedValueOnce({
@@ -66,6 +64,6 @@ describe('token store', () => {
     fetchMock.mockRejectedValueOnce(new Error('error'));
     await app.store.dispatch(user.login());
     await app.store.dispatch(token.getToken());
-    expect(app.store.getState().voice.token.status).toEqual('rejected');
+    expect(app.store.getState().voice.token?.status).toEqual('rejected');
   });
 });

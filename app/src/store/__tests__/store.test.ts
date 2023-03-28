@@ -33,8 +33,6 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   return { Call: MockCall };
 });
 
-jest.mock('react-native-auth0');
-
 it('works good', async () => {
   fetchMock.mockResolvedValueOnce({
     text: jest.fn().mockResolvedValueOnce('foo'),
@@ -42,7 +40,7 @@ it('works good', async () => {
   const getTokenAction = token.getToken();
   await app.store.dispatch(getTokenAction);
 
-  expect(app.store.getState().voice.token.status).toEqual('fulfilled');
+  expect(app.store.getState().voice.token?.status).toEqual('fulfilled');
 
   voiceConnectMock.mockResolvedValueOnce({
     _uuid: 'mock uuid',
@@ -63,7 +61,7 @@ it('works good', async () => {
   });
   await app.store.dispatch(makeOutgoingCallAction);
 
-  expect(app.store.getState().voice.call.outgoingCall.status).toEqual(
+  expect(app.store.getState().voice.call.outgoingCall?.status).toEqual(
     'fulfilled',
   );
 

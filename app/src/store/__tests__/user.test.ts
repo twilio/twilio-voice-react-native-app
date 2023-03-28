@@ -1,6 +1,5 @@
 import * as user from '../user';
 import * as app from '../app';
-
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 
 let MockCall: { Event: Record<string, string> };
@@ -30,8 +29,6 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   };
   return { Call: MockCall };
 });
-
-jest.mock('react-native-auth0');
 
 describe('user store', () => {
   it('should initially be null', () => {
