@@ -6,19 +6,19 @@ module.exports = {
       config: 'e2e/jest.config.js'
     },
     jest: {
-      setupTimeout: 120000
+      setupTimeout: 240000
     }
   },
   apps: {
     'ios.debug': {
       type: 'ios.app',
       binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/TwilioVoiceReactNativeReferenceApp.app',
-      build: 'xcodebuild -workspace ios/TwilioVoiceReactNativeReferenceApp.xcworkspace -scheme TwilioVoiceReactNativeReferenceApp -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build'
+      build: 'xcodebuild -workspace ios/TwilioVoiceReactNativeReferenceApp.xcworkspace -scheme TwilioVoiceReactNativeReferenceApp -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build -quiet -arch x86_64'
     },
     'ios.release': {
       type: 'ios.app',
       binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/TwilioVoiceReactNativeReferenceApp.app',
-      build: 'xcodebuild -workspace ios/TwilioVoiceReactNativeReferenceApp.xcworkspace -scheme TwilioVoiceReactNativeReferenceApp -configuration Release -sdk iphonesimulator -derivedDataPath ios/build'
+      build: 'xcodebuild -workspace ios/TwilioVoiceReactNativeReferenceApp.xcworkspace -scheme TwilioVoiceReactNativeReferenceApp -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -quiet -arch x86_64'
     },
     'android.debug': {
       type: 'android.apk',
