@@ -31,6 +31,7 @@
     "@types/jest": "^29.5.0",
     "@types/react": "^18.0.21",
     "@types/react-native": "^0.70.6",
+    "@types/react-native-auth0": "^2.17.3",
     "@types/react-test-renderer": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
@@ -50,6 +51,7 @@
       "jsx",
       "json",
       "node"
-    ]
+    ],
+    "collectCoverage": true
   }
 }

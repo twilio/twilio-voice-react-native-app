@@ -1,4 +1,4 @@
-const authorize = jest.fn().mockReturnValue({
+export const authorize = jest.fn().mockReturnValue({
   accessToken: 'test token',
   idToken: 'test id token',
 });
@@ -12,6 +12,8 @@ export const getCredentials = jest.fn().mockReturnValue({
   idToken: 'test id token',
 });
 
+export const clearSession = jest.fn();
+
 const mockAuth0 = jest.fn().mockImplementation(() => ({
   credentialsManager: {
     getCredentials,
@@ -19,7 +21,7 @@ const mockAuth0 = jest.fn().mockImplementation(() => ({
     saveCredentials: jest.fn(),
   },
   auth: { userInfo },
-  webAuth: { authorize, clearSession: jest.fn() },
+  webAuth: { authorize, clearSession },
 }));
 
 export default mockAuth0;

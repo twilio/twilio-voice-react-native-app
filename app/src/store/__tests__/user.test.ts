@@ -1,15 +1,14 @@
-import * as user from '../../src/store/user';
-import * as app from '../../src/store/app';
-
-import * as auth0 from '../../__mocks__/react-native-auth0';
+import * as user from '../user';
+import * as app from '../app';
+import * as auth0 from '../../../__mocks__/react-native-auth0';
 
 let MockCall: { Event: Record<string, string> };
 
-jest.mock('../../src/util/fetch', () => ({
+jest.mock('../../../src/util/fetch', () => ({
   fetch: jest.fn(),
 }));
 
-jest.mock('../../src/util/voice', () => ({
+jest.mock('../../../src/util/voice', () => ({
   voice: {
     connect: jest.fn(),
   },
@@ -31,9 +30,7 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   return { Call: MockCall };
 });
 
-jest.mock('react-native-auth0');
-
-describe('user slice', () => {
+describe('user store', () => {
   it('should initially be null', () => {
     const userState = app.store.getState().voice.user;
     expect(userState).toEqual(null);
@@ -79,6 +76,26 @@ describe('user slice', () => {
       status: 'fulfilled',
       accessToken: 'test token',
       email: 'test email',
+    });
+  });
+
+  it('should handle login error', async () => {
+    jest.spyOn(auth0, 'authorize').mockRejectedValue(new Error('login failed'));
+    await app.store.dispatch(user.login());
+    const userState = app.store.getState().voice.user;
+    expect(userState).toEqual({ status: 'rejected', error: 'LOGIN_ERROR' });
+  });
+
+  it('should handle logout error', async () => {
+    jest
+      .spyOn(auth0, 'clearSession')
+      .mockRejectedValue(new Error('logout failed'));
+    await app.store.dispatch(user.login());
+    await app.store.dispatch(user.logout());
+    const userState = app.store.getState().voice.user;
+    expect(userState).toEqual({
+      status: 'rejected',
+      error: 'LOGOUT_ERROR',
     });
   });
 });
