@@ -171,7 +171,7 @@ jobs:
     steps:
       - attach_project
       - app-detox-build:
-          configuration: android.emu.release
+          configuration: android.emu.debug
       - android/create-avd:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
@@ -181,7 +181,7 @@ jobs:
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
       - app-detox-test:
-          configuration: android.emu.release
+          configuration: android.emu.debug
 
   app-detox-ios:
     macos:
@@ -191,9 +191,9 @@ jobs:
       - app-install-applesimutils
       - app-install-pods
       - app-detox-build:
-          configuration: ios.sim.release
+          configuration: ios.sim.debug
       - app-detox-test:
-          configuration: ios.sim.release
+          configuration: ios.sim.debug
 
   ###
   # Server jobs
