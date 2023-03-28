@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Button, Image, Text } from 'react-native';
+import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { login, checkLoginStatus } from '../../store/user';
 import { type Dispatch } from '../../store/app';
 
+const ArrowForward = require('../../../assets/icons/arrow-forward.png');
 const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
 const HelloFigure = require('../../../assets/icons/hello-figure.png');
 
@@ -30,11 +31,35 @@ const styles = StyleSheet.create({
     color: '#121C2D',
   },
   logoContainer: {
-    marginTop: 140,
+    marginTop: '50%',
     marginLeft: 18,
   },
   text: {
     marginBottom: 20,
+  },
+  loginScreenButton: {
+    marginTop: 10,
+    paddingTop: 8,
+    paddingBottom: 8,
+    backgroundColor: '#0263E0',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#fff',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loginText: {
+    color: '#FFFFFF',
+    textAlign: 'center',
+    weight: 600,
+    size: 14,
+  },
+  arrowForward: {
+    width: 20,
+    height: 20,
+    marginLeft: 4,
   },
 });
 
@@ -62,7 +87,16 @@ const SignIn: React.FC = () => {
         <Text style={styles.text}>
           Welcome to Twilio's Voice SDK Reference App. Log in to get started!
         </Text>
-        <Button title="Log in" color="#0263E0" onPress={handleLogin} />
+        <TouchableOpacity
+          style={styles.loginScreenButton}
+          onPress={handleLogin}>
+          <Text style={styles.loginText}>Log in</Text>
+          <Image
+            source={ArrowForward}
+            resizeMode="contain"
+            style={styles.arrowForward}
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.helloFigureContainer}>
         <Image source={HelloFigure} resizeMode="contain" />
