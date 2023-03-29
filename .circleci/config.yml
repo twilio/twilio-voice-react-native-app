@@ -93,7 +93,7 @@ commands:
           name: "App: Detox test"
           command: |
             cd app
-            yarn detox:test --configuration << parameters.configuration >>
+            yarn detox:test --configuration << parameters.configuration >> --headless
             cd ..
 
   ##
