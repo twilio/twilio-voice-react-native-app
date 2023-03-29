@@ -1703,7 +1703,7 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.5.tgz#5f19d2b85a98e9558036f6a3cacc8819420f05cf"
   integrity sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==
 
-"@types/react-native-auth0@^2.17.3":
+"@types/react-native-auth0@^2.17.1":
   version "2.17.3"
   resolved "https://registry.yarnpkg.com/@types/react-native-auth0/-/react-native-auth0-2.17.3.tgz#cdd8995f86e7314234d393c14c4760172d00df65"
   integrity sha512-kfNzHuffZGQG7zmmPKIU4xkj0X0fC9MdwZ6oOwXuSgjcjKmEpReY9Pkz4zypkZMLUN8MldESZyd6Sv8+EqOuYA==
