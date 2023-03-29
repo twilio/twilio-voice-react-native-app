@@ -40,7 +40,7 @@ The Twilio Voice React Native Reference App implements Auth0 to demonstrate logi
 
 > Allowed Callback Url format iOS
 ```
-com.twiliovoicereactnativereferenceapp://{YourDomain}/ios/com.twiliovoicereactnativereferenceapp/callback
+org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp://{YourDomain}/ios/org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp/callback
 ```
 
 > Allowed Callback Url format Android
@@ -50,7 +50,7 @@ com.twiliovoicereactnativereferenceapp://{YourDomain}/android/com.twiliovoicerea
 
 > Allowed Logout Url format iOS
 ```
-com.twiliovoicereactnativereferenceapp://{YourDomain}/ios/com.twiliovoicereactnativereferenceapp/callback
+org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp://{YourDomain}/ios/org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp/callback
 ```
 
 > Allowed Logout Url format Android
