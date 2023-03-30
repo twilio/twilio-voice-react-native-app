@@ -16,6 +16,11 @@ const Dialer: React.FC = () => {
     recipient,
   } = useDialer();
 
+  const isOutgoingCallButtonDisabled =
+    dialpad.outgoingNumber === '' || isDisabled;
+
+  const isBackSpaceVisible = dialpad.outgoingNumber !== '';
+
   return (
     <View style={styles.container}>
       <View style={styles.spacer} />
@@ -38,13 +43,17 @@ const Dialer: React.FC = () => {
           recipientType={recipient.type}
         />
         <MakeOutgoingCallButton
-          disabled={isDisabled}
+          disabled={isOutgoingCallButtonDisabled}
           onPress={makeOutgoingCall.handle}
         />
-        <BackspaceButton
-          disabled={isDisabled}
-          onPress={dialpad.handleBackspace}
-        />
+        {isBackSpaceVisible ? (
+          <BackspaceButton
+            disabled={isDisabled}
+            onPress={dialpad.handleBackspace}
+          />
+        ) : (
+          <View style={styles.emptyButton} />
+        )}
       </View>
       <View style={styles.spacer} />
     </View>
@@ -68,6 +77,9 @@ const styles = StyleSheet.create({
   buttons: {
     display: 'flex',
     flexDirection: 'row',
+  },
+  emptyButton: {
+    width: 96,
   },
 });
 
