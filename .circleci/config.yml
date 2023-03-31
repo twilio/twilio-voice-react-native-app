@@ -32,9 +32,9 @@ commands:
       - attach_workspace:
           at: ~/project
 
-  ##
+  ###
   # App commands
-  ##
+  ###
   app-install-dependencies:
     steps:
       - run:
@@ -107,7 +107,6 @@ commands:
             cd server
             yarn install --immutable
             cd ..
-
 
 jobs:
   ###
@@ -249,12 +248,8 @@ workflows:
       - app-typecheck:
           requires:
             - app-cache-install-yarn-dependencies
-      - app-detox-android:
-          requires:
-            - app-cache-install-yarn-dependencies
-      - app-detox-ios:
-          requires:
-            - app-cache-install-yarn-dependencies
+      - app-detox-android
+      - app-detox-ios
       # server jobs
       - server-cache-install-dependencies
       - server-test:
