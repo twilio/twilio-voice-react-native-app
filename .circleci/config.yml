@@ -1,6 +1,12 @@
 version: 2.1
 
 ###
+# Orbs
+###
+orbs:
+  android: circleci/android@2.2.0
+
+###
 # Parameters
 ###
 parameters:
@@ -25,14 +31,74 @@ commands:
     steps:
       - attach_workspace:
           at: ~/project
+
+  ###
+  # App commands
+  ###
   app-install-dependencies:
     steps:
       - run:
-          name: "App: install dependencies"
+          name: "App: install Yarn dependencies"
           command: |
             cd app
             yarn install --immutable
             cd ..
+
+  app-setup-cocoapods:
+    steps:
+      - run:
+          name: "App: setup Cocoapods"
+          command: |
+            sudo gem install cocoapods -v 1.11.3
+
+  app-install-pods:
+    steps:
+      - run:
+          name: "App: install Pods"
+          command: |
+            cd app
+            cd ios
+            pod install
+            cd ..
+            cd ..
+
+  app-install-applesimutils:
+    steps:
+      - run:
+          name: "App: install applesimutils"
+          command: |
+            HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install applesimutils
+
+  app-detox-build:
+    parameters:
+      configuration:
+        description: The Detox config to build as defined in .detoxrc.js
+        type: string
+    steps:
+      - run:
+          name: "App: Detox build"
+          command: |
+            cd app
+            yarn detox:build --configuration << parameters.configuration >>
+            cd ..
+
+  app-detox-test:
+    parameters:
+      configuration:
+        description: The Detox config to test as defined in .detoxrc.js
+        type: string
+    steps:
+      - run:
+          name: "App: Detox test"
+          command: |
+            cd app
+            yarn detox:test --configuration << parameters.configuration >> --headless
+            cd ..
+
+  ##
+  # Server commands
+  ##
   server-install-dependencies:
     steps:
       - run:
@@ -46,7 +112,7 @@ jobs:
   ###
   # App jobs
   ###
-  app-cache-install-dependencies:
+  app-cache-install-yarn-dependencies:
     executor: default
     steps:
       - checkout
@@ -96,6 +162,40 @@ jobs:
             yarn typecheck
             cd ..
 
+  app-detox-android:
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2023.02.1
+    steps:
+      - checkout
+      - app-install-dependencies
+      - app-detox-build:
+          configuration: android.emu.release
+      - android/create-avd:
+          avd-name: TwilioVoiceReactNativeReferenceApp_AVD
+          install: true
+          system-image: system-images;android-29;default;x86_64
+      - android/start-emulator:
+          avd-name: TwilioVoiceReactNativeReferenceApp_AVD
+          post-emulator-launch-assemble-command: ""
+          restore-gradle-cache-post-emulator-launch: false
+      - app-detox-test:
+          configuration: android.emu.release
+
+  app-detox-ios:
+    macos:
+      xcode: 14.0.0
+    steps:
+      - checkout
+      - app-install-dependencies
+      - app-install-applesimutils
+      - app-install-pods
+      - app-detox-build:
+          configuration: ios.sim.release
+      - app-detox-test:
+          configuration: ios.sim.release
+
   ###
   # Server jobs
   ###
@@ -137,19 +237,21 @@ workflows:
   build-test:
     when: << pipeline.parameters.pr_workflow >>
     jobs:
+      # app jobs
+      - app-cache-install-yarn-dependencies
+      - app-test:
+          requires:
+            - app-cache-install-yarn-dependencies
+      - app-lint:
+          requires:
+            - app-cache-install-yarn-dependencies
+      - app-typecheck:
+          requires:
+            - app-cache-install-yarn-dependencies
+      - app-detox-android
+      - app-detox-ios
       # server jobs
       - server-cache-install-dependencies
       - server-test:
           requires:
             - server-cache-install-dependencies
-      # app jobs
-      - app-cache-install-dependencies
-      - app-test:
-          requires:
-            - app-cache-install-dependencies
-      - app-lint:
-          requires:
-            - app-cache-install-dependencies
-      - app-typecheck:
-          requires:
-            - app-cache-install-dependencies

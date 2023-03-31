@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { type State } from '../store/app';
 import { type ActiveCall } from '../store/voice/call/activeCall';
+import { setTimeout } from '../util/setTimeout';
 
 /**
  * Default time interval for updating the state of the active call time.

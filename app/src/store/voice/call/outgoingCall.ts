@@ -82,8 +82,8 @@ export const outgoingCallSlice = createSlice({
       };
     },
     handleConnectEvent(state, action: PayloadAction<{ time: number }>) {
-      if (state?.status === 'fulfilled') {
-        state.initialConnectTimestamp ??= action.payload.time;
+      if (state?.status === 'fulfilled' && !state.initialConnectTimestamp) {
+        state.initialConnectTimestamp = action.payload.time;
       }
     },
   },
