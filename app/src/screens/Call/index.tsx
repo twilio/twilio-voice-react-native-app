@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Dialpad from '../../components/Dialpad';
 import RemoteParticipant from './RemoteParticipant';
@@ -8,6 +8,9 @@ import SelectAudioOutputDeviceButton from './SelectAudioOutputDeviceButton';
 import ShowDialpadButton from './ShowDialpadButton';
 import HideDialpadButton from './HideDialpadButton';
 import useCall from './hooks';
+import { useNavigation } from '@react-navigation/native';
+import { type StackNavigationProp } from '../../types';
+import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 
 const Call: React.FC = () => {
   const {
@@ -54,6 +57,14 @@ const Call: React.FC = () => {
     ),
     [dialpad, hangup, mute, selectAudioOutputDevice],
   );
+
+  const navigation = useNavigation<StackNavigationProp<'App'>>();
+
+  useEffect(() => {
+    if (callStatus === TwilioCall.State.Disconnected) {
+      setTimeout(() => navigation.navigate('Dialer'), 1000);
+    }
+  }, [callStatus, navigation]);
 
   return (
     <View style={styles.container}>
