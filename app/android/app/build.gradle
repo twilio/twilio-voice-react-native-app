@@ -142,6 +142,8 @@ android {
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
         manifestPlaceholders = [auth0Domain: "{DomainName}", auth0Scheme: "${applicationId}"]
+        testBuildType System.getProperty('testBuildType', 'debug')
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         if (isNewArchitectureEnabled()) {
             // We configure the CMake build only if you decide to opt-in for the New Architecture.
@@ -229,6 +231,7 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
 
@@ -250,6 +253,9 @@ android {
 }
 
 dependencies {
+    androidTestImplementation('com.wix:detox:+')
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
     //noinspection GradleDynamicVersion
