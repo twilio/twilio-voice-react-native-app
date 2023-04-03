@@ -1,17 +1,17 @@
-import * as app from '../src/store/app';
-import * as token from '../src/store/voice/token';
-import * as outgoingCall from '../src/store/voice/call/outgoingCall';
-import * as activeCall from '../src/store/voice/call/activeCall';
+import * as app from '../app';
+import * as token from '../voice/token';
+import * as outgoingCall from '../voice/call/outgoingCall';
+import * as activeCall from '../voice/call/activeCall';
 
 let fetchMock: jest.Mock;
 let voiceConnectMock: jest.Mock;
 let MockCall: { Event: Record<string, string> };
 
-jest.mock('../src/util/fetch', () => ({
+jest.mock('../../../src/util/fetch', () => ({
   fetch: (fetchMock = jest.fn()),
 }));
 
-jest.mock('../src/util/voice', () => ({
+jest.mock('../../../src/util/voice', () => ({
   voice: {
     connect: (voiceConnectMock = jest.fn()),
   },
@@ -34,15 +34,13 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
 });
 
 it('works good', async () => {
-  console.log(app.store.getState());
-
   fetchMock.mockResolvedValueOnce({
     text: jest.fn().mockResolvedValueOnce('foo'),
   });
   const getTokenAction = token.getToken();
   await app.store.dispatch(getTokenAction);
 
-  console.log(app.store.getState());
+  expect(app.store.getState().voice.token?.status).toEqual('fulfilled');
 
   voiceConnectMock.mockResolvedValueOnce({
     _uuid: 'mock uuid',
@@ -63,10 +61,10 @@ it('works good', async () => {
   });
   await app.store.dispatch(makeOutgoingCallAction);
 
-  console.log(app.store.getState());
+  expect(app.store.getState().voice.call.outgoingCall?.status).toEqual(
+    'fulfilled',
+  );
 
   const muteActiveCallAction = activeCall.muteActiveCall({ mute: true });
   await app.store.dispatch(muteActiveCallAction);
-
-  console.log(app.store.getState().voice.call.outgoingCall);
 });

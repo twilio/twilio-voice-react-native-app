@@ -91,7 +91,10 @@ const TabNavigator: React.FC = () => {
   const screen = React.useMemo(
     () => (
       <View style={styles.screens}>
-        <Tab.Navigator>
+        <Tab.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}>
           <Tab.Screen name="Home" component={Home} options={homeTabOptions} />
           <Tab.Screen
             name="Dialer"

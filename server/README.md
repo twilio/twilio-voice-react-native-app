@@ -14,6 +14,28 @@ The Twilio Voice React Native Reference Server is a supplementary backend servic
 
 See [example.env](example.env) for information on environment variables required to run the server.
 
+### Setting Up Auth0
+
+Find the `Domain` found in the `Settings` tab of your Auth0 Application
+
+![auth0nativesettings](https://user-images.githubusercontent.com/35968892/226760563-fbc6e3cf-2d63-4fa1-8fa0-eae98dd80859.png)
+
+Add the Application `Domain` as `AUTH0_ISSUER_BASE_URL` to the env file
+
+```
+.env
+```
+
+Find the `Identifier` found in the `Settings` tab of your Auth0 API
+
+![auth0apisettings](https://user-images.githubusercontent.com/35968892/226760697-9bb44982-2c2f-40fd-bc6f-5176bbafcd0c.png)
+
+Add the `Identifier` as `AUTH0_AUDIENCE` in the env file
+
+```
+.env
+```
+
 ### Running the Project Locally
 
 * Install dependencies

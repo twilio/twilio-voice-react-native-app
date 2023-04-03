@@ -51,23 +51,23 @@ describe('main', () => {
     });
   });
 
-  describe('twilio credentials', () => {
-    it('should create an app with the twilio credentials from the env vars', () => {
+  describe('server credentials', () => {
+    it('should create an app with the server credentials from the env vars', () => {
       runServer();
 
-      expect(env.getTwilioCredentials.mock.results).toHaveLength(1);
-      const retCreds = env.getTwilioCredentials.mock.results[0].value;
+      expect(env.getServerCredentials.mock.results).toHaveLength(1);
+      const retCreds = env.getServerCredentials.mock.results[0].value;
       expect(server.createExpressApp.mock.calls).toHaveLength(1);
       const argCreds = server.createExpressApp.mock.calls[0][0];
       expect(retCreds).toBe(argCreds);
     });
 
     it('should not create an app if there are incomplete credentials', () => {
-      env.getTwilioCredentials.mockReturnValueOnce(undefined);
+      env.getServerCredentials.mockReturnValueOnce(undefined);
 
       runServer();
 
-      expect(env.getTwilioCredentials.mock.results).toHaveLength(1);
+      expect(env.getServerCredentials.mock.results).toHaveLength(1);
       expect(server.createExpressApp.mock.calls).toHaveLength(0);
     });
   });

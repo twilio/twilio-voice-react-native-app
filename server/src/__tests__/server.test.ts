@@ -1,43 +1,70 @@
 import request from 'supertest';
 import { createExpressApp } from '../server';
+import * as auth0JwtCheck from 'express-oauth2-jwt-bearer';
+import { validateExpressRequest } from 'twilio';
 
 jest.unmock('express');
-jest.unmock('twilio');
 
 jest.mock('../utils/log');
+jest.mock('express-oauth2-jwt-bearer');
+jest.mocked(validateExpressRequest);
 
-const mockTwilioCredentials = {
+const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
+  AUTH_TOKEN: 'mock-twiliocredentials-authtoken',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
+  AUTH0_AUDIENCE: 'mock-auth0-audience',
+  AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
 
 describe('/token', () => {
   function tokenRouteTest() {
-    const app = createExpressApp(mockTwilioCredentials);
+    const app = createExpressApp(mockServerConfig);
     return request(app).post('/token');
   }
 
   describe('responds with status code 200', () => {
     it('if a valid username and password are present', async () => {
+      const auth = jest.spyOn(auth0JwtCheck, 'auth');
       const response = await tokenRouteTest().send({
         username: 'alice',
         password: 'supersecretpassword1234',
       });
+      expect(auth).toBeCalledTimes(1);
       expect(response.status).toBe(200);
       expect(response.headers['content-type']).toMatch(/text/);
       expect(response.text).toBeDefined();
       expect(response.text).not.toBe('');
     });
   });
+
+  describe('responds with status code 401', () => {
+    it('if auth0 middleware returns 401', async () => {
+      jest.spyOn(auth0JwtCheck, 'auth').mockImplementation(() =>
+        jest.fn((req: any, res: any, next: any) => {
+          throw Error(res.status(401));
+        }),
+      );
+      const response = await tokenRouteTest().send({
+        username: 'alice',
+        password: 'supersecretpassword1234',
+      });
+      expect(response.status).toBe(401);
+    });
+  });
 });
 
 describe('/twiml', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   function twimlRouteTest() {
-    const app = createExpressApp(mockTwilioCredentials);
+    const app = createExpressApp(mockServerConfig);
     return request(app).post('/twiml');
   }
 
@@ -88,6 +115,20 @@ describe('/twiml', () => {
       expect(response.headers['content-type']).toMatch(/xml/);
       expect(response.text).toBeDefined();
       expect(response.text).not.toBe('');
+    });
+  });
+
+  describe('responds with status code 401', () => {
+    it('if the twilio signature is unauthorized', async () => {
+      jest.mocked(validateExpressRequest).mockReturnValue(false);
+      const response = await twimlRouteTest().send({
+        username: 'alice',
+        password: 'supersecretpassword1234',
+        To: 'bob',
+        recipientType: 'client',
+      });
+      expect(response.status).toBe(401);
+      expect(response.text).toBe('Unauthorized Twilio signature');
     });
   });
 });

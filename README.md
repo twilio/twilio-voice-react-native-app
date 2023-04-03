@@ -6,22 +6,67 @@ This project consists of a backend server and a React Native app that demonstrat
 
 * Dialpad for making outgoing calls to a phone number
 * Active call screen to interact with and control ongoing calls
+* Login flow for authenticating and authorizing users
 
 ### Planned Features
 
 * App to app calls
-* Login flow for authenticating and authorizing users
 * Registration and notifications for incoming calls
 
-![dialer](https://user-images.githubusercontent.com/22135968/223575482-53f733b4-c828-4dd1-b100-7cc945a52c9f.jpg)
-![active](https://user-images.githubusercontent.com/22135968/223575472-f112ab20-f11c-4f54-9432-3640ddbb0f1c.jpg)
+![login](https://user-images.githubusercontent.com/35968892/227046749-f2d3cc70-cfee-44c6-ae22-9e7a1c71c9fb.png)
+![dialer](https://user-images.githubusercontent.com/35968892/227047077-b58f33b3-067a-4765-a645-75e1562f6607.png)
+![active](https://user-images.githubusercontent.com/35968892/227046999-598f765f-3496-4e0d-83de-c7995bd616ce.png)
 
 ## Prerequisites
 
-- Understanding of [Twilio Programmable Voice](https://www.twilio.com/docs/voice/sdks).
-- A [React Native Development Environment](https://reactnative.dev/docs/0.70/environment-setup).
-- Latest LTS version of [NodeJS](https://nodejs.org/en/).
-- A Node package manager. Examples in this project will use the latest version of [Yarn v1](https://classic.yarnpkg.com/lang/en/).
+* Understanding of [Twilio Programmable Voice](https://www.twilio.com/docs/voice/sdks).
+* A [React Native Development Environment](https://reactnative.dev/docs/0.70/environment-setup).
+* An LTS version of [NodeJS](https://nodejs.org/en/) as specified [here](app/.node-version).
+* A Node package manager. Examples in this project will use the latest version of [Yarn v1](https://classic.yarnpkg.com/lang/en/).
+* An [Auth0 Account](https://auth0.com/signup?place=header&type=button&text=sign%20up)
+
+## Setting Up Auth0 Authentication
+
+The Twilio Voice React Native Reference App implements Auth0 to demonstrate login flow for authenticating and authorizing users. Sign in to your Auth0 account and follow the steps below.
+
+### Auth0 for the app
+
+1. Create a new Auth0 `Native` app from the Auth0 user console, then enter your desired `Name`
+
+![auth0reactnative](https://user-images.githubusercontent.com/35968892/226486988-5dc0172d-0f46-4957-916b-385c2bdeaf8b.png)
+
+2. Navigate to the settings tab of your newly created Auth0 Application. You will now need to fill out the fields labeled `Allowed Callback Urls` and `Allowed Logout Urls`. Depending on your use case enter the iOS format, Android format, or both.
+
+
+> Allowed Callback Url format iOS
+```
+org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp://{YourDomain}/ios/org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp/callback
+```
+
+> Allowed Callback Url format Android
+```
+com.twiliovoicereactnativereferenceapp://{YourDomain}/android/com.twiliovoicereactnativereferenceapp/callback
+```
+
+> Allowed Logout Url format iOS
+```
+org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp://{YourDomain}/ios/org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp/callback
+```
+
+> Allowed Logout Url format Android
+```
+com.twiliovoicereactnativereferenceapp://{YourDomain}/android/com.twiliovoicereactnativereferenceapp/callback
+```
+
+> Android Example for `Allowed Callback Urls` and `Allowed Logout Urls`
+
+![auth0AndroidUrls](https://user-images.githubusercontent.com/35968892/226817121-d9fb887b-6881-463a-bf27-485ecd3844c9.png)
+
+### Auth0 for the server
+
+Create a new Auth0 `API` from the Auth0 user console, then enter your desired `Name` and `Identifier`.
+
+![auth0api](https://user-images.githubusercontent.com/35968892/226484829-1544e9db-a258-4986-adcf-923364e759ef.png)
 
 ## Structure
 
@@ -39,10 +84,10 @@ Please see the `README.md` files within each sub-folder for more information abo
 
 ## Related
 
-- [Twilio Voice React Native](https://github.com/twilio/twilio-voice-react-native)
-- [Twilio Voice JS](https://github.com/twilio/twilio-voice.js)
-- [Twilio Voice iOS](https://github.com/twilio/voice-quickstart-ios)
-- [Twilio Voice Android](https://github.com/twilio/voice-quickstart-android)
+* [Twilio Voice React Native](https://github.com/twilio/twilio-voice-react-native)
+* [Twilio Voice JS](https://github.com/twilio/twilio-voice.js)
+* [Twilio Voice iOS](https://github.com/twilio/voice-quickstart-ios)
+* [Twilio Voice Android](https://github.com/twilio/voice-quickstart-android)
 
 ## License
 
