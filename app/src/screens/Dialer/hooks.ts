@@ -19,11 +19,11 @@ import { useActiveCall } from '../../hooks/activeCall';
  */
 const useDialpad = (
   recipientType: RecipientType,
+  outgoingNumber: string,
+  setOutgoingNumber: React.Dispatch<React.SetStateAction<string>>,
   isDialerDisabled: boolean,
 ) => {
   const isRecipientTypeNumber = recipientType === 'number';
-
-  const [outgoingNumber, setOutgoingNumber] = React.useState<string>('');
 
   const handleInput = React.useCallback(
     (dialpadInput: string) => {
@@ -34,7 +34,7 @@ const useDialpad = (
         (currentOutgoingNumber) => currentOutgoingNumber + dialpadInput,
       );
     },
-    [isRecipientTypeNumber],
+    [isRecipientTypeNumber, setOutgoingNumber],
   );
 
   const isInputDisabled = React.useMemo(() => {
@@ -53,39 +53,32 @@ const useDialpad = (
         ? currentOutgoingNumber.slice(0, currentOutgoingNumber.length - 1)
         : currentOutgoingNumber,
     );
-  }, []);
+  }, [setOutgoingNumber]);
 
   return {
-    handleInput,
-    handleBackspace,
-    isInputDisabled,
-    isBackspaceDisabled,
-    outgoingNumber,
+    input: {
+      handle: handleInput,
+      isDisabled: isInputDisabled,
+    },
+    backspace: {
+      handle: handleBackspace,
+      isDisabled: isBackspaceDisabled,
+    },
   };
-};
-
-/**
- * Hook for the remote participant text field.
- * @returns - Handlers and state for the remote participant text field.
- */
-const useOutgoingRemoteParticipant = () => {
-  const [clientIdentity, setClientIdentity] = React.useState<string>('');
-
-  return { clientIdentity, setClientIdentity };
 };
 
 /**
  * Hook for the recipient type.
  * @returns - Handlers and state for the recipient type.
  */
-const useToggleRecipientType = () => {
+const useToggleRecipientType = (isDialerDisabled: boolean) => {
   const [type, setType] = React.useState<RecipientType>('number');
 
-  const handleToggle = React.useCallback(() => {
+  const handle = React.useCallback(() => {
     setType((currentType) => (currentType === 'client' ? 'number' : 'client'));
   }, []);
 
-  return { handleToggle, type };
+  return { isDisabled: isDialerDisabled, handle, type };
 };
 
 /**
@@ -103,8 +96,12 @@ const useMakeOutgoingCall = (
   dispatch: ReturnType<typeof useTypedDispatch>,
   navigation: StackNavigationProp<'App'>,
   recipientType: RecipientType,
-  to: string,
+  outgoingClient: string,
+  outgoingNumber: string,
+  isDialerDisabled: boolean,
 ) => {
+  const to = recipientType === 'client' ? outgoingClient : outgoingNumber;
+
   const handle = React.useCallback(async () => {
     const tokenAction = await dispatch(getToken());
     if (getToken.rejected.match(tokenAction)) {
@@ -125,7 +122,13 @@ const useMakeOutgoingCall = (
     }
   }, [dispatch, navigation, recipientType, to]);
 
-  return { handle };
+  const isDisabled = React.useMemo(() => {
+    return isDialerDisabled || recipientType === 'client'
+      ? outgoingClient.length === 0
+      : outgoingNumber.length === 0;
+  }, [isDialerDisabled, outgoingClient, outgoingNumber, recipientType]);
+
+  return { handle, isDisabled };
 };
 
 /**
@@ -138,7 +141,7 @@ const useDialer = () => {
 
   const activeCall = useActiveCall();
 
-  const isDisabled = React.useMemo(() => {
+  const isDialerDisabled = React.useMemo(() => {
     switch (activeCall?.status) {
       case undefined:
         return false;
@@ -151,33 +154,39 @@ const useDialer = () => {
     }
   }, [activeCall]);
 
-  const recipient = useToggleRecipientType();
-  const dialpad = useDialpad(recipient.type, isDisabled);
-  const outgoingRemoteParticipant = useOutgoingRemoteParticipant();
+  const [outgoingClient, setOutgoingClient] = React.useState<string>('');
+  const [outgoingNumber, setOutgoingNumber] = React.useState<string>('');
 
-  const to = React.useMemo(() => {
-    return recipient.type === 'client'
-      ? outgoingRemoteParticipant.clientIdentity
-      : dialpad.outgoingNumber;
-  }, [
-    recipient.type,
-    outgoingRemoteParticipant.clientIdentity,
-    dialpad.outgoingNumber,
-  ]);
-
-  const makeOutgoingCall = useMakeOutgoingCall(
+  const recipientToggle = useToggleRecipientType(isDialerDisabled);
+  const dialpad = useDialpad(
+    recipientToggle.type,
+    outgoingNumber,
+    setOutgoingNumber,
+    isDialerDisabled,
+  );
+  const makeCall = useMakeOutgoingCall(
     dispatch,
     navigation,
-    recipient.type,
-    to,
+    recipientToggle.type,
+    outgoingClient,
+    outgoingNumber,
+    isDialerDisabled,
   );
 
   return {
     dialpad,
-    isDisabled,
-    makeOutgoingCall,
-    outgoingRemoteParticipant,
-    recipient,
+    makeCall,
+    recipientToggle,
+    outgoing: {
+      client: {
+        value: outgoingClient,
+        setValue: setOutgoingClient,
+      },
+      number: {
+        value: outgoingNumber,
+        setValue: setOutgoingNumber,
+      },
+    },
   };
 };
 

@@ -8,52 +8,44 @@ import OutgoingRemoteParticipant from './OutgoingRemoteParticipant';
 import useDialer from './hooks';
 
 const Dialer: React.FC = () => {
-  const {
-    dialpad,
-    isDisabled,
-    outgoingRemoteParticipant,
-    makeOutgoingCall,
-    recipient,
-  } = useDialer();
+  const { dialpad, makeCall, outgoing, recipientToggle } = useDialer();
 
-  const isOutgoingCallButtonDisabled =
-    dialpad.outgoingNumber === '' || isDisabled;
-
-  const isBackSpaceVisible = dialpad.outgoingNumber !== '';
+  const backspaceButton = React.useMemo(
+    () =>
+      dialpad.backspace.isDisabled ? (
+        <View style={styles.emptyButton} />
+      ) : (
+        <BackspaceButton onPress={dialpad.backspace.handle} />
+      ),
+    [dialpad.backspace.isDisabled, dialpad.backspace.handle],
+  );
 
   return (
     <View style={styles.container}>
       <View style={styles.spacer} />
       <View style={styles.remoteParticipant}>
         <OutgoingRemoteParticipant
-          outgoingIdentity={outgoingRemoteParticipant.clientIdentity}
-          outgoingNumber={dialpad.outgoingNumber}
-          recipientType={recipient.type}
-          setOutgoingIdentity={outgoingRemoteParticipant.setClientIdentity}
+          outgoingIdentity={outgoing.client.value}
+          outgoingNumber={outgoing.number.value}
+          recipientType={recipientToggle.type}
+          setOutgoingIdentity={outgoing.client.setValue}
         />
       </View>
       <Dialpad
-        disabled={dialpad.isInputDisabled}
-        onPress={dialpad.handleInput}
+        disabled={dialpad.input.isDisabled}
+        onPress={dialpad.input.handle}
       />
       <View style={styles.buttons}>
         <ToggleClientInputButton
-          disabled={isDisabled}
-          onPress={recipient.handleToggle}
-          recipientType={recipient.type}
+          disabled={recipientToggle.isDisabled}
+          onPress={recipientToggle.handle}
+          recipientType={recipientToggle.type}
         />
         <MakeOutgoingCallButton
-          disabled={isOutgoingCallButtonDisabled}
-          onPress={makeOutgoingCall.handle}
+          disabled={makeCall.isDisabled}
+          onPress={makeCall.handle}
         />
-        {isBackSpaceVisible ? (
-          <BackspaceButton
-            disabled={isDisabled}
-            onPress={dialpad.handleBackspace}
-          />
-        ) : (
-          <View style={styles.emptyButton} />
-        )}
+        {backspaceButton}
       </View>
       <View style={styles.spacer} />
     </View>
