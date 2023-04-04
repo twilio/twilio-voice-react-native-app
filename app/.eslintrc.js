@@ -7,7 +7,13 @@ module.exports = {
   globals: {
     globalThis: false, // false denotes not-writable
   },
-  rules: {
-    'no-shadow': 'error',
-  },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        '@typescript-eslint/no-shadow': ['error'],
+        'no-shadow': 'off',
+      },
+    },
+  ],
 };
