@@ -7,4 +7,7 @@ module.exports = {
   globals: {
     globalThis: false, // false denotes not-writable
   },
+  rules: {
+    'no-shadow': 'error',
+  },
 };
