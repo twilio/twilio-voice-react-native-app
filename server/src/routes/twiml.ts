@@ -15,11 +15,14 @@ export function createTwimlRoute(
       );
 
       if (!requestIsValid) {
-        return res.status(401).send('Unauthorized Twilio signature');
+        error('/twiml Unauthorized Twilio signature');
+        res.status(401).send('Unauthorized Twilio signature');
+        return;
       }
 
       const { To: to } = req.body;
       if (typeof to !== 'string') {
+        error('/twiml Missing "To".');
         res.status(400).send('Missing "To".');
         return;
       }
@@ -28,6 +31,7 @@ export function createTwimlRoute(
         (r) => r === req.body.recipientType,
       );
       if (typeof recipientType === 'undefined') {
+        error('/twiml Invalid "recipientType".');
         res.status(400).send('Invalid "recipientType".');
         return;
       }

@@ -40,13 +40,13 @@ export const makeOutgoingCall = createAsyncThunk<
     callMap.set(uuid, outgoingCall);
 
     outgoingCall.on(TwilioCall.Event.ConnectFailure, (error) =>
-      console.error(error),
+      console.error('ConnectFailure:', error),
     );
     outgoingCall.on(TwilioCall.Event.Reconnecting, (error) =>
-      console.error(error),
+      console.error('Reconnecting:', error),
     );
     outgoingCall.on(TwilioCall.Event.Disconnected, (error) =>
-      console.error(error),
+      console.error('Disconnected:', error),
     );
 
     Object.values(TwilioCall.Event).forEach((callEvent) => {
