@@ -89,7 +89,7 @@ export const login = createAsyncThunk<{ accessToken: string; email: string }>(
         email: user.email,
       };
     } catch (error) {
-      return rejectWithValue(error?.error_description);
+      return rejectWithValue(error);
     }
   },
 );
@@ -102,7 +102,7 @@ export const logout = createAsyncThunk<{ accessToken: string; email: string }>(
       await auth0.credentialsManager.clearCredentials();
       return { accessToken: '', email: '' };
     } catch (error) {
-      return rejectWithValue(error?.error_description);
+      return rejectWithValue(error);
     }
   },
 );
