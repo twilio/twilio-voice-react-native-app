@@ -5,3 +5,8 @@ node_modules/
 build/
 coverage/
 .env
+
+# logs
+combined.log
+error.log
+
