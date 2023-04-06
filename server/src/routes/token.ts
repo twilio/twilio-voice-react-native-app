@@ -11,27 +11,23 @@ export function createTokenRoute(
     AccessToken: { VoiceGrant },
   } = jwt;
   return function tokenRoute(_req: Request, res: Response) {
-    try {
-      const accessToken = new AccessToken(
-        twilioCredentials.ACCOUNT_SID,
-        twilioCredentials.API_KEY_SID,
-        twilioCredentials.API_KEY_SECRET,
-      );
+    const accessToken = new AccessToken(
+      twilioCredentials.ACCOUNT_SID,
+      twilioCredentials.API_KEY_SID,
+      twilioCredentials.API_KEY_SECRET,
+    );
 
-      const voiceGrant = new VoiceGrant({
-        incomingAllow: true,
-        outgoingApplicationSid: twilioCredentials.OUTGOING_APPLICATION_SID,
-        pushCredentialSid: twilioCredentials.PUSH_CREDENTIAL_SID,
-      });
+    const voiceGrant = new VoiceGrant({
+      incomingAllow: true,
+      outgoingApplicationSid: twilioCredentials.OUTGOING_APPLICATION_SID,
+      pushCredentialSid: twilioCredentials.PUSH_CREDENTIAL_SID,
+    });
 
-      accessToken.addGrant(voiceGrant);
+    accessToken.addGrant(voiceGrant);
 
-      res
-        .header('Content-Type', 'text/plain')
-        .status(200)
-        .send(accessToken.toJwt());
-    } catch (e) {
-      error(e);
-    }
+    res
+      .header('Content-Type', 'text/plain')
+      .status(200)
+      .send(accessToken.toJwt());
   };
 }
