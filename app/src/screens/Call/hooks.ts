@@ -180,7 +180,15 @@ const useSelectAudioOutputDevice = (
    * Refresh the list of audio devices when the call screen is mounted.
    */
   React.useEffect(() => {
-    dispatch(getAudioDevices());
+    const getAudioDevicesEffect = async () => {
+      const getAudioDevicesAction = await dispatch(getAudioDevices());
+      if (getAudioDevices.rejected.match(getAudioDevicesAction)) {
+        console.error(
+          getAudioDevicesAction.payload || getAudioDevicesAction.error,
+        );
+      }
+    };
+    getAudioDevicesEffect();
   }, [dispatch]);
 
   return { handle, isActive, isDisabled };

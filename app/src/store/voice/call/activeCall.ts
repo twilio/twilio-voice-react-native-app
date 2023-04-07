@@ -47,8 +47,11 @@ export const disconnectActiveCall = createAsyncThunk<
     if (!call) {
       return rejectWithValue('CALL_UUID_NOT_FOUND');
     }
-
-    await call.disconnect();
+    try {
+      await call.disconnect();
+    } catch (e) {
+      console.error(e);
+    }
   },
 );
 
@@ -84,7 +87,11 @@ export const muteActiveCall = createAsyncThunk<
       return rejectWithValue('CALL_UUID_NOT_FOUND');
     }
 
-    await call.mute(mute);
+    try {
+      await call.mute(mute);
+    } catch (e) {
+      console.error(e);
+    }
 
     // todo use active call heuristic
     dispatch(
@@ -124,7 +131,10 @@ export const sendDtmfActiveCall = createAsyncThunk<
     if (!call) {
       return rejectWithValue('CALL_UUID_NOT_FOUND');
     }
-
-    await call.sendDigits(dtmf);
+    try {
+      await call.sendDigits(dtmf);
+    } catch (e) {
+      console.error(e);
+    }
   },
 );

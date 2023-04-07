@@ -21,50 +21,54 @@ export const makeOutgoingCall = createAsyncThunk<
 >(
   'voice/makeOutgoingCall',
   async ({ to, recipientType }, { getState, dispatch, rejectWithValue }) => {
-    const token = getState().voice.token;
+    try {
+      const token = getState().voice.token;
 
-    if (token?.status !== 'fulfilled') {
-      return rejectWithValue('TOKEN_UNFULFILLED');
-    }
+      if (token?.status !== 'fulfilled') {
+        return rejectWithValue('TOKEN_UNFULFILLED');
+      }
 
-    const outgoingCall = await voice.connect(token.value, {
-      params: {
-        To: to,
-        recipientType,
-      },
-    });
-
-    // eslint-disable-next-line dot-notation
-    const uuid = outgoingCall['_uuid'];
-
-    callMap.set(uuid, outgoingCall);
-
-    outgoingCall.on(TwilioCall.Event.ConnectFailure, (error) =>
-      console.error('ConnectFailure:', error),
-    );
-    outgoingCall.on(TwilioCall.Event.Reconnecting, (error) =>
-      console.error('Reconnecting:', error),
-    );
-    outgoingCall.on(TwilioCall.Event.Disconnected, (error) =>
-      console.error('Disconnected:', error),
-    );
-
-    Object.values(TwilioCall.Event).forEach((callEvent) => {
-      outgoingCall.on(callEvent, () => {
-        console.log('dispatching', callEvent);
-        const callInfo = getCallInfo(outgoingCall);
-        dispatch(setOutgoingCallInfo({ to, callInfo }));
+      const outgoingCall = await voice.connect(token.value, {
+        params: {
+          To: to,
+          recipientType,
+        },
       });
-    });
 
-    outgoingCall.once(TwilioCall.Event.Connected, () => {
-      console.log('dispatching initial connect');
-      dispatch(handleConnectEvent({ time: Date.now() }));
-    });
+      // eslint-disable-next-line dot-notation
+      const uuid = outgoingCall['_uuid'];
 
-    const callInfo = getCallInfo(outgoingCall);
-    dispatch(setOutgoingCallInfo({ to, callInfo }));
-    return callInfo;
+      callMap.set(uuid, outgoingCall);
+
+      outgoingCall.on(TwilioCall.Event.ConnectFailure, (error) =>
+        console.error('ConnectFailure:', error),
+      );
+      outgoingCall.on(TwilioCall.Event.Reconnecting, (error) =>
+        console.error('Reconnecting:', error),
+      );
+      outgoingCall.on(TwilioCall.Event.Disconnected, (error) =>
+        console.error('Disconnected:', error),
+      );
+
+      Object.values(TwilioCall.Event).forEach((callEvent) => {
+        outgoingCall.on(callEvent, () => {
+          console.log('dispatching', callEvent);
+          const callInfo = getCallInfo(outgoingCall);
+          dispatch(setOutgoingCallInfo({ to, callInfo }));
+        });
+      });
+
+      outgoingCall.once(TwilioCall.Event.Connected, () => {
+        console.log('dispatching initial connect');
+        dispatch(handleConnectEvent({ time: Date.now() }));
+      });
+
+      const callInfo = getCallInfo(outgoingCall);
+      dispatch(setOutgoingCallInfo({ to, callInfo }));
+      return callInfo;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
   },
 );
 
@@ -102,8 +106,8 @@ export const outgoingCallSlice = createSlice({
       .addCase(makeOutgoingCall.pending, () => {
         return { status: 'pending' };
       })
-      .addCase(makeOutgoingCall.rejected, () => {
-        return { status: 'rejected' };
+      .addCase(makeOutgoingCall.rejected, (_, action) => {
+        return { status: 'rejected', error: action.payload };
       });
   },
 });

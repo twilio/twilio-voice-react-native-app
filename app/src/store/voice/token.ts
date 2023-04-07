@@ -6,26 +6,30 @@ export const getToken = createAsyncThunk<
   string,
   void,
   { state: State; dispatch: Dispatch }
->('voice/getToken', async (_, { getState }) => {
-  const user = getState().voice.user;
-  if (user?.status !== 'fulfilled') {
-    return '';
+>('voice/getToken', async (_, { getState, rejectWithValue }) => {
+  try {
+    const user = getState().voice.user;
+    if (user?.status !== 'fulfilled') {
+      return '';
+    }
+    const res = await fetch(`${defaultUrl}/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.accessToken}`,
+      },
+      body: JSON.stringify({
+        username: 'alice',
+        password: 'supersecretpassword1234',
+      }),
+    });
+
+    const token: string = await res.text();
+
+    return token;
+  } catch (error) {
+    return rejectWithValue(error);
   }
-  const res = await fetch(`${defaultUrl}/token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${user.accessToken}`,
-    },
-    body: JSON.stringify({
-      username: 'alice',
-      password: 'supersecretpassword1234',
-    }),
-  });
-
-  const token: string = await res.text();
-
-  return token;
 });
 
 export type TokenState = AsyncStoreSlice<{ value: string }>;
@@ -42,8 +46,8 @@ export const tokenSlice = createSlice({
       .addCase(getToken.fulfilled, (_, action) => {
         return { status: 'fulfilled', value: action.payload };
       })
-      .addCase(getToken.rejected, () => {
-        return { status: 'rejected' };
+      .addCase(getToken.rejected, (_, action) => {
+        return { status: 'rejected', error: action.payload };
       });
   },
 });

@@ -13,17 +13,23 @@ export const getAudioDevices = createAsyncThunk<
   { audioDevices: AudioDeviceInfo[]; selectedDevice: AudioDeviceInfo | null },
   void,
   { state: State; dispatch: Dispatch }
->('voice/getAudioDevices', async () => {
-  const { audioDevices, selectedDevice } = await voice.getAudioDevices();
+>('voice/getAudioDevices', async (_, { rejectWithValue }) => {
+  try {
+    const { audioDevices, selectedDevice } = await voice.getAudioDevices();
 
-  for (const audioDevice of audioDevices) {
-    audioDeviceMap.set(audioDevice.uuid, audioDevice);
+    for (const audioDevice of audioDevices) {
+      audioDeviceMap.set(audioDevice.uuid, audioDevice);
+    }
+
+    return {
+      audioDevices: audioDevices.map(getAudioDeviceInfo),
+      selectedDevice: selectedDevice
+        ? getAudioDeviceInfo(selectedDevice)
+        : null,
+    };
+  } catch (error) {
+    return rejectWithValue(error);
   }
-
-  return {
-    audioDevices: audioDevices.map(getAudioDeviceInfo),
-    selectedDevice: selectedDevice ? getAudioDeviceInfo(selectedDevice) : null,
-  };
 });
 
 const getAudioDeviceInfo = (audioDevice: TwilioAudioDevice) => {
@@ -61,8 +67,8 @@ export const audioDevicesSlice = createSlice({
       .addCase(getAudioDevices.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
       })
-      .addCase(getAudioDevices.rejected, () => {
-        return { status: 'rejected' };
+      .addCase(getAudioDevices.rejected, (_, action) => {
+        return { status: 'rejected', error: action.payload };
       });
   },
 });
