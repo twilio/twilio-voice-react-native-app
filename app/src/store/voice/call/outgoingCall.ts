@@ -16,7 +16,6 @@ export const makeOutgoingCall = createAsyncThunk<
   {
     state: State;
     dispatch: Dispatch;
-    rejectValue: 'TOKEN_UNFULFILLED';
   }
 >(
   'voice/makeOutgoingCall',
