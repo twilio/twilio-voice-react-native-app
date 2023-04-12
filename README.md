@@ -1,4 +1,4 @@
-# Twilio Voice React Native Reference
+# Twilio Voice React Native Reference App
 
 This project consists of a backend server and a React Native app that demonstrate best practices for developing a Twilio Programmable Voice application.
 
