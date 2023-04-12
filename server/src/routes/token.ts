@@ -1,7 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import { jwt } from 'twilio';
 import { TwilioCredentials } from '../common/types';
-import { error } from '../utils/log';
 
 export function createTokenRoute(
   twilioCredentials: TwilioCredentials,

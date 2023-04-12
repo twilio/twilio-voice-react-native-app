@@ -38,6 +38,7 @@ export const error = (message: string) =>
     level: 'error',
     message,
   });
+
 export const log = (message: string) =>
   logger.log({
     level: 'info',
