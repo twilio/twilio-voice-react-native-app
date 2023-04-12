@@ -7,23 +7,26 @@ export function createTwimlRoute(
   serverConfig: ServerCredentials,
 ): RequestHandler {
   const { VoiceResponse } = twiml;
+
+  const logError = (msg: string) => {
+    error(`/twiml ${msg}`);
+  };
+
   return function twimlRoute(req: Request, res: Response) {
-    const requestIsValid = validateExpressRequest(
-      req,
-      serverConfig.AUTH_TOKEN,
-      { protocol: 'https' },
-    );
+    const requestIsValid = validateExpressRequest(req, serverConfig.AUTH_TOKEN);
 
     if (!requestIsValid) {
-      error('/twiml Unauthorized Twilio signature');
-      res.status(401).send('Unauthorized Twilio signature');
+      const msg = 'Unauthorized Twilio signature';
+      logError(msg);
+      res.status(401).send(msg);
       return;
     }
 
     const { To: to } = req.body;
     if (typeof to !== 'string') {
-      error('/twiml Missing "To".');
-      res.status(400).send('Missing "To".');
+      const msg = 'Missing "To".';
+      logError(msg);
+      res.status(400).send(msg);
       return;
     }
 
@@ -31,8 +34,9 @@ export function createTwimlRoute(
       (r) => r === req.body.recipientType,
     );
     if (typeof recipientType === 'undefined') {
-      error('/twiml Invalid "recipientType".');
-      res.status(400).send('Invalid "recipientType".');
+      const msg = 'Invalid "recipientType".';
+      logError(msg);
+      res.status(400).send(msg);
       return;
     }
 
