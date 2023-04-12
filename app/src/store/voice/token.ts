@@ -5,7 +5,14 @@ import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
 export const getToken = createAsyncThunk<
   string,
   void,
-  { state: State; dispatch: Dispatch }
+  {
+    state: State;
+    dispatch: Dispatch;
+    rejectValue: {
+      reason: 'GET_TOKEN_ERROR';
+      error: any;
+    };
+  }
 >('voice/getToken', async (_, { getState, rejectWithValue }) => {
   try {
     const user = getState().voice.user;
@@ -28,7 +35,7 @@ export const getToken = createAsyncThunk<
 
     return token;
   } catch (error) {
-    return rejectWithValue(error);
+    return rejectWithValue({ reason: 'GET_TOKEN_ERROR', error });
   }
 });
 
@@ -47,7 +54,11 @@ export const tokenSlice = createSlice({
         return { status: 'fulfilled', value: action.payload };
       })
       .addCase(getToken.rejected, (_, action) => {
-        return { status: 'rejected', error: action.payload };
+        return {
+          status: 'rejected',
+          reason: action.payload?.reason,
+          error: action.payload?.error || action.error,
+        };
       });
   },
 });

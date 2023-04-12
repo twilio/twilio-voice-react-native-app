@@ -16,6 +16,10 @@ export const makeOutgoingCall = createAsyncThunk<
   {
     state: State;
     dispatch: Dispatch;
+    rejectValue: {
+      reason: 'TOKEN_UNFULFILLED' | 'OUTGOING_CALL_ERROR';
+      error: any;
+    };
   }
 >(
   'voice/makeOutgoingCall',
@@ -24,7 +28,7 @@ export const makeOutgoingCall = createAsyncThunk<
       const token = getState().voice.token;
 
       if (token?.status !== 'fulfilled') {
-        return rejectWithValue('TOKEN_UNFULFILLED');
+        return rejectWithValue({ reason: 'TOKEN_UNFULFILLED', error: null });
       }
 
       const outgoingCall = await voice.connect(token.value, {
@@ -66,7 +70,7 @@ export const makeOutgoingCall = createAsyncThunk<
       dispatch(setOutgoingCallInfo({ to, callInfo }));
       return callInfo;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue({ reason: 'OUTGOING_CALL_ERROR', error });
     }
   },
 );

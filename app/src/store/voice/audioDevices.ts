@@ -12,7 +12,11 @@ export const selectAudioDevice = createAsyncThunk<
 export const getAudioDevices = createAsyncThunk<
   { audioDevices: AudioDeviceInfo[]; selectedDevice: AudioDeviceInfo | null },
   void,
-  { state: State; dispatch: Dispatch }
+  {
+    state: State;
+    dispatch: Dispatch;
+    rejectValue: { reason: 'VOICE_GET_AUDIO_DEVICES_ERROR'; error: any };
+  }
 >('voice/getAudioDevices', async (_, { rejectWithValue }) => {
   try {
     const { audioDevices, selectedDevice } = await voice.getAudioDevices();
@@ -28,7 +32,7 @@ export const getAudioDevices = createAsyncThunk<
         : null,
     };
   } catch (error) {
-    return rejectWithValue(error);
+    return rejectWithValue({ reason: 'VOICE_GET_AUDIO_DEVICES_ERROR', error });
   }
 });
 
@@ -68,7 +72,11 @@ export const audioDevicesSlice = createSlice({
         return { status: 'fulfilled', ...action.payload };
       })
       .addCase(getAudioDevices.rejected, (_, action) => {
-        return { status: 'rejected', error: action.payload };
+        return {
+          status: 'rejected',
+          reason: action.payload?.reason,
+          error: action.payload?.error || action.error,
+        };
       });
   },
 });

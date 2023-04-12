@@ -86,6 +86,7 @@ describe('user store', () => {
     expect(userState).toEqual({
       status: 'rejected',
       error: new Error('login failed'),
+      reason: 'LOGIN_ERROR',
     });
   });
 
@@ -99,6 +100,7 @@ describe('user store', () => {
     expect(userState).toEqual({
       status: 'rejected',
       error: new Error('logout failed'),
+      reason: 'LOGOUT_ERROR',
     });
   });
 });
