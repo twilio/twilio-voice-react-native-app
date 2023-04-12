@@ -83,7 +83,10 @@ describe('user store', () => {
     jest.spyOn(auth0, 'authorize').mockRejectedValue(new Error('login failed'));
     await app.store.dispatch(user.login());
     const userState = app.store.getState().voice.user;
-    expect(userState).toEqual({ status: 'rejected', error: 'LOGIN_ERROR' });
+    expect(userState).toEqual({
+      status: 'rejected',
+      error: new Error('login failed'),
+    });
   });
 
   it('should handle logout error', async () => {
@@ -95,7 +98,7 @@ describe('user store', () => {
     const userState = app.store.getState().voice.user;
     expect(userState).toEqual({
       status: 'rejected',
-      error: 'LOGOUT_ERROR',
+      error: new Error('logout failed'),
     });
   });
 });
