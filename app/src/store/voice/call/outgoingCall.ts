@@ -75,11 +75,18 @@ export const makeOutgoingCall = createAsyncThunk<
   },
 );
 
-export type OutgoingCallState = AsyncStoreSlice<{
-  initialConnectTimestamp?: number;
-  callInfo: CallInfo;
-  to: string;
-}>;
+export type OutgoingCallState = AsyncStoreSlice<
+  {
+    initialConnectTimestamp?: number;
+    callInfo: CallInfo;
+    to: string;
+  },
+  {
+    status: 'rejected';
+    reason: 'OUTGOING_CALL_ERROR' | 'TOKEN_UNFULFILLED' | undefined;
+    error: any;
+  }
+>;
 
 export const outgoingCallSlice = createSlice({
   name: 'outgoingCall',
@@ -110,7 +117,11 @@ export const outgoingCallSlice = createSlice({
         return { status: 'pending' };
       })
       .addCase(makeOutgoingCall.rejected, (_, action) => {
-        return { status: 'rejected', error: action.payload };
+        return {
+          status: 'rejected',
+          reason: action.payload?.reason,
+          error: action.payload?.error || action.error,
+        };
       });
   },
 });

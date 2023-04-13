@@ -39,7 +39,14 @@ export const getToken = createAsyncThunk<
   }
 });
 
-export type TokenState = AsyncStoreSlice<{ value: string }>;
+export type TokenState = AsyncStoreSlice<
+  { value: string },
+  {
+    status: 'rejected';
+    reason: 'GET_TOKEN_ERROR' | undefined;
+    error: any;
+  }
+>;
 
 export const tokenSlice = createSlice({
   name: 'token',

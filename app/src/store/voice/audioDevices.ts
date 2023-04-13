@@ -54,10 +54,17 @@ export type AudioDeviceInfo = {
   name: string;
 };
 
-export type AudioDevicesState = AsyncStoreSlice<{
-  audioDevices: AudioDeviceInfo[];
-  selectedDevice: AudioDeviceInfo | null;
-}>;
+export type AudioDevicesState = AsyncStoreSlice<
+  {
+    audioDevices: AudioDeviceInfo[];
+    selectedDevice: AudioDeviceInfo | null;
+  },
+  {
+    status: 'rejected';
+    reason: 'VOICE_GET_AUDIO_DEVICES_ERROR' | undefined;
+    error: any;
+  }
+>;
 
 export const audioDevicesSlice = createSlice({
   name: 'audioDevices',
