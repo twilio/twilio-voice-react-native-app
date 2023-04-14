@@ -5,12 +5,10 @@ import { State, Dispatch, type AsyncStoreSlice } from './app';
 
 export type UserState = AsyncStoreSlice<
   {
-    status: 'fulfilled';
     accessToken: string;
     email: string;
   },
   {
-    status: 'rejected';
     reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR' | 'LOGOUT_ERROR' | undefined;
     error: any;
   }

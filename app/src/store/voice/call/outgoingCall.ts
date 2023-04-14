@@ -82,7 +82,6 @@ export type OutgoingCallState = AsyncStoreSlice<
     to: string;
   },
   {
-    status: 'rejected';
     reason: 'OUTGOING_CALL_ERROR' | 'TOKEN_UNFULFILLED' | undefined;
     error: any;
   }

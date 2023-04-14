@@ -60,7 +60,6 @@ export type AudioDevicesState = AsyncStoreSlice<
     selectedDevice: AudioDeviceInfo | null;
   },
   {
-    status: 'rejected';
     reason: 'VOICE_GET_AUDIO_DEVICES_ERROR' | undefined;
     error: any;
   }
