@@ -55,3 +55,19 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
     }
 }
+
+subprojects {
+    afterEvaluate { subproject ->
+        // fix detox with auth0 error, reference: https://github.com/auth0/react-native-auth0/issues/387#issuecomment-918483390 
+        if (subproject.name == 'react-native-auth0') {
+            def String taskRequests = getGradle().getStartParameter().getTaskRequests().toString()
+            if (taskRequests.contains("assembleAndroidTest")) {
+                android {
+                    defaultConfig {
+                        manifestPlaceholders = [auth0Domain: "E2E_TEST", auth0Scheme: "com.E2E.TEST"]
+                    }
+                }
+            }
+        }
+    }
+}
