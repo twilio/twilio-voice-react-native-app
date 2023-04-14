@@ -12,18 +12,28 @@ export const selectAudioDevice = createAsyncThunk<
 export const getAudioDevices = createAsyncThunk<
   { audioDevices: AudioDeviceInfo[]; selectedDevice: AudioDeviceInfo | null },
   void,
-  { state: State; dispatch: Dispatch }
->('voice/getAudioDevices', async () => {
-  const { audioDevices, selectedDevice } = await voice.getAudioDevices();
-
-  for (const audioDevice of audioDevices) {
-    audioDeviceMap.set(audioDevice.uuid, audioDevice);
+  {
+    state: State;
+    dispatch: Dispatch;
+    rejectValue: { reason: 'VOICE_GET_AUDIO_DEVICES_ERROR'; error: any };
   }
+>('voice/getAudioDevices', async (_, { rejectWithValue }) => {
+  try {
+    const { audioDevices, selectedDevice } = await voice.getAudioDevices();
 
-  return {
-    audioDevices: audioDevices.map(getAudioDeviceInfo),
-    selectedDevice: selectedDevice ? getAudioDeviceInfo(selectedDevice) : null,
-  };
+    for (const audioDevice of audioDevices) {
+      audioDeviceMap.set(audioDevice.uuid, audioDevice);
+    }
+
+    return {
+      audioDevices: audioDevices.map(getAudioDeviceInfo),
+      selectedDevice: selectedDevice
+        ? getAudioDeviceInfo(selectedDevice)
+        : null,
+    };
+  } catch (error) {
+    return rejectWithValue({ reason: 'VOICE_GET_AUDIO_DEVICES_ERROR', error });
+  }
 });
 
 const getAudioDeviceInfo = (audioDevice: TwilioAudioDevice) => {
@@ -44,10 +54,16 @@ export type AudioDeviceInfo = {
   name: string;
 };
 
-export type AudioDevicesState = AsyncStoreSlice<{
-  audioDevices: AudioDeviceInfo[];
-  selectedDevice: AudioDeviceInfo | null;
-}>;
+export type AudioDevicesState = AsyncStoreSlice<
+  {
+    audioDevices: AudioDeviceInfo[];
+    selectedDevice: AudioDeviceInfo | null;
+  },
+  {
+    reason: 'VOICE_GET_AUDIO_DEVICES_ERROR' | undefined;
+    error: any;
+  }
+>;
 
 export const audioDevicesSlice = createSlice({
   name: 'audioDevices',
@@ -61,8 +77,12 @@ export const audioDevicesSlice = createSlice({
       .addCase(getAudioDevices.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
       })
-      .addCase(getAudioDevices.rejected, () => {
-        return { status: 'rejected' };
+      .addCase(getAudioDevices.rejected, (_, action) => {
+        return {
+          status: 'rejected',
+          reason: action.payload?.reason,
+          error: action.payload?.error || action.error,
+        };
       });
   },
 });

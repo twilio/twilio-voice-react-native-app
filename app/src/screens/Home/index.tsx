@@ -52,8 +52,7 @@ const Home: React.FC = () => {
   const handleLogout = async () => {
     const logoutAction = await dispatch(logout());
     if (logout.rejected.match(logoutAction)) {
-      console.error(logoutAction.error);
-      return;
+      console.error(logoutAction.payload || logoutAction.error);
     }
   };
 

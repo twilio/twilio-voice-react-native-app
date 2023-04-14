@@ -73,8 +73,7 @@ const SignIn: React.FC = () => {
   const handleLogin = async () => {
     const loginAction = await dispatch(login());
     if (login.rejected.match(loginAction)) {
-      console.error(loginAction.error);
-      return;
+      console.error(loginAction.payload || loginAction.error);
     }
   };
 

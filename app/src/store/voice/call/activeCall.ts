@@ -22,10 +22,14 @@ export const disconnectActiveCall = createAsyncThunk<
   {
     state: State;
     dispatch: Dispatch;
-    rejectValue:
-      | 'CALL_NOT_FULFILLED'
-      | 'CALL_UUID_NOT_FOUND'
-      | 'CALL_INFO_NOT_FOUND';
+    rejectValue: {
+      reason:
+        | 'CALL_NOT_FULFILLED'
+        | 'CALL_UUID_NOT_FOUND'
+        | 'CALL_INFO_NOT_FOUND'
+        | 'CALL_DISCONNECT_ERROR';
+      error: any;
+    };
   }
 >(
   'voice/disconnectActiveCall',
@@ -36,19 +40,22 @@ export const disconnectActiveCall = createAsyncThunk<
     const activeCall = outgoingCall;
 
     if (activeCall?.status !== 'fulfilled') {
-      return rejectWithValue('CALL_NOT_FULFILLED');
+      return rejectWithValue({ reason: 'CALL_NOT_FULFILLED', error: null });
     }
 
     if (!activeCall?.callInfo) {
-      return rejectWithValue('CALL_INFO_NOT_FOUND');
+      return rejectWithValue({ reason: 'CALL_INFO_NOT_FOUND', error: null });
     }
 
     const call = callMap.get(activeCall.callInfo.uuid);
     if (!call) {
-      return rejectWithValue('CALL_UUID_NOT_FOUND');
+      return rejectWithValue({ reason: 'CALL_UUID_NOT_FOUND', error: null });
     }
-
-    await call.disconnect();
+    try {
+      await call.disconnect();
+    } catch (error) {
+      rejectWithValue({ reason: 'CALL_DISCONNECT_ERROR', error });
+    }
   },
 );
 
@@ -58,10 +65,14 @@ export const muteActiveCall = createAsyncThunk<
   {
     state: State;
     dispatch: Dispatch;
-    rejectValue:
-      | 'CALL_NOT_FULFILLED'
-      | 'CALL_UUID_NOT_FOUND'
-      | 'CALL_INFO_NOT_FOUND';
+    rejectValue: {
+      reason:
+        | 'CALL_NOT_FULFILLED'
+        | 'CALL_UUID_NOT_FOUND'
+        | 'CALL_INFO_NOT_FOUND'
+        | 'MUTE_CALL_ERROR';
+      error: any;
+    };
   }
 >(
   'voice/muteActiveCall',
@@ -72,19 +83,23 @@ export const muteActiveCall = createAsyncThunk<
     const activeCall = outgoingCall;
 
     if (activeCall?.status !== 'fulfilled') {
-      return rejectWithValue('CALL_NOT_FULFILLED');
+      return rejectWithValue({ reason: 'CALL_NOT_FULFILLED', error: null });
     }
 
     if (!activeCall?.callInfo) {
-      return rejectWithValue('CALL_INFO_NOT_FOUND');
+      return rejectWithValue({ reason: 'CALL_INFO_NOT_FOUND', error: null });
     }
 
     const call = callMap.get(activeCall.callInfo.uuid);
     if (!call) {
-      return rejectWithValue('CALL_UUID_NOT_FOUND');
+      return rejectWithValue({ reason: 'CALL_UUID_NOT_FOUND', error: null });
     }
 
-    await call.mute(mute);
+    try {
+      await call.mute(mute);
+    } catch (error) {
+      rejectWithValue({ reason: 'MUTE_CALL_ERROR', error });
+    }
 
     // todo use active call heuristic
     dispatch(
@@ -99,10 +114,14 @@ export const sendDtmfActiveCall = createAsyncThunk<
   {
     state: State;
     dispatch: Dispatch;
-    rejectValue:
-      | 'CALL_NOT_FULFILLED'
-      | 'CALL_UUID_NOT_FOUND'
-      | 'CALL_INFO_NOT_FOUND';
+    rejectValue: {
+      reason:
+        | 'CALL_NOT_FULFILLED'
+        | 'CALL_UUID_NOT_FOUND'
+        | 'CALL_INFO_NOT_FOUND'
+        | 'ACTIVE_CALL_ERROR';
+      error: any;
+    };
   }
 >(
   'voice/sendDtmfActiveCall',
@@ -113,18 +132,21 @@ export const sendDtmfActiveCall = createAsyncThunk<
     const activeCall = outgoingCall;
 
     if (activeCall?.status !== 'fulfilled') {
-      return rejectWithValue('CALL_NOT_FULFILLED');
+      return rejectWithValue({ reason: 'CALL_NOT_FULFILLED', error: null });
     }
 
     if (!activeCall?.callInfo) {
-      return rejectWithValue('CALL_INFO_NOT_FOUND');
+      return rejectWithValue({ reason: 'CALL_INFO_NOT_FOUND', error: null });
     }
 
     const call = callMap.get(activeCall.callInfo.uuid);
     if (!call) {
-      return rejectWithValue('CALL_UUID_NOT_FOUND');
+      return rejectWithValue({ reason: 'CALL_UUID_NOT_FOUND', error: null });
     }
-
-    await call.sendDigits(dtmf);
+    try {
+      await call.sendDigits(dtmf);
+    } catch (error) {
+      rejectWithValue({ reason: 'ACTIVE_CALL_ERROR', error });
+    }
   },
 );

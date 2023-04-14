@@ -1,12 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import config from '../../config';
 import Auth0 from 'react-native-auth0';
-import { type AsyncStoreSlice } from './app';
+import { State, Dispatch, type AsyncStoreSlice } from './app';
 
-export type UserState = AsyncStoreSlice<{
-  accessToken: string;
-  email: string;
-}>;
+export type UserState = AsyncStoreSlice<
+  {
+    accessToken: string;
+    email: string;
+  },
+  {
+    reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR' | 'LOGOUT_ERROR' | undefined;
+    error: any;
+  }
+>;
 
 export const userSlice = createSlice({
   name: 'user',
@@ -28,7 +34,11 @@ export const userSlice = createSlice({
         return { status: 'fulfilled', ...action.payload };
       })
       .addCase(login.rejected, (_, action) => {
-        return { status: 'rejected', error: action.payload };
+        return {
+          status: 'rejected',
+          reason: action.payload?.reason,
+          error: action.payload?.error || action.error,
+        };
       });
     builder
       .addCase(logout.pending, () => {
@@ -38,7 +48,11 @@ export const userSlice = createSlice({
         return { status: 'fulfilled', ...action.payload };
       })
       .addCase(logout.rejected, (_, action) => {
-        return { status: 'rejected', error: action.payload };
+        return {
+          status: 'rejected',
+          reason: action.payload?.reason,
+          error: action.payload?.error || action.error,
+        };
       });
   },
 });
@@ -66,43 +80,53 @@ export const checkLoginStatus = createAsyncThunk<{
   }
 });
 
-export const login = createAsyncThunk<{ accessToken: string; email: string }>(
-  'user/login',
-  async (_, { rejectWithValue }) => {
-    try {
-      const credentials = await auth0.webAuth.authorize({
-        scope: config.auth0Scope,
-        audience: config.audience,
-      });
+export const login = createAsyncThunk<
+  { accessToken: string; email: string },
+  void,
+  {
+    state: State;
+    dispatch: Dispatch;
+    rejectValue: { reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR'; error: any };
+  }
+>('user/login', async (_, { rejectWithValue }) => {
+  try {
+    const credentials = await auth0.webAuth.authorize({
+      scope: config.auth0Scope,
+      audience: config.audience,
+    });
 
-      if (typeof credentials.idToken === 'undefined') {
-        return rejectWithValue('ID_TOKEN_UNDEFINED');
-      }
-
-      auth0.credentialsManager.saveCredentials(credentials as any);
-
-      const user = await auth0.auth.userInfo({
-        token: credentials.accessToken,
-      });
-      return {
-        accessToken: credentials.accessToken,
-        email: user.email,
-      };
-    } catch (error) {
-      return rejectWithValue('LOGIN_ERROR');
+    if (typeof credentials.idToken === 'undefined') {
+      return rejectWithValue({ reason: 'ID_TOKEN_UNDEFINED', error: null });
     }
-  },
-);
 
-export const logout = createAsyncThunk<{ accessToken: string; email: string }>(
-  'user/logout',
-  async (_, { rejectWithValue }) => {
-    try {
-      await auth0.webAuth.clearSession();
-      await auth0.credentialsManager.clearCredentials();
-      return { accessToken: '', email: '' };
-    } catch (error) {
-      return rejectWithValue('LOGOUT_ERROR');
-    }
-  },
-);
+    auth0.credentialsManager.saveCredentials(credentials as any);
+
+    const user = await auth0.auth.userInfo({
+      token: credentials.accessToken,
+    });
+    return {
+      accessToken: credentials.accessToken,
+      email: user.email,
+    };
+  } catch (error) {
+    return rejectWithValue({ reason: 'LOGIN_ERROR', error });
+  }
+});
+
+export const logout = createAsyncThunk<
+  { accessToken: string; email: string },
+  void,
+  {
+    state: State;
+    dispatch: Dispatch;
+    rejectValue: { reason: 'LOGOUT_ERROR'; error: any };
+  }
+>('user/logout', async (_, { rejectWithValue }) => {
+  try {
+    await auth0.webAuth.clearSession();
+    await auth0.credentialsManager.clearCredentials();
+    return { accessToken: '', email: '' };
+  } catch (error) {
+    return rejectWithValue({ reason: 'LOGOUT_ERROR', error });
+  }
+});

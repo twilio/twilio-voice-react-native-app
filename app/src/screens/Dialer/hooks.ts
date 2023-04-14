@@ -115,6 +115,10 @@ const useMakeOutgoingCall = (
         to,
       }),
     );
+    if (makeOutgoingCallAction.rejected.match(callAction)) {
+      console.error(callAction.payload || callAction.error);
+    }
+
     if (makeOutgoingCallAction.fulfilled.match(callAction)) {
       navigation.navigate('Call');
     } else {
