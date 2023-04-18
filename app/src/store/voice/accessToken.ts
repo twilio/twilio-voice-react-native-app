@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetch, defaultUrl } from '../../util/fetch';
 import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
 
-export const getToken = createAsyncThunk<
+export const getAccessToken = createAsyncThunk<
   string,
   void,
   {
@@ -39,7 +39,7 @@ export const getToken = createAsyncThunk<
   }
 });
 
-export type TokenState = AsyncStoreSlice<
+export type AccessTokenState = AsyncStoreSlice<
   { value: string },
   {
     reason: 'GET_TOKEN_ERROR' | undefined;
@@ -47,19 +47,19 @@ export type TokenState = AsyncStoreSlice<
   }
 >;
 
-export const tokenSlice = createSlice({
-  name: 'token',
-  initialState: null as TokenState,
+export const accessTokenSlice = createSlice({
+  name: 'accessToken',
+  initialState: null as AccessTokenState,
   reducers: {},
   extraReducers(builder) {
     builder
-      .addCase(getToken.pending, () => {
+      .addCase(getAccessToken.pending, () => {
         return { status: 'pending' };
       })
-      .addCase(getToken.fulfilled, (_, action) => {
+      .addCase(getAccessToken.fulfilled, (_, action) => {
         return { status: 'fulfilled', value: action.payload };
       })
-      .addCase(getToken.rejected, (_, action) => {
+      .addCase(getAccessToken.rejected, (_, action) => {
         return {
           status: 'rejected',
           reason: action.payload?.reason,

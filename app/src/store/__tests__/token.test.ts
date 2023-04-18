@@ -1,4 +1,4 @@
-import * as token from '../voice/token';
+import * as token from '../voice/accessToken';
 import * as user from '../user';
 import * as app from '../app';
 import * as auth0 from '../../../__mocks__/react-native-auth0';

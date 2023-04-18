@@ -1,5 +1,5 @@
 import * as app from '../app';
-import * as token from '../voice/token';
+import * as token from '../voice/accessToken';
 import * as outgoingCall from '../voice/call/outgoingCall';
 import * as activeCall from '../voice/call/activeCall';
 

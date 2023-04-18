@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { login, checkLoginStatus } from '../../store/user';
+import { login } from '../../store/user';
 import { type Dispatch } from '../../store/app';
 
 const ArrowForward = require('../../../assets/icons/arrow-forward.png');
@@ -65,10 +65,6 @@ const styles = StyleSheet.create({
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
-
-  React.useEffect(() => {
-    dispatch(checkLoginStatus());
-  }, [dispatch]);
 
   const handleLogin = async () => {
     const loginAction = await dispatch(login());

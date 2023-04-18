@@ -6,7 +6,7 @@ import {
   makeOutgoingCall as makeOutgoingCallAction,
   type RecipientType,
 } from '../../store/voice/call/outgoingCall';
-import { getToken } from '../../store/voice/token';
+import { getAccessToken } from '../../store/voice/accessToken';
 import { type StackNavigationProp } from '../../types';
 import { useActiveCall } from '../../hooks/activeCall';
 
@@ -103,8 +103,8 @@ const useMakeOutgoingCall = (
   const to = recipientType === 'client' ? outgoingClient : outgoingNumber;
 
   const handle = React.useCallback(async () => {
-    const tokenAction = await dispatch(getToken());
-    if (getToken.rejected.match(tokenAction)) {
+    const tokenAction = await dispatch(getAccessToken());
+    if (getAccessToken.rejected.match(tokenAction)) {
       console.error(tokenAction.payload || tokenAction.error);
       return;
     }
