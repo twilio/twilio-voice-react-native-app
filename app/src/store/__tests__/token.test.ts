@@ -33,26 +33,32 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
 });
 
 describe('token store', () => {
+  let store: app.Store;
+
+  beforeEach(() => {
+    store = app.createStore();
+  });
+
   it('successfully gets a token', async () => {
     fetchMock.mockResolvedValueOnce({
       text: jest.fn().mockResolvedValueOnce('foo'),
     });
-    await app.store.dispatch(user.login());
-    await app.store.dispatch(token.getToken());
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
     expect(fetchMock).toBeCalledTimes(1);
-    expect(app.store.getState().voice.token).toEqual({
+    expect(store.getState().voice.accessToken).toEqual({
       status: 'fulfilled',
       value: 'foo',
     });
   });
 
-  it('returns empty string if no user', async () => {
+  it('rejects if no user', async () => {
     jest.spyOn(auth0, 'authorize').mockReturnValue({ undefined });
-    await app.store.dispatch(user.login());
-    await app.store.dispatch(token.getToken());
-    expect(app.store.getState().voice.token).toEqual({
-      status: 'fulfilled',
-      value: '',
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
+    expect(store.getState().voice.accessToken).toEqual({
+      status: 'rejected',
+      reason: 'USER_NOT_FULFILLED',
     });
   });
 
@@ -62,8 +68,8 @@ describe('token store', () => {
       idToken: 'test id token',
     });
     fetchMock.mockRejectedValueOnce(new Error('error'));
-    await app.store.dispatch(user.login());
-    await app.store.dispatch(token.getToken());
-    expect(app.store.getState().voice.token?.status).toEqual('rejected');
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
+    expect(store.getState().voice.accessToken?.status).toEqual('rejected');
   });
 });

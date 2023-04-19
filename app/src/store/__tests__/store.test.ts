@@ -2,6 +2,7 @@ import * as app from '../app';
 import * as token from '../voice/accessToken';
 import * as outgoingCall from '../voice/call/outgoingCall';
 import * as activeCall from '../voice/call/activeCall';
+import * as user from '../user';
 
 let fetchMock: jest.Mock;
 let voiceConnectMock: jest.Mock;
@@ -33,14 +34,20 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   return { Call: MockCall };
 });
 
-it('works good', async () => {
+jest.mock('react-native-auth0');
+
+it('works', async () => {
+  const store = app.createStore();
+
+  await store.dispatch(user.checkLoginStatus());
+
   fetchMock.mockResolvedValueOnce({
     text: jest.fn().mockResolvedValueOnce('foo'),
   });
-  const getTokenAction = token.getToken();
-  await app.store.dispatch(getTokenAction);
+  const getTokenAction = token.getAccessToken();
+  await store.dispatch(getTokenAction);
 
-  expect(app.store.getState().voice.token?.status).toEqual('fulfilled');
+  expect(store.getState().voice.accessToken?.status).toEqual('fulfilled');
 
   voiceConnectMock.mockResolvedValueOnce({
     _uuid: 'mock uuid',
@@ -59,12 +66,10 @@ it('works good', async () => {
     recipientType: 'client',
     to: 'bob',
   });
-  await app.store.dispatch(makeOutgoingCallAction);
+  await store.dispatch(makeOutgoingCallAction);
 
-  expect(app.store.getState().voice.call.outgoingCall?.status).toEqual(
-    'fulfilled',
-  );
+  expect(store.getState().voice.call.outgoingCall?.status).toEqual('fulfilled');
 
   const muteActiveCallAction = activeCall.muteActiveCall({ mute: true });
-  await app.store.dispatch(muteActiveCallAction);
+  await store.dispatch(muteActiveCallAction);
 });
