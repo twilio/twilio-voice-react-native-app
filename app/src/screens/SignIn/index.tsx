@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { login } from '../../store/user';
+import { loginAndRegister } from '../../store/voice/registration';
 import { type Dispatch } from '../../store/app';
 
 const ArrowForward = require('../../../assets/icons/arrow-forward.png');
@@ -67,8 +67,8 @@ const SignIn: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
 
   const handleLogin = async () => {
-    const loginAction = await dispatch(login());
-    if (login.rejected.match(loginAction)) {
+    const loginAction = await dispatch(loginAndRegister());
+    if (loginAndRegister.rejected.match(loginAction)) {
       console.error(loginAction.payload || loginAction.error);
     }
   };

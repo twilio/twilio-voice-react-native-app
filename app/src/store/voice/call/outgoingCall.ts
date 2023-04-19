@@ -25,7 +25,7 @@ export const makeOutgoingCall = createAsyncThunk<
   'voice/makeOutgoingCall',
   async ({ to, recipientType }, { getState, dispatch, rejectWithValue }) => {
     try {
-      const token = getState().voice.token;
+      const token = getState().voice.accessToken;
 
       if (token?.status !== 'fulfilled') {
         return rejectWithValue({ reason: 'TOKEN_UNFULFILLED', error: null });
