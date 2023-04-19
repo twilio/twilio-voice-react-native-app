@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import config from '../../config';
-import Auth0 from 'react-native-auth0';
+import Auth0, { type SaveCredentialsParams } from 'react-native-auth0';
 import { State, Dispatch, type AsyncStoreSlice } from './app';
 
 export type UserState = AsyncStoreSlice<
@@ -86,7 +86,7 @@ export const login = createAsyncThunk<
   {
     state: State;
     dispatch: Dispatch;
-    rejectValue: { reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR'; error: any };
+    rejectValue: { reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR'; error?: any };
   }
 >('user/login', async (_, { rejectWithValue }) => {
   try {
@@ -96,10 +96,12 @@ export const login = createAsyncThunk<
     });
 
     if (typeof credentials.idToken === 'undefined') {
-      return rejectWithValue({ reason: 'ID_TOKEN_UNDEFINED', error: null });
+      return rejectWithValue({ reason: 'ID_TOKEN_UNDEFINED' });
     }
 
-    auth0.credentialsManager.saveCredentials(credentials as any);
+    auth0.credentialsManager.saveCredentials(
+      credentials as SaveCredentialsParams,
+    );
 
     const user = await auth0.auth.userInfo({
       token: credentials.accessToken,

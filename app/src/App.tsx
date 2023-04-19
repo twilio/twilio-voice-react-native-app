@@ -1,9 +1,11 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { store } from './store/app';
+import { createStore } from './store/app';
 import StackNavigator from './screens/StackNavigator';
 import { bootstrapApp } from './store/bootstrap';
+
+const store = createStore();
 
 const App = () => {
   React.useEffect(() => {

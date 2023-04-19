@@ -2,15 +2,18 @@ import { configureStore } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 import { voiceReducer } from './voice';
 
-export const store = configureStore({
-  reducer: {
-    voice: voiceReducer,
-  },
-});
+export const createStore = () =>
+  configureStore({
+    reducer: {
+      voice: voiceReducer,
+    },
+  });
 
-export type State = ReturnType<typeof store.getState>;
+export type Store = ReturnType<typeof createStore>;
 
-export type Dispatch = typeof store.dispatch;
+export type State = ReturnType<Store['getState']>;
+
+export type Dispatch = Store['dispatch'];
 
 export type AsyncStoreSlice<R = {}, S = {}, T = {}> =
   | null

@@ -119,11 +119,7 @@ const useMakeOutgoingCall = (
       console.error(callAction.payload || callAction.error);
     }
 
-    if (makeOutgoingCallAction.fulfilled.match(callAction)) {
-      navigation.navigate('Call');
-    } else {
-      console.error(callAction.payload || callAction.error);
-    }
+    navigation.navigate('Call');
   }, [dispatch, navigation, recipientType, to]);
 
   const isDisabled = React.useMemo(() => {
