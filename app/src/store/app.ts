@@ -1,11 +1,24 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, Middleware } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 import { voiceReducer } from './voice';
+
+const logActionType: Middleware = () => (next) => (action) => {
+  console.log(
+    action.type.match(/\/rejected$/g)
+      ? `${action.type} ${JSON.stringify(action.payload, null, 2)}`
+      : action.type,
+  );
+
+  return next(action);
+};
 
 export const createStore = () =>
   configureStore({
     reducer: {
       voice: voiceReducer,
+    },
+    middleware(getDefaultMiddleware) {
+      return getDefaultMiddleware().concat(logActionType);
     },
   });
 
