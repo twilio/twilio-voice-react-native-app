@@ -8,9 +8,7 @@ import { bootstrapApp } from './store/bootstrap';
 const store = createStore();
 
 const App = () => {
-  React.useEffect(() => {
-    store.dispatch(bootstrapApp());
-  }, []);
+  React.useEffect(() => store.dispatch(bootstrapApp()).abort, []);
 
   return (
     <Provider store={store}>

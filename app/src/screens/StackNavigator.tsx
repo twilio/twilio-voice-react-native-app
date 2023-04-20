@@ -18,7 +18,7 @@ const StackNavigator = () => {
   }
 
   if (user?.status === 'pending') {
-    return <Text>Loading...</Text>;
+    return null;
   }
 
   const screens =
@@ -32,17 +32,14 @@ const StackNavigator = () => {
         <Stack.Screen name="Call" component={Call} />
       </>
     ) : (
-      <Stack.Screen name="SignIn" component={SignIn} />
+      <Stack.Screen
+        name="Sign In"
+        options={{ headerShown: false }}
+        component={SignIn}
+      />
     );
 
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}>
-      {screens}
-    </Stack.Navigator>
-  );
+  return <Stack.Navigator>{screens}</Stack.Navigator>;
 };
 
 export default StackNavigator;
