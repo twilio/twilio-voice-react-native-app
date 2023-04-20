@@ -64,7 +64,7 @@ describe('user store', () => {
   });
 
   it('should check if a user is NOT logged in', async () => {
-    jest.spyOn(auth0, 'getCredentials').mockReturnValueOnce(undefined);
+    jest.spyOn(auth0, 'getCredentials').mockRejectedValueOnce(undefined);
     await store.dispatch(user.checkLoginStatus());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({
@@ -75,7 +75,6 @@ describe('user store', () => {
   });
 
   it('should check if a user IS logged in', async () => {
-    await store.dispatch(user.login());
     await store.dispatch(user.checkLoginStatus());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({

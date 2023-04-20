@@ -41,6 +41,7 @@ describe('token store', () => {
 
   it('successfully gets a token', async () => {
     fetchMock.mockResolvedValueOnce({
+      ok: true,
       text: jest.fn().mockResolvedValueOnce('foo'),
     });
     await store.dispatch(user.login());
@@ -53,7 +54,7 @@ describe('token store', () => {
   });
 
   it('rejects if no user', async () => {
-    jest.spyOn(auth0, 'authorize').mockReturnValue({ undefined });
+    jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({ undefined });
     await store.dispatch(user.login());
     await store.dispatch(token.getAccessToken());
     expect(store.getState().voice.accessToken).toEqual({
@@ -63,7 +64,7 @@ describe('token store', () => {
   });
 
   it('handles rejected case for fetch error', async () => {
-    jest.spyOn(auth0, 'authorize').mockReturnValue({
+    jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
       accessToken: 'test token',
       idToken: 'test id token',
     });

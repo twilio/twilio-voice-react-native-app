@@ -42,6 +42,7 @@ it('works', async () => {
   await store.dispatch(user.checkLoginStatus());
 
   fetchMock.mockResolvedValueOnce({
+    ok: true,
     text: jest.fn().mockResolvedValueOnce('foo'),
   });
   const getTokenAction = token.getAccessToken();
