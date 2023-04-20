@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import config from '../../config';
 import Auth0, { type SaveCredentialsParams } from 'react-native-auth0';
 import { State, Dispatch, type AsyncStoreSlice } from './app';
+import { wrapPromise } from '../util/wrapPromise';
 
 export type UserState = AsyncStoreSlice<
   {
@@ -9,8 +10,13 @@ export type UserState = AsyncStoreSlice<
     email: string;
   },
   {
-    reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR' | 'LOGOUT_ERROR' | undefined;
-    error: any;
+    reason:
+      | 'ID_TOKEN_UNDEFINED'
+      | 'LOGIN_ERROR'
+      | 'LOGOUT_ERROR'
+      | 'CHECK_LOGIN_STATUS'
+      | undefined;
+    error?: any;
   }
 >;
 
@@ -25,6 +31,9 @@ export const userSlice = createSlice({
       })
       .addCase(checkLoginStatus.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
+      })
+      .addCase(checkLoginStatus.rejected, () => {
+        return { status: 'rejected', reason: 'CHECK_LOGIN_STATUS' };
       });
     builder
       .addCase(login.pending, () => {
@@ -62,12 +71,24 @@ const auth0 = new Auth0({
   clientId: config.clientId,
 });
 
-export const checkLoginStatus = createAsyncThunk<{
-  accessToken: string;
-  email: string;
-}>('user/checkLoginStatus', async () => {
-  const credentials = await auth0.credentialsManager.getCredentials();
-  if (credentials) {
+export const checkLoginStatus = createAsyncThunk<
+  {
+    accessToken: string;
+    email: string;
+  },
+  void,
+  {
+    state: State;
+    dispatch: Dispatch;
+    rejectValue: undefined;
+  }
+>('user/checkLoginStatus', async () => {
+  const getCredentialsResult = await wrapPromise(
+    auth0.credentialsManager.getCredentials(),
+  );
+
+  if (getCredentialsResult.status === 'fulfilled') {
+    const credentials = getCredentialsResult.value;
     const user = await auth0.auth.userInfo({
       token: credentials.accessToken,
     });

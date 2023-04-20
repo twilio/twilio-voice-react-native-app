@@ -15,6 +15,10 @@ export type GetAccessTokenRejectValue =
       error: any;
     }
   | {
+      reason: 'TOKEN_RESPONSE_NOT_OK';
+      status: number;
+    }
+  | {
       reason: 'FETCH_TEXT_ERROR';
       error: any;
     };
@@ -49,15 +53,24 @@ export const getAccessToken = createAsyncThunk<
     });
   }
 
-  const textResult = await wrapPromise(fetchResult.value.text());
-  if (textResult.status === 'rejected') {
+  const tokenResponse = fetchResult.value;
+  if (!tokenResponse.ok) {
     return rejectWithValue({
-      reason: 'FETCH_TEXT_ERROR',
-      error: textResult.reason,
+      reason: 'TOKEN_RESPONSE_NOT_OK',
+      status: tokenResponse.status,
     });
   }
 
-  return textResult.value;
+  const tokenTextResult = await wrapPromise(tokenResponse.text());
+  if (tokenTextResult.status === 'rejected') {
+    return rejectWithValue({
+      reason: 'FETCH_TEXT_ERROR',
+      error: tokenTextResult.reason,
+    });
+  }
+
+  const token = tokenTextResult.value;
+  return token;
 });
 
 /**
