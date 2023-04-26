@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fetch, defaultUrl } from '../../util/fetch';
-import { wrapPromise } from '../../util/wrapPromise';
+import { settlePromise } from '../../util/settlePromise';
 import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
 
 /**
@@ -37,7 +37,7 @@ export const getAccessToken = createAsyncThunk<
     return rejectWithValue({ reason: 'USER_NOT_FULFILLED' });
   }
 
-  const fetchResult = await wrapPromise(
+  const fetchResult = await settlePromise(
     fetch(`${defaultUrl}/token`, {
       method: 'POST',
       headers: {
@@ -61,7 +61,7 @@ export const getAccessToken = createAsyncThunk<
     });
   }
 
-  const tokenTextResult = await wrapPromise(tokenResponse.text());
+  const tokenTextResult = await settlePromise(tokenResponse.text());
   if (tokenTextResult.status === 'rejected') {
     return rejectWithValue({
       reason: 'FETCH_TEXT_ERROR',

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AsyncStoreSlice, type Dispatch, type State } from '../app';
 import { voice } from '../../util/voice';
-import { wrapPromise } from '../../util/wrapPromise';
+import { settlePromise } from '../../util/settlePromise';
 import { login } from '../user';
 import { getAccessToken } from './accessToken';
 
@@ -39,7 +39,7 @@ export const register = createAsyncThunk<
     return rejectWithValue({ reason: 'NO_ACCESS_TOKEN' });
   }
 
-  const voiceRegisterResult = await wrapPromise(
+  const voiceRegisterResult = await settlePromise(
     voice.register(accessToken.value),
   );
   if (voiceRegisterResult.status === 'rejected') {

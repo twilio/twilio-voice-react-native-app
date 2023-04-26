@@ -1,11 +1,11 @@
-import { wrapPromise } from '../wrapPromise';
+import { settlePromise } from '../settlePromise';
 
 describe('when given a promise that fulfills', () => {
   it('wraps the return value', async () => {
     const promiseResVal = 'some promise resolution thing';
 
     await expect(
-      wrapPromise(Promise.resolve(promiseResVal)),
+      settlePromise(Promise.resolve(promiseResVal)),
     ).resolves.toStrictEqual({
       status: 'fulfilled',
       value: promiseResVal,
@@ -13,7 +13,7 @@ describe('when given a promise that fulfills', () => {
   });
 
   it('wraps no return value', async () => {
-    await expect(wrapPromise(Promise.resolve())).resolves.toStrictEqual({
+    await expect(settlePromise(Promise.resolve())).resolves.toStrictEqual({
       status: 'fulfilled',
       value: undefined,
     });
@@ -25,7 +25,7 @@ describe('when given a promise that rejects', () => {
     const promiseResVal = 'some promise resolution thing';
 
     await expect(
-      wrapPromise(Promise.reject(promiseResVal)),
+      settlePromise(Promise.reject(promiseResVal)),
     ).resolves.toStrictEqual({
       status: 'rejected',
       reason: promiseResVal,
@@ -33,7 +33,7 @@ describe('when given a promise that rejects', () => {
   });
 
   it('wraps no return value', async () => {
-    await expect(wrapPromise(Promise.reject())).resolves.toStrictEqual({
+    await expect(settlePromise(Promise.reject())).resolves.toStrictEqual({
       status: 'rejected',
       reason: undefined,
     });
@@ -44,6 +44,6 @@ it('should never reject', async () => {
   const pFul = Promise.resolve();
   const pRej = Promise.reject();
 
-  await expect(wrapPromise(pFul)).resolves.toBeTruthy();
-  await expect(wrapPromise(pRej)).resolves.toBeTruthy();
+  await expect(settlePromise(pFul)).resolves.toBeTruthy();
+  await expect(settlePromise(pRej)).resolves.toBeTruthy();
 });

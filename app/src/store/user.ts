@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import config from '../../config';
 import Auth0, { type SaveCredentialsParams } from 'react-native-auth0';
 import { State, Dispatch, type AsyncStoreSlice } from './app';
-import { wrapPromise } from '../util/wrapPromise';
+import { settlePromise } from '../util/settlePromise';
 
 export type UserState = AsyncStoreSlice<
   {
@@ -83,7 +83,7 @@ export const checkLoginStatus = createAsyncThunk<
     rejectValue: undefined;
   }
 >('user/checkLoginStatus', async () => {
-  const getCredentialsResult = await wrapPromise(
+  const getCredentialsResult = await settlePromise(
     auth0.credentialsManager.getCredentials(),
   );
 

@@ -1,6 +1,5 @@
 /**
- * Wraps a Promise such that fulfillments and rejections are handled and
- * wrapped.
+ * Settles a Promise, wrapping fulfillments and rejections.
  *
  * @example
  * ```ts
@@ -30,10 +29,10 @@
  * @param - a Promise to wrap
  * @returns a Promise that always resolves.
  */
-export async function wrapPromise<T>(
+export async function settlePromise<T>(
   promise: Promise<T>,
 ): Promise<
-  { status: 'fulfilled'; value: T } | { status: 'rejected'; reason: any }
+  { status: 'fulfilled'; value: T } | { status: 'rejected'; reason: unknown }
 > {
   return promise
     .then((value) => ({ status: 'fulfilled' as const, value }))
