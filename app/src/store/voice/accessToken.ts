@@ -16,7 +16,7 @@ export type GetAccessTokenRejectValue =
     }
   | {
       reason: 'TOKEN_RESPONSE_NOT_OK';
-      status: number;
+      statusCode: number;
     }
   | {
       reason: 'FETCH_TEXT_ERROR';
@@ -57,7 +57,7 @@ export const getAccessToken = createAsyncThunk<
   if (!tokenResponse.ok) {
     return rejectWithValue({
       reason: 'TOKEN_RESPONSE_NOT_OK',
-      status: tokenResponse.status,
+      statusCode: tokenResponse.status,
     });
   }
 
@@ -100,6 +100,12 @@ export const accessTokenSlice = createSlice({
           return {
             status: 'rejected',
             reason: action.payload.reason,
+          };
+        case 'TOKEN_RESPONSE_NOT_OK':
+          return {
+            status: 'rejected',
+            reason: action.payload.reason,
+            statusCode: action.payload.statusCode,
           };
         case 'FETCH_ERROR':
         case 'FETCH_TEXT_ERROR':
