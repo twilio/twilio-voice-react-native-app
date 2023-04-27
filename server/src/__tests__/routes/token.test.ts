@@ -1,6 +1,8 @@
 import { createTokenRoute } from '../../routes/token';
 import { jwt } from 'twilio';
 
+jest.mock('../../utils/auth');
+
 const mockedAccessToken = jest.mocked(jwt.AccessToken);
 const mockedVoiceGrant = jest.mocked(jwt.AccessToken.VoiceGrant);
 
@@ -28,41 +30,50 @@ describe('createTokenRoute()', () => {
 
   describe('tokenRoute()', () => {
     let tokenRoute: ReturnType<typeof createTokenRoute>;
-    let mockReq: {};
+    let mockReq: {
+      auth: {
+        token: string;
+      };
+    };
     let mockRes: {
       header: jest.Mock;
       locals: Record<any, any>;
       status: jest.Mock;
       send: jest.Mock;
     };
-    let mockNext: jest.Mock;
 
     beforeEach(() => {
       tokenRoute = createTokenRoute(mockServerConfig);
-      mockReq = {};
+      mockReq = {
+        auth: {
+          token: 'mock-token',
+        },
+      };
       mockRes = {
         header: jest.fn(() => mockRes),
         locals: {},
         status: jest.fn(() => mockRes),
         send: jest.fn(() => mockRes),
       };
-      mockNext = jest.fn();
     });
 
-    it('constructs an access token', () => {
-      tokenRoute(mockReq as any, mockRes as any, mockNext);
+    it('constructs an access token', async () => {
+      await tokenRoute(mockReq as any, mockRes as any);
 
       expect(mockedAccessToken.mock.calls).toEqual([
         [
           mockServerConfig.ACCOUNT_SID,
           mockServerConfig.API_KEY_SID,
           mockServerConfig.API_KEY_SECRET,
+          {
+            identity: 'mock-email',
+          },
         ],
       ]);
     });
 
-    it('constructs a voice grant', () => {
-      tokenRoute(mockReq as any, mockRes as any, mockNext);
+    it('constructs a voice grant', async () => {
+      await tokenRoute(mockReq as any, mockRes as any);
 
       expect(mockedVoiceGrant.mock.calls).toEqual([
         [
@@ -75,14 +86,14 @@ describe('createTokenRoute()', () => {
       ]);
     });
 
-    it('adds the voice grant to the access token', () => {
+    it('adds the voice grant to the access token', async () => {
       mockedVoiceGrant.mockImplementationOnce(
         () =>
           ({
             'i am': 'a mock voice grant',
           } as any),
       );
-      tokenRoute(mockReq as any, mockRes as any, mockNext);
+      await tokenRoute(mockReq as any, mockRes as any);
 
       expect(mockedVoiceGrant.mock.results).toHaveLength(1);
       const mockVoiceGrant = mockedVoiceGrant.mock.results[0].value;
@@ -91,10 +102,9 @@ describe('createTokenRoute()', () => {
       expect(mockAddGrant.mock.calls[0][0]).toBe(mockVoiceGrant);
     });
 
-    it('returns an access token', () => {
-      tokenRoute(mockReq as any, mockRes as any, mockNext);
+    it('returns an access token', async () => {
+      await tokenRoute(mockReq as any, mockRes as any);
 
-      expect(mockNext.mock.calls).toEqual([]);
       expect(mockRes.status.mock.calls).toEqual([[200]]);
       const mockToJwt = mockedAccessToken.mock.results[0].value.toJwt;
       expect(mockToJwt.mock.calls).toEqual([[]]);

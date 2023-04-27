@@ -1,13 +1,13 @@
-import request from 'supertest';
-import { createExpressApp } from '../server';
 import * as auth0JwtCheck from 'express-oauth2-jwt-bearer';
+import request from 'supertest';
 import { validateExpressRequest } from 'twilio';
+import { createExpressApp } from '../server';
+import * as authUtil from '../utils/auth';
 
 jest.unmock('express');
 
 jest.mock('../utils/log');
-jest.mock('express-oauth2-jwt-bearer');
-jest.mocked(validateExpressRequest);
+jest.mock('../utils/auth');
 
 const mockServerConfig = {
   ACCOUNT_SID: 'mock-twiliocredentials-accountsid',
@@ -27,34 +27,55 @@ describe('/token', () => {
     return request(app).post('/token');
   }
 
-  describe('responds with status code 200', () => {
-    it('if a valid username and password are present', async () => {
-      const auth = jest.spyOn(auth0JwtCheck, 'auth');
-      const response = await tokenRouteTest().send({
-        username: 'alice',
-        password: 'supersecretpassword1234',
-      });
-      expect(auth).toBeCalledTimes(1);
-      expect(response.status).toBe(200);
-      expect(response.headers['content-type']).toMatch(/text/);
-      expect(response.text).toBeDefined();
-      expect(response.text).not.toBe('');
-    });
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  describe('responds with status code 401', () => {
-    it('if auth0 middleware returns 401', async () => {
-      jest.spyOn(auth0JwtCheck, 'auth').mockImplementation(() =>
-        jest.fn((req: any, res: any, next: any) => {
-          throw Error(res.status(401));
-        }),
-      );
-      const response = await tokenRouteTest().send({
-        username: 'alice',
-        password: 'supersecretpassword1234',
-      });
-      expect(response.status).toBe(401);
+  it('responds with 200 for a valid request', async () => {
+    const auth = jest.spyOn(auth0JwtCheck, 'auth');
+    const response = await tokenRouteTest().send();
+    expect(auth).toBeCalledTimes(1);
+    expect(response.status).toBe(200);
+    expect(response.headers['content-type']).toMatch(/text/);
+    expect(response.text).toBe('mock-accesstoken-tojwt-foobar');
+  });
+
+  it('responds with 403 if the auth token is missing', async () => {
+    const auth = jest.spyOn(auth0JwtCheck, 'auth').mockImplementationOnce(() =>
+      jest.fn((_req: any, _res: any, next: any) => {
+        next();
+      }),
+    );
+    const response = await tokenRouteTest().send();
+    expect(auth).toBeCalledTimes(1);
+    expect(response.status).toBe(403);
+    expect(response.headers['content-type']).toMatch(/text/);
+    expect(response.text).toBe('No auth token.');
+  });
+
+  it('responds with 404 if user info cannot be found', async () => {
+    const getUserInfo = jest.spyOn(authUtil, 'getUserInfo').mockResolvedValueOnce({
+      success: false,
+      reason: 'AXIOS_ERROR',
+      error: new Error() as any,
     });
+    const response = await tokenRouteTest().send();
+    expect(getUserInfo.mock.calls).toEqual([
+      ['mock-auth0-issuer-base-url', 'some valid token'],
+    ]);
+    expect(response.status).toBe(404);
+    expect(response.headers['content-type']).toMatch(/text/);
+    expect(response.text).toBe('User info not found.');
+  });
+
+  it('responds with 401 if unauthorized', async () => {
+    jest.spyOn(auth0JwtCheck, 'auth').mockImplementationOnce(() =>
+      jest.fn((_req: any, res: any, _next: any) => {
+        throw Error(res.status(401));
+      }),
+    );
+    const response = await tokenRouteTest().send();
+    expect(response.status).toBe(401);
   });
 });
 
@@ -70,10 +91,7 @@ describe('/twiml', () => {
 
   describe('responds with status code 400', () => {
     it('if "to" is missing', async () => {
-      const response = await twimlRouteTest().send({
-        username: 'alice',
-        password: 'supersecretpassword1234',
-      });
+      const response = await twimlRouteTest().send();
       expect(response.status).toBe(400);
       expect(response.headers['content-type']).toMatch(/text/);
       expect(response.text).toBe('Missing "To".');
@@ -81,8 +99,6 @@ describe('/twiml', () => {
 
     it('if "recipientType" is missing', async () => {
       const response = await twimlRouteTest().send({
-        username: 'alice',
-        password: 'supersecretpassword1234',
         To: 'bob',
       });
       expect(response.status).toBe(400);
@@ -92,8 +108,6 @@ describe('/twiml', () => {
 
     it('if "recipientType" is invalid', async () => {
       const response = await twimlRouteTest().send({
-        username: 'alice',
-        password: 'supersecretpassword1234',
         To: 'bob',
         recipientType: 'foobar',
       });
@@ -106,8 +120,6 @@ describe('/twiml', () => {
   describe('responds with status code 200', () => {
     it('if a valid username and password are present', async () => {
       const response = await twimlRouteTest().send({
-        username: 'alice',
-        password: 'supersecretpassword1234',
         To: 'bob',
         recipientType: 'client',
       });
@@ -120,10 +132,8 @@ describe('/twiml', () => {
 
   describe('responds with status code 401', () => {
     it('if the twilio signature is unauthorized', async () => {
-      jest.mocked(validateExpressRequest).mockReturnValue(false);
+      jest.mocked(validateExpressRequest).mockReturnValueOnce(false);
       const response = await twimlRouteTest().send({
-        username: 'alice',
-        password: 'supersecretpassword1234',
         To: 'bob',
         recipientType: 'client',
       });
