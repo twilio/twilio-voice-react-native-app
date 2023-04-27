@@ -3,7 +3,7 @@ export const authorize = jest.fn().mockResolvedValue({
   idToken: 'test id token',
 });
 
-const userInfo = jest.fn().mockResolvedValue({
+export const userInfo = jest.fn().mockResolvedValue({
   email: 'test email',
 });
 

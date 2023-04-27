@@ -35,7 +35,7 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
 });
 
 it('works', async () => {
-  const store = app.createStore();
+  const store: app.Store = app.createStore();
 
   await store.dispatch(user.checkLoginStatus());
 
