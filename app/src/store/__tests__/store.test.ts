@@ -34,8 +34,6 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   return { Call: MockCall };
 });
 
-jest.mock('react-native-auth0');
-
 it('works', async () => {
   const store = app.createStore();
 
