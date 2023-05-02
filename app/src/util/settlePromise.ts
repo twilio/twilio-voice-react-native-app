@@ -4,12 +4,12 @@
  * @example
  * ```ts
  * const pFul = Promise.resolve('ahoy!');
- * const ful = await wrapPromise(pFul);
+ * const ful = await settlePromise(pFul);
  * // ful === { status: 'fulfilled', value: 'ahoy!' }
  *
  * const someError = new Error();
  * const pRej = Promise.reject(someError);
- * const rej = await wrapPromise(pRej);
+ * const rej = await settlePromise(pRej);
  * // rej === { status: 'rejected', reason: someError }
  * ```
  *
