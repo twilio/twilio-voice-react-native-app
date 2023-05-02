@@ -22,6 +22,9 @@ export function createExpressApp(serverConfig: ServerCredentials) {
    *
    * Configure the following line according to your environment, development or
    * production.
+   *
+   * Please see the official Express documentation for more information.
+   * https://expressjs.com/en/guide/behind-proxies.html
    */
   app.set('trust proxy', 1);
 
