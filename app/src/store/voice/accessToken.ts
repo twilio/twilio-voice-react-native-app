@@ -3,9 +3,6 @@ import { fetch, defaultUrl } from '../../util/fetch';
 import { settlePromise } from '../../util/settlePromise';
 import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
 
-/**
- * Actions
- */
 export type GetAccessTokenRejectValue =
   | {
       reason: 'USER_NOT_FULFILLED';
@@ -73,9 +70,6 @@ export const getAccessToken = createAsyncThunk<
   return token;
 });
 
-/**
- * Slice
- */
 export type AccessTokenState = AsyncStoreSlice<
   { value: string },
   GetAccessTokenRejectValue | { error: any }

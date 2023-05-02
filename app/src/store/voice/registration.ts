@@ -5,9 +5,6 @@ import { settlePromise } from '../../util/settlePromise';
 import { login } from '../user';
 import { getAccessToken } from './accessToken';
 
-/**
- * Actions
- */
 export type RegisterRejectValue =
   | {
       reason: 'ACCESS_TOKEN_NOT_FULFILLED';
@@ -86,9 +83,6 @@ export const loginAndRegister = createAsyncThunk<
   }
 });
 
-/**
- * Slice
- */
 export type RegistrationSlice = AsyncStoreSlice<
   {},
   RegisterRejectValue | { error: any }
