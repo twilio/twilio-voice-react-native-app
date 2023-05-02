@@ -1,5 +1,13 @@
 import axios, { type AxiosError } from 'axios';
 
+export type AuthError = {
+  cause?: Error;
+  code?: string;
+  message: string;
+  name: string;
+  status?: number;
+}
+
 export type UserInfo = {
   email: string;
   email_verified: string;
@@ -17,8 +25,8 @@ export type UserInfoResponse =
     }
   | {
       success: false;
-      reason: 'AXIOS_ERROR';
-      error: AxiosError;
+      reason: 'AUTH_ERROR';
+      error: AuthError;
     };
 
 export async function getUserInfo(
@@ -31,11 +39,18 @@ export async function getUserInfo(
     .then((value) => ({ success: true as const, value }))
     .catch((error) => ({ success: false as const, error }));
 
-  if (!response.success) {
+    if (!response.success) {
+    const error: AxiosError = response.error;
     return {
       success: false,
-      reason: 'AXIOS_ERROR',
-      error: response.error,
+      reason: 'AUTH_ERROR',
+      error: {
+        cause: error.cause,
+        code: error.code,
+        message: error.message,
+        name: error.name,
+        status: error.status,
+      },
     };
   }
 
