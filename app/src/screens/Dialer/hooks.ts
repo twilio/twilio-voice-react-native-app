@@ -117,6 +117,7 @@ const useMakeOutgoingCall = (
     );
     if (makeOutgoingCallAction.rejected.match(callAction)) {
       console.error(callAction.payload || callAction.error);
+      return;
     }
 
     navigation.navigate('Call');
