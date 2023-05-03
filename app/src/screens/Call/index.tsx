@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Dialpad from '../../components/Dialpad';
-import RemoteParticipant from './RemoteParticipant';
-import HangupButton from './HangupButton';
+import RemoteParticipant from '../../components/Call/RemoteParticipant';
+import EndCallButton from '../../components/Call/EndCallButton';
 import MuteButton from './MuteButton';
 import SelectAudioOutputDeviceButton from './SelectAudioOutputDeviceButton';
 import ShowDialpadButton from './ShowDialpadButton';
 import HideDialpadButton from './HideDialpadButton';
 import useCall from './hooks';
 import { useNavigation } from '@react-navigation/native';
-import { type StackNavigationProp } from '../../types';
+import { type StackNavigationProp } from '../types';
 import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 
 const Call: React.FC = () => {
@@ -25,7 +25,7 @@ const Call: React.FC = () => {
         <Dialpad disabled={dialpad.isDisabled} onPress={dialpad.handle} />
         <View style={styles.buttonBox}>
           <HideDialpadButton onPress={() => dialpad.setIsVisible(false)} />
-          <HangupButton disabled={hangup.isDisabled} onPress={hangup.handle} />
+          <EndCallButton disabled={hangup.isDisabled} onPress={hangup.handle} />
           <View style={styles.buttonSpacer} />
         </View>
       </>
@@ -52,7 +52,7 @@ const Call: React.FC = () => {
             onPress={selectAudioOutputDevice.handle}
           />
         </View>
-        <HangupButton disabled={hangup.isDisabled} onPress={hangup.handle} />
+        <EndCallButton disabled={hangup.isDisabled} onPress={hangup.handle} />
       </>
     ),
     [dialpad, hangup, mute, selectAudioOutputDevice],

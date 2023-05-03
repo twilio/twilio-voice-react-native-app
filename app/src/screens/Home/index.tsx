@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { type Dispatch, type State } from '../../store/app';
 import { logout } from '../../store/user';
 
-const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
+const TwilioLogo = require('../../../assets/icons/twilio-logo.png');
 
 const styles = StyleSheet.create({
   container: {

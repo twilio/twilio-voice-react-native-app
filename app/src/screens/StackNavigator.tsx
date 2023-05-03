@@ -4,9 +4,11 @@ import { Text } from 'react-native';
 import { useSelector } from 'react-redux';
 import Call from './Call';
 import TabNavigator from './TabNavigator';
-import { type StackParamList } from '../types';
+import { type StackParamList } from './types';
 import SignIn from './SignIn';
 import { type State } from '../store/app';
+import IncomingCall from './IncomingCall';
+import LoadingScreen from '../components/LoadingScreen';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -18,7 +20,7 @@ const StackNavigator = () => {
   }
 
   if (user?.status === 'pending') {
-    return null;
+    return <LoadingScreen />;
   }
 
   const screens =
@@ -30,6 +32,7 @@ const StackNavigator = () => {
           component={TabNavigator}
         />
         <Stack.Screen name="Call" component={Call} />
+        <Stack.Screen name="Incoming Call" component={IncomingCall} />
       </>
     ) : (
       <Stack.Screen
