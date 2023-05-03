@@ -226,6 +226,17 @@ jobs:
           root: .
           paths: .
 
+  server-build:
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: "Server: build"
+          command: |
+            cd server
+            yarn build
+            cd ..
+
   server-test:
     executor: default
     steps:
@@ -263,5 +274,8 @@ workflows:
       # server jobs
       - server-cache-install-dependencies
       - server-test:
+          requires:
+            - server-cache-install-dependencies
+      - server-build:
           requires:
             - server-cache-install-dependencies
