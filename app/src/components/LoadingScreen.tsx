@@ -31,9 +31,6 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
   },
-  test: {
-    backgroundColor: 'blue',
-  },
 });
 
 export default IncomingCall;
