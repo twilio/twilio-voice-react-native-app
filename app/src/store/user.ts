@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import config from '../../config';
-import Auth0 from 'react-native-auth0';
+import Auth0, { type SaveCredentialsParams } from 'react-native-auth0';
 import { State, Dispatch, type AsyncStoreSlice } from './app';
+import { settlePromise } from '../util/settlePromise';
 
 export type UserState = AsyncStoreSlice<
   {
@@ -9,8 +10,13 @@ export type UserState = AsyncStoreSlice<
     email: string;
   },
   {
-    reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR' | 'LOGOUT_ERROR' | undefined;
-    error: any;
+    reason:
+      | 'ID_TOKEN_UNDEFINED'
+      | 'LOGIN_ERROR'
+      | 'LOGOUT_ERROR'
+      | 'CHECK_LOGIN_STATUS'
+      | undefined;
+    error?: any;
   }
 >;
 
@@ -25,6 +31,9 @@ export const userSlice = createSlice({
       })
       .addCase(checkLoginStatus.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
+      })
+      .addCase(checkLoginStatus.rejected, () => {
+        return { status: 'rejected', reason: 'CHECK_LOGIN_STATUS' };
       });
     builder
       .addCase(login.pending, () => {
@@ -62,12 +71,24 @@ const auth0 = new Auth0({
   clientId: config.clientId,
 });
 
-export const checkLoginStatus = createAsyncThunk<{
-  accessToken: string;
-  email: string;
-}>('user/checkLoginStatus', async () => {
-  const credentials = await auth0.credentialsManager.getCredentials();
-  if (credentials) {
+export const checkLoginStatus = createAsyncThunk<
+  {
+    accessToken: string;
+    email: string;
+  },
+  void,
+  {
+    state: State;
+    dispatch: Dispatch;
+    rejectValue: undefined;
+  }
+>('user/checkLoginStatus', async () => {
+  const getCredentialsResult = await settlePromise(
+    auth0.credentialsManager.getCredentials(),
+  );
+
+  if (getCredentialsResult.status === 'fulfilled') {
+    const credentials = getCredentialsResult.value;
     const user = await auth0.auth.userInfo({
       token: credentials.accessToken,
     });
@@ -86,7 +107,7 @@ export const login = createAsyncThunk<
   {
     state: State;
     dispatch: Dispatch;
-    rejectValue: { reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR'; error: any };
+    rejectValue: { reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR'; error?: any };
   }
 >('user/login', async (_, { rejectWithValue }) => {
   try {
@@ -96,10 +117,12 @@ export const login = createAsyncThunk<
     });
 
     if (typeof credentials.idToken === 'undefined') {
-      return rejectWithValue({ reason: 'ID_TOKEN_UNDEFINED', error: null });
+      return rejectWithValue({ reason: 'ID_TOKEN_UNDEFINED' });
     }
 
-    auth0.credentialsManager.saveCredentials(credentials as any);
+    auth0.credentialsManager.saveCredentials(
+      credentials as SaveCredentialsParams,
+    );
 
     const user = await auth0.auth.userInfo({
       token: credentials.accessToken,

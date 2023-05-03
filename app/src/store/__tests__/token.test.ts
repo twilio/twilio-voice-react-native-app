@@ -1,4 +1,4 @@
-import * as token from '../voice/token';
+import * as token from '../voice/accessToken';
 import * as user from '../user';
 import * as app from '../app';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
@@ -33,37 +33,44 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
 });
 
 describe('token store', () => {
+  let store: app.Store;
+
+  beforeEach(() => {
+    store = app.createStore();
+  });
+
   it('successfully gets a token', async () => {
     fetchMock.mockResolvedValueOnce({
+      ok: true,
       text: jest.fn().mockResolvedValueOnce('foo'),
     });
-    await app.store.dispatch(user.login());
-    await app.store.dispatch(token.getToken());
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
     expect(fetchMock).toBeCalledTimes(1);
-    expect(app.store.getState().voice.token).toEqual({
+    expect(store.getState().voice.accessToken).toEqual({
       status: 'fulfilled',
       value: 'foo',
     });
   });
 
-  it('returns empty string if no user', async () => {
-    jest.spyOn(auth0, 'authorize').mockReturnValue({ undefined });
-    await app.store.dispatch(user.login());
-    await app.store.dispatch(token.getToken());
-    expect(app.store.getState().voice.token).toEqual({
-      status: 'fulfilled',
-      value: '',
+  it('rejects if no user', async () => {
+    jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({ undefined });
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
+    expect(store.getState().voice.accessToken).toEqual({
+      status: 'rejected',
+      reason: 'USER_NOT_FULFILLED',
     });
   });
 
   it('handles rejected case for fetch error', async () => {
-    jest.spyOn(auth0, 'authorize').mockReturnValue({
+    jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
       accessToken: 'test token',
       idToken: 'test id token',
     });
     fetchMock.mockRejectedValueOnce(new Error('error'));
-    await app.store.dispatch(user.login());
-    await app.store.dispatch(token.getToken());
-    expect(app.store.getState().voice.token?.status).toEqual('rejected');
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
+    expect(store.getState().voice.accessToken?.status).toEqual('rejected');
   });
 });

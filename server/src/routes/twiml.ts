@@ -1,15 +1,15 @@
 import { Request, RequestHandler, Response } from 'express';
 import { twiml, validateExpressRequest } from 'twilio';
 import { ServerCredentials } from '../common/types';
-import { error } from '../utils/log';
+import { log } from '../utils/log';
 
 export function createTwimlRoute(
   serverConfig: ServerCredentials,
 ): RequestHandler {
   const { VoiceResponse } = twiml;
 
-  const logError = (msg: string) => {
-    error(`/twiml ${msg}`);
+  const logMsg = (msg: string) => {
+    log(`/twiml ${msg}`);
   };
 
   return function twimlRoute(req: Request, res: Response) {
@@ -17,7 +17,7 @@ export function createTwimlRoute(
 
     if (!requestIsValid) {
       const msg = 'Unauthorized Twilio signature';
-      logError(msg);
+      logMsg(msg);
       res.status(401).send(msg);
       return;
     }
@@ -25,7 +25,7 @@ export function createTwimlRoute(
     const { To: to } = req.body;
     if (typeof to !== 'string') {
       const msg = 'Missing "To".';
-      logError(msg);
+      logMsg(msg);
       res.status(400).send(msg);
       return;
     }
@@ -35,7 +35,7 @@ export function createTwimlRoute(
     );
     if (typeof recipientType === 'undefined') {
       const msg = 'Invalid "recipientType".';
-      logError(msg);
+      logMsg(msg);
       res.status(400).send(msg);
       return;
     }

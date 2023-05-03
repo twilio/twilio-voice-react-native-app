@@ -44,6 +44,15 @@ commands:
             yarn install --immutable
             cd ..
 
+  app-save-google-services-json:
+    steps:
+      - run:
+          name: "App: save Google Services JSON"
+          command: |
+            cd app
+            echo $GOOGLE_SERVICES_JSON | base64 -d > android/app/google-services.json
+            cd ..
+
   app-setup-cocoapods:
     steps:
       - run:
@@ -170,6 +179,7 @@ jobs:
     steps:
       - checkout
       - app-install-dependencies
+      - app-save-google-services-json
       - app-detox-build:
           configuration: android.emu.release
       - android/create-avd:
