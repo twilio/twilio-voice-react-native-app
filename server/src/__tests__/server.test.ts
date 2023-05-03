@@ -56,7 +56,7 @@ describe('/token', () => {
   it('responds with 404 if user info cannot be found', async () => {
     const getUserInfo = jest.spyOn(authUtil, 'getUserInfo').mockResolvedValueOnce({
       success: false,
-      reason: 'AXIOS_ERROR',
+      reason: 'AUTH_ERROR',
       error: new Error() as any,
     });
     const response = await tokenRouteTest().send();

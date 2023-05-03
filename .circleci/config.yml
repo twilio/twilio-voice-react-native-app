@@ -226,6 +226,17 @@ jobs:
           root: .
           paths: .
 
+  server-typecheck:
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: "Server: typecheck"
+          command: |
+            cd server
+            yarn typecheck
+            cd ..
+
   server-test:
     executor: default
     steps:
