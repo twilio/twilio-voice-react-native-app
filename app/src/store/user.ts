@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import config from '../../config';
+import Config from 'react-native-config';
 import Auth0 from 'react-native-auth0';
 import { State, Dispatch, type AsyncStoreSlice } from './app';
 
@@ -58,8 +58,8 @@ export const userSlice = createSlice({
 });
 
 const auth0 = new Auth0({
-  domain: config.domain,
-  clientId: config.clientId,
+  domain: Config.DOMAIN_NAME!,
+  clientId: Config.CLIENT_ID!,
 });
 
 export const checkLoginStatus = createAsyncThunk<{
@@ -91,8 +91,8 @@ export const login = createAsyncThunk<
 >('user/login', async (_, { rejectWithValue }) => {
   try {
     const credentials = await auth0.webAuth.authorize({
-      scope: config.auth0Scope,
-      audience: config.audience,
+      scope: Config.AUTH0_SCOPE!,
+      audience: Config.AUDIENCE!,
     });
 
     if (typeof credentials.idToken === 'undefined') {
