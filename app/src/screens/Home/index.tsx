@@ -36,7 +36,9 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     marginTop: 100,
-    marginLeft: 18,
+  },
+  logo: {
+    maxHeight: '75%',
   },
   logoutText: {
     color: '#0263E0',
@@ -59,7 +61,7 @@ const Home: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image source={TwilioLogo} resizeMode="contain" />
+        <Image style={styles.logo} source={TwilioLogo} resizeMode="contain" />
       </View>
       <View style={styles.body}>
         <Text>Ahoy!</Text>
