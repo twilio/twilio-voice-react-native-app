@@ -7,8 +7,7 @@
     "build": "tsc",
     "start": "node build/src/",
     "watch": "nodemon",
-    "test": "jest",
-    "typecheck": "tsc --noEmit"
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.20.5",

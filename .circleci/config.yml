@@ -226,15 +226,15 @@ jobs:
           root: .
           paths: .
 
-  server-typecheck:
+  server-build:
     executor: default
     steps:
       - attach_project
       - run:
-          name: "Server: typecheck"
+          name: "Server: build"
           command: |
             cd server
-            yarn typecheck
+            yarn build
             cd ..
 
   server-test:
@@ -276,6 +276,6 @@ workflows:
       - server-test:
           requires:
             - server-cache-install-dependencies
-      - server-typecheck:
+      - server-build:
           requires:
             - server-cache-install-dependencies
