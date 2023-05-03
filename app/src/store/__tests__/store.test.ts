@@ -34,7 +34,7 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   return { Call: MockCall };
 });
 
-it('can make an outgoing call and mute it', async () => {
+it('should make an outgoing call and mute it', async () => {
   const store: app.Store = app.createStore();
 
   await store.dispatch(user.checkLoginStatus());
