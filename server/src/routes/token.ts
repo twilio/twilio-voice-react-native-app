@@ -1,25 +1,52 @@
-import { Request, RequestHandler, Response } from 'express';
+import { Request, Response } from 'express';
 import { jwt } from 'twilio';
-import { TwilioCredentials } from '../common/types';
+import { ServerCredentials } from '../common/types';
+import { getUserInfo } from '../utils/auth';
+import { log } from '../utils/log';
 
 export function createTokenRoute(
-  twilioCredentials: TwilioCredentials,
-): RequestHandler {
+  serverCredentials: ServerCredentials,
+) {
   const {
     AccessToken,
     AccessToken: { VoiceGrant },
   } = jwt;
-  return function tokenRoute(_req: Request, res: Response) {
+
+  const logMsg = (msg: string) => {
+    log(`/token ${msg}`);
+  };
+
+  return async function tokenRoute(req: Request, res: Response) {
+    if (typeof req.auth?.token !== 'string') {
+      const msg = 'No auth token.';
+      logMsg(msg);
+      return res.header('Content-Type', 'text/plain').status(403).send(msg);
+    }
+
+    const userInfoResult = await getUserInfo(
+      serverCredentials.AUTH0_ISSUER_BASE_URL,
+      req.auth.token,
+    );
+    if (!userInfoResult.success) {
+      const msg = 'User info not found.';
+      logMsg(msg);
+      return res.header('Content-Type', 'text/plain').status(404).send(msg);
+    }
+
+    const { userInfo } = userInfoResult;
     const accessToken = new AccessToken(
-      twilioCredentials.ACCOUNT_SID,
-      twilioCredentials.API_KEY_SID,
-      twilioCredentials.API_KEY_SECRET,
+      serverCredentials.ACCOUNT_SID,
+      serverCredentials.API_KEY_SID,
+      serverCredentials.API_KEY_SECRET,
+      {
+        identity: userInfo.email,
+      },
     );
 
     const voiceGrant = new VoiceGrant({
       incomingAllow: true,
-      outgoingApplicationSid: twilioCredentials.OUTGOING_APPLICATION_SID,
-      pushCredentialSid: twilioCredentials.PUSH_CREDENTIAL_SID,
+      outgoingApplicationSid: serverCredentials.OUTGOING_APPLICATION_SID,
+      pushCredentialSid: serverCredentials.PUSH_CREDENTIAL_SID,
     });
 
     accessToken.addGrant(voiceGrant);

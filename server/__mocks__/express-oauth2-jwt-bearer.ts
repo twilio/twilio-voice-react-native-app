@@ -1,4 +1,5 @@
 const auth0Middleware = (req: any, res: any, next: any) => {
+  req.auth = { token: 'some valid token' };
   next();
 };
 

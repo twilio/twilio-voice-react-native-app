@@ -1,5 +1,7 @@
-import { createTwimlRoute } from '../../routes/twiml';
 import { twiml } from 'twilio';
+import { createTwimlRoute } from '../../routes/twiml';
+
+jest.mock('../../utils/log');
 
 const mockedVoiceResponse = jest.mocked(twiml.VoiceResponse);
 

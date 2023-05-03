@@ -1,16 +1,32 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, Middleware } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 import { voiceReducer } from './voice';
 
-export const store = configureStore({
-  reducer: {
-    voice: voiceReducer,
-  },
-});
+export const logActionType: Middleware = () => (next) => (action) => {
+  console.log(
+    action.type.match(/\/rejected$/g)
+      ? `${action.type} ${JSON.stringify(action.payload, null, 2)}`
+      : action.type,
+  );
 
-export type State = ReturnType<typeof store.getState>;
+  return next(action);
+};
 
-export type Dispatch = typeof store.dispatch;
+export const createStore = (...middlewares: Middleware[]) =>
+  configureStore({
+    reducer: {
+      voice: voiceReducer,
+    },
+    middleware(getDefaultMiddleware) {
+      return getDefaultMiddleware().concat(...middlewares);
+    },
+  });
+
+export type Store = ReturnType<typeof createStore>;
+
+export type State = ReturnType<Store['getState']>;
+
+export type Dispatch = Store['dispatch'];
 
 export type AsyncStoreSlice<R = {}, S = {}, T = {}> =
   | null

@@ -40,18 +40,22 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
 });
 
 describe('audioDevices store', () => {
+  let store: app.Store;
+
+  beforeEach(() => {
+    store = app.createStore();
+  });
+
   it('gets an audio device', async () => {
-    await app.store.dispatch(audioDevices.getAudioDevices());
-    expect(app.store.getState().voice.audioDevices?.status).toEqual(
-      'fulfilled',
-    );
+    await store.dispatch(audioDevices.getAudioDevices());
+    expect(store.getState().voice.audioDevices?.status).toEqual('fulfilled');
   });
 
   it('handles audio device error', async () => {
     jest
       .spyOn(voice, 'getAudioDevices')
       .mockRejectedValue(new Error('audio device error'));
-    await app.store.dispatch(audioDevices.getAudioDevices());
-    expect(app.store.getState().voice.audioDevices?.status).toEqual('rejected');
+    await store.dispatch(audioDevices.getAudioDevices());
+    expect(store.getState().voice.audioDevices?.status).toEqual('rejected');
   });
 });

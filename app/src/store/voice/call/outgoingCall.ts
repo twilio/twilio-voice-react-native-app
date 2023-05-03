@@ -25,7 +25,7 @@ export const makeOutgoingCall = createAsyncThunk<
   'voice/makeOutgoingCall',
   async ({ to, recipientType }, { getState, dispatch, rejectWithValue }) => {
     try {
-      const token = getState().voice.token;
+      const token = getState().voice.accessToken;
 
       if (token?.status !== 'fulfilled') {
         return rejectWithValue({ reason: 'TOKEN_UNFULFILLED', error: null });
@@ -49,9 +49,11 @@ export const makeOutgoingCall = createAsyncThunk<
       outgoingCall.on(TwilioCall.Event.Reconnecting, (error) =>
         console.error('Reconnecting:', error),
       );
-      outgoingCall.on(TwilioCall.Event.Disconnected, (error) =>
-        console.error('Disconnected:', error),
-      );
+      outgoingCall.on(TwilioCall.Event.Disconnected, (error) => {
+        if (error) {
+          console.error('Disconnected:', error);
+        }
+      });
 
       Object.values(TwilioCall.Event).forEach((callEvent) => {
         outgoingCall.on(callEvent, () => {

@@ -25,6 +25,7 @@ buildscript {
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("de.undercouch:gradle-download-task:5.0.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath("com.google.gms:google-services:4.3.15")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -58,7 +59,7 @@ allprojects {
 
 subprojects {
     afterEvaluate { subproject ->
-        // fix detox with auth0 error, reference: https://github.com/auth0/react-native-auth0/issues/387#issuecomment-918483390 
+        // fix detox with auth0 error, reference: https://github.com/auth0/react-native-auth0/issues/387#issuecomment-918483390
         if (subproject.name == 'react-native-auth0') {
             def String taskRequests = getGradle().getStartParameter().getTaskRequests().toString()
             if (taskRequests.contains("assembleAndroidTest")) {

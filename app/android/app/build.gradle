@@ -1,5 +1,8 @@
 apply plugin: "com.android.application"
 
+// Google Services
+apply plugin: 'com.google.gms.google-services'
+
 import com.android.build.OutputFile
 import org.apache.tools.ant.taskdefs.condition.Os
 

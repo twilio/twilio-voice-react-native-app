@@ -1,13 +1,13 @@
-export const authorize = jest.fn().mockReturnValue({
+export const authorize = jest.fn().mockResolvedValue({
   accessToken: 'test token',
   idToken: 'test id token',
 });
 
-const userInfo = jest.fn().mockReturnValue({
+export const userInfo = jest.fn().mockResolvedValue({
   email: 'test email',
 });
 
-export const getCredentials = jest.fn().mockReturnValue({
+export const getCredentials = jest.fn().mockResolvedValue({
   accessToken: 'test token',
   idToken: 'test id token',
 });
