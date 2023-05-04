@@ -190,6 +190,7 @@ jobs:
     steps:
       - checkout
       - app-install-dependencies
+      - app-save-config
       - app-save-google-services-json
       - app-detox-build:
           configuration: android.emu.release
@@ -210,6 +211,7 @@ jobs:
     steps:
       - checkout
       - app-install-dependencies
+      - app-save-config
       - app-install-applesimutils
       - app-install-pods
       - app-detox-build:
