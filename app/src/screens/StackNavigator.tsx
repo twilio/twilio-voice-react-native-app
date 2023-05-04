@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { Text } from 'react-native';
 import { useSelector } from 'react-redux';
-import Call from './Call';
+import ActiveCall from './ActiveCall';
 import TabNavigator from './TabNavigator';
 import { type StackParamList } from './types';
 import SignIn from './SignIn';
@@ -31,7 +31,7 @@ const StackNavigator = () => {
           options={{ headerShown: false }}
           component={TabNavigator}
         />
-        <Stack.Screen name="Call" component={Call} />
+        <Stack.Screen name="Call" component={ActiveCall} />
         <Stack.Screen name="Incoming Call" component={IncomingCall} />
       </>
     ) : (
