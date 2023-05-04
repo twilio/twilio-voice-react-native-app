@@ -34,6 +34,15 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   return { Call: MockCall };
 });
 
+it('should export a default store', () => {
+  expect(app.defaultStore).toBeDefined();
+
+  expect(app.defaultStore.dispatch).toBeDefined();
+  expect(app.defaultStore.getState).toBeDefined();
+  expect(app.defaultStore.replaceReducer).toBeDefined();
+  expect(app.defaultStore.subscribe).toBeDefined();
+});
+
 it('should make an outgoing call and mute it', async () => {
   const store: app.Store = app.createStore();
 
