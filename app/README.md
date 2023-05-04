@@ -14,12 +14,6 @@ Add the Application `Domain` and `Client ID` to the app env file
 .env
 ```
 
-Add the Application `Domain` to `manifestPlaceholders` in the build.gradle file
-
-```
-app/android/app/build.gradle
-```
-
 Find the `Identifier` found in the `Settings` tab of your Auth0 API
 
 ![auth0apisettings](https://user-images.githubusercontent.com/35968892/226760697-9bb44982-2c2f-40fd-bc6f-5176bbafcd0c.png)
