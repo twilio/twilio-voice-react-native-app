@@ -144,6 +144,7 @@ jobs:
       - save_cache:
           key: app-dependencies-{{ checksum "app/package.json" }}
           paths: app/node_modules
+      - app-save-config
       - persist_to_workspace:
           root: .
           paths: .
