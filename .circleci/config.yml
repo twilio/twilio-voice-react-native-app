@@ -53,6 +53,16 @@ commands:
             echo $GOOGLE_SERVICES_JSON | base64 -d > android/app/google-services.json
             cd ..
 
+  # TODO change this command once we have a CI config.ts
+  app-save-config:
+    steps:
+      - run:
+          name: "App: save config.ts"
+          command: |
+            cd app
+            cp config.example.ts config.ts
+            cd ..
+
   app-setup-cocoapods:
     steps:
       - run:
