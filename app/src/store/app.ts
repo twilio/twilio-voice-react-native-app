@@ -22,6 +22,8 @@ export const createStore = (...middlewares: Middleware[]) =>
     },
   });
 
+export const defaultStore = createStore(logActionType);
+
 export type Store = ReturnType<typeof createStore>;
 
 export type State = ReturnType<Store['getState']>;
