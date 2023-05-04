@@ -4,6 +4,15 @@ The Twilio Voice React Native Reference App is an example implementation of the 
 
 ### Setting up Auth0
 
+Make a copy of the file
+```
+app/config.example.ts
+```
+with the name
+```
+app/config.ts
+```
+
 Find the `Domain` and `Client ID` found in the `Settings` tab of your Auth0 Application
 
 ![auth0nativesettings](https://user-images.githubusercontent.com/35968892/226760563-fbc6e3cf-2d63-4fa1-8fa0-eae98dd80859.png)
