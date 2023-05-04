@@ -7,7 +7,7 @@ import TabNavigator from './TabNavigator';
 import { type StackParamList } from './types';
 import SignIn from './SignIn';
 import { type State } from '../store/app';
-import IncomingCall from './IncomingCall';
+import CallInvite from './CallInvite';
 import LoadingScreen from '../components/LoadingScreen';
 
 const Stack = createNativeStackNavigator<StackParamList>();
@@ -32,7 +32,7 @@ const StackNavigator = () => {
           component={TabNavigator}
         />
         <Stack.Screen name="Call" component={ActiveCall} />
-        <Stack.Screen name="Incoming Call" component={IncomingCall} />
+        <Stack.Screen name="Incoming Call" component={CallInvite} />
       </>
     ) : (
       <Stack.Screen
