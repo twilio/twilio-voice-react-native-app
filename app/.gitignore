@@ -71,3 +71,5 @@ coverage/
 ###
 # Google Services
 google-services.json
+# Application configs
+config.ts

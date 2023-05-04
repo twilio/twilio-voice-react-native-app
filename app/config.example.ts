@@ -1,4 +1,9 @@
 /**
+ * To configure this App, set the below values appropriately in a copy of this
+ * file with the name `config.ts`
+ */
+
+/**
  * Auth0 related configurations
  */
 const config = {
