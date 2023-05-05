@@ -35,6 +35,15 @@ commands:
   ###
   # App commands
   ###
+  app-save-env-file:
+    steps:
+      -run:
+        name: "App: save env file"
+        command: |
+          cd app 
+          echo $APP_ENV | base64 -d > .env
+          cd ..
+
   app-install-dependencies:
     steps:
       - run:
