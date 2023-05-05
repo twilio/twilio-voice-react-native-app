@@ -7,7 +7,11 @@ const HangupSource = require('../../../assets/icons/end-call.png');
 export type Props = Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const HangupButton: React.FC<Props> = ({ disabled, onPress }) => (
-  <Button size={96} disabled={disabled} onPress={onPress}>
+  <Button
+    accessibilityLabel="end call"
+    size={96}
+    disabled={disabled}
+    onPress={onPress}>
     <Image source={HangupSource} resizeMode="contain" style={styles.image} />
   </Button>
 );

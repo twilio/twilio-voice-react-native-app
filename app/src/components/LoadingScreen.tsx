@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 export type Props = { delayMs?: number };
 
-const IncomingCall: React.FC<Props> = ({ delayMs = 500 }) => {
+const LoadingScreen: React.FC<Props> = ({ delayMs = 500 }) => {
   const [doAnimate, setDoAnimate] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -33,4 +33,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IncomingCall;
+export default LoadingScreen;
