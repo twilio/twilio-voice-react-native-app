@@ -2,7 +2,7 @@ import '@testing-library/jest-native/extend-expect';
 import { render, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { Provider } from 'react-redux';
-import LoadingScreen from '../LoadingScreen';
+import Busy from '../Busy';
 import { createStore } from '../../store/app';
 
 describe('component', () => {
@@ -14,14 +14,14 @@ describe('component', () => {
     wrapper = ({ children }) => <Provider store={store}>{children}</Provider>;
   });
 
-  describe('LoadingScreen', () => {
+  describe('Busy', () => {
     it('should show nothing at first', () => {
-      render(<LoadingScreen />, { wrapper });
+      render(<Busy />, { wrapper });
       expect(screen.root).toBeEmptyElement();
     });
 
     it('should show a loading wheel after 500ms', async () => {
-      render(<LoadingScreen />, { wrapper });
+      render(<Busy />, { wrapper });
       await waitFor(() => expect(screen.root.children).toHaveLength(1), {
         timeout: 550,
       });
