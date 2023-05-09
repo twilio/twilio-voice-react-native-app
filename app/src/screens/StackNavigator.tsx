@@ -8,7 +8,7 @@ import { type StackParamList } from './types';
 import SignIn from './SignIn';
 import { type State } from '../store/app';
 import CallInvite from './CallInvite';
-import LoadingScreen from '../components/LoadingScreen';
+import Loading from '../components/Loading';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -20,7 +20,7 @@ const StackNavigator = () => {
   }
 
   if (user?.status === 'pending') {
-    return <LoadingScreen />;
+    return <Loading />;
   }
 
   const screens =
