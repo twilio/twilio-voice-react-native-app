@@ -14,7 +14,7 @@ import {
 } from '../hooks/activeCall';
 import Home from './Home';
 import Dialer from './Dialer';
-import { type TabParamList, type StackNavigationProp } from '../types';
+import { type TabParamList, type StackNavigationProp } from './types';
 
 const HomeSource = require('../../assets/icons/home.png');
 const HomeSelectedSource = require('../../assets/icons/home-selected.png');

@@ -25,7 +25,7 @@ import { useAudioDevices } from '../../hooks/audioDevices';
  * @param dispatch - The dispatch function for the Redux store.
  * @returns - Handlers and state for the dialpad.
  */
-const useCallDialpad = (
+const useDialpad = (
   activeCall: ActiveCall,
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
@@ -57,7 +57,7 @@ const useCallDialpad = (
  * @param dispatch - The dispatch function for the Redux store.
  * @returns - Handlers and state for the mute button.
  */
-const useCallMute = (
+const useMute = (
   activeCall: ActiveCall,
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
@@ -87,7 +87,7 @@ const useCallMute = (
  * @param dispatch - The dispatch function for the Redux store.
  * @returns - Handlers and state for the hangup button.
  */
-const useCallHangup = (
+const useHangup = (
   activeCall: ActiveCall,
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
@@ -199,7 +199,7 @@ const useSelectAudioOutputDevice = (
  * call screen.
  * @returns - Handlers and state for the active call screen.
  */
-const useCall = () => {
+const useActiveCallScreen = () => {
   const dispatch = useTypedDispatch();
 
   const audioDevices = useAudioDevices();
@@ -210,9 +210,9 @@ const useCall = () => {
 
   return {
     button: {
-      dialpad: useCallDialpad(activeCall, dispatch),
-      hangup: useCallHangup(activeCall, dispatch),
-      mute: useCallMute(activeCall, dispatch),
+      dialpad: useDialpad(activeCall, dispatch),
+      hangup: useHangup(activeCall, dispatch),
+      mute: useMute(activeCall, dispatch),
       selectAudioOutputDevice: useSelectAudioOutputDevice(
         activeCall,
         audioDevices,
@@ -224,4 +224,4 @@ const useCall = () => {
   };
 };
 
-export default useCall;
+export default useActiveCallScreen;

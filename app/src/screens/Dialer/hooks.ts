@@ -7,7 +7,7 @@ import {
   type RecipientType,
 } from '../../store/voice/call/outgoingCall';
 import { getAccessToken } from '../../store/voice/accessToken';
-import { type StackNavigationProp } from '../../types';
+import { type StackNavigationProp } from '../types';
 import { useActiveCall } from '../../hooks/activeCall';
 
 /**
