@@ -7,17 +7,17 @@ import MuteButton from './MuteButton';
 import SelectAudioOutputDeviceButton from './SelectAudioOutputDeviceButton';
 import ShowDialpadButton from './ShowDialpadButton';
 import HideDialpadButton from './HideDialpadButton';
-import useCall from './hooks';
+import useActiveCallScreen from './hooks';
 import { useNavigation } from '@react-navigation/native';
 import { type StackNavigationProp } from '../types';
 import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 
-const Call: React.FC = () => {
+const ActiveCall: React.FC = () => {
   const {
     button: { dialpad, hangup, mute, selectAudioOutputDevice },
     callStatus,
     remoteParticipant,
-  } = useCall();
+  } = useActiveCallScreen();
 
   const dialpadView = React.useMemo(
     () => (
@@ -100,4 +100,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Call;
+export default ActiveCall;

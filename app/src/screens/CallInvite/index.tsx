@@ -7,7 +7,7 @@ import { useIncomingCall } from './hooks';
 
 const TwilioLogo = require('../../../assets/icons/twilio-logo.png');
 
-const IncomingCall: React.FC = () => {
+const CallInvite: React.FC = () => {
   const { remoteParticipant } = useIncomingCall();
 
   return (
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IncomingCall;
+export default CallInvite;
