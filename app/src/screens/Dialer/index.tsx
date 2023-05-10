@@ -21,7 +21,7 @@ const Dialer: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="dialer">
       <View style={styles.spacer} />
       <View style={styles.remoteParticipant}>
         <OutgoingRemoteParticipant

@@ -57,6 +57,7 @@ const dialerTabOptions: BottomTabNavigationOptions = {
       />
     );
   },
+  tabBarTestID: 'dialer_button',
 };
 
 const TabNavigator: React.FC = () => {
