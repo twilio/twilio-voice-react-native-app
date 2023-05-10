@@ -21,7 +21,7 @@
 
 - [Bulleted summary of validation steps including local and CI pipeline]
 - [eg. Added new test]
-- [eg. Manually tested with app]
+- [eg. Manually tested with both app and server]
 
 ## Additional Notes
 
