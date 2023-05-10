@@ -62,10 +62,10 @@ for your respective target platform.
 
 ### Setting it up with the Server
 
-Once the Reference Server is up and running, the Reference App can be directed to it by modifying the following line in `app/src/util/fetch.ts`.
+Once the Reference Server is up and running, the Reference App can be directed to it by modifying the following line in `.env`.
 
 ```
-const defaultUrl = ...;
+DEFAULT_URL = ...;
 ```
 
 If developing locally and running the Reference Server locally, consider using a tool like `ngrok` to proxy the server endpoints. Once proxied, change `defaultUrl` to the `ngrok` URL endpoints.
