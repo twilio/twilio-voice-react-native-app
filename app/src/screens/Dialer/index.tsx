@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import BackspaceButton from './BackspaceButton';
-import MakeOutgoingCallButton from './MakeOutgoingCallButton';
+import MakeCallButton from '../../components/Call/MakeCallButton';
 import ToggleClientInputButton from './ToggleClientInputButton';
 import Dialpad from '../../components/Dialpad';
 import OutgoingRemoteParticipant from './OutgoingRemoteParticipant';
@@ -41,7 +41,7 @@ const Dialer: React.FC = () => {
           onPress={recipientToggle.handle}
           recipientType={recipientToggle.type}
         />
-        <MakeOutgoingCallButton
+        <MakeCallButton
           disabled={makeCall.isDisabled}
           onPress={makeCall.handle}
         />

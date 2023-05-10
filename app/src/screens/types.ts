@@ -12,6 +12,7 @@ export type StackParamList = {
   Call: undefined;
   App: undefined;
   'Sign In': undefined;
+  'Incoming Call': undefined;
 };
 
 export type StackScreenProps<T extends keyof StackParamList> =
