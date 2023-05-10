@@ -5,7 +5,7 @@
  - [ ] Code coverage is more or equal to the previous coverage
  - [ ] A visual inspection of the `Files changed` tab was made prior to submitting the pull request ensuring the style guide was followed
  - [ ] [CI pipeline](https://app.circleci.com/pipelines/github/twilio/twilio-voice-react-native-app) is green 
-
+- [ ] Included screenshot if necessary
 
 ## Description
 
