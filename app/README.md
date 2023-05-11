@@ -47,7 +47,7 @@ for your respective target platform.
 Once the Reference Server is up and running, the Reference App can be directed to it by modifying the following line in `.env`.
 
 ```
-DEFAULT_URL = ...;
+DEFAULT_URL=...;
 ```
 
 If developing locally and running the Reference Server locally, consider using a tool like `ngrok` to proxy the server endpoints. Once proxied, change `defaultUrl` to the `ngrok` URL endpoints.
