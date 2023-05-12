@@ -4,7 +4,6 @@ export const getEnvVariable = (envVar: string): string => {
   if (envVar in Config && typeof Config[envVar] !== 'undefined') {
     return Config[envVar] as string;
   } else {
-    console.error(`Missing ${envVar} in .env`);
-    return '';
+    throw new Error(`Missing ${envVar} in .env`);
   }
 };
