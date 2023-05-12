@@ -42,7 +42,7 @@ commands:
           command: |
             cd app 
             echo "DOMAIN_NAME=$DOMAIN_NAME" >> .env
-            echo "CLIENT_SECRET=$CLIENT_SECRET" >> .env
+            echo "CLIENT_ID=$CLIENT_ID" >> .env
             echo "AUTH0_SCOPE=$AUTH0_SCOPE" >> .env
             echo "AUDIENCE=$AUDIENCE" >> .env
             echo "DEFAULT_URL=$DEFAULT_URL" >> .env
