@@ -140,8 +140,9 @@ commands:
             wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
             sudo tar xvzf ngrok-v3-stable-linux-amd64.tgz
             sudo chmod +x ngrok
-            ngrok config add-authtoken ${NGROK_AUTH_TOKEN}
-            ngrok http 3030
+            ./ngrok authtoken ${NGROK_AUTH_TOKEN}
+  # stdout of this: https://github.com/inconshreveable/ngrok/issues/57
+            ./ngrok http 3030 -log=stdout
             sleep 60
 
 jobs:
