@@ -1,2 +1,3 @@
+import { getEnvVariable } from './env';
 export const fetch = globalThis.fetch;
-export const defaultUrl = 'http://localhost:3030';
+export const defaultUrl = getEnvVariable('DEFAULT_URL');

@@ -4,74 +4,62 @@ The Twilio Voice React Native Reference App is an example implementation of the 
 
 ### Setting up Auth0
 
-Find the `Domain` and `Client ID` found in the `Settings` tab of your Auth0 Application
-
-![auth0nativesettings](https://user-images.githubusercontent.com/35968892/226760563-fbc6e3cf-2d63-4fa1-8fa0-eae98dd80859.png)
-
-Add the Application `Domain` and `Client ID` to the app config file
-
-```
-app/config.ts
-```
-
-Add the Application `Domain` to `manifestPlaceholders` in the build.gradle file
-
-```
-app/android/app/build.gradle
-```
-
-Find the `Identifier` found in the `Settings` tab of your Auth0 API
-
-![auth0apisettings](https://user-images.githubusercontent.com/35968892/226760697-9bb44982-2c2f-40fd-bc6f-5176bbafcd0c.png)
-
-Add the `Identifier` as `audience` in the app config file
-
-```
-app/config.ts
-```
+See [example.env](example.env) for information on Auth0 environment variables required to run the app.
 
 ### Launching the App
 
 Ensure that you are within the `app/` folder.
+
 ```
 cd app/
 ```
+
 Fetch the dependencies.
+
 ```
 yarn install
 ```
+
 Install iOS dependencies if running on iOS
+
 ```
 cd ios
 pod install
 cd ../
 ```
+
 Start a native build and the Metro bundler at the same time by using the command
+
 ```
 yarn android
 ```
+
 or
+
 ```
 yarn ios
 ```
+
 for your respective target platform.
 
 ### Setting it up with the Server
 
-Once the Reference Server is up and running, the Reference App can be directed to it by modifying the following line in `app/src/util/fetch.ts`.
+Once the Reference Server is up and running, the Reference App can be directed to it by modifying the following line in `.env`.
+
 ```
-const defaultUrl = ...;
+DEFAULT_URL=...;
 ```
 
-If developing locally and running the Reference Server locally, consider using a tool like `ngrok` to proxy the server endpoints. Once proxied, change `defaultUrl` to the `ngrok` URL endpoints.
+If developing locally and running the Reference Server locally, consider using a tool like `ngrok` to proxy the server endpoints. Once proxied, change `DEFAULT_URL` to the `ngrok` URL endpoints.
 
 See more info about `ngrok` [here](https://ngrok.com/).
 
-If the Reference Server is deployed to a cloud service (some examples include Google App Engine, Amazon EC2, or similar), then point `defaultUrl` to the deployed service URL.
+If the Reference Server is deployed to a cloud service (some examples include Google App Engine, Amazon EC2, or similar), then point `DEFAULT_URL` to the deployed service URL.
 
 See some of the following cloud services for production deployment:
-* Google App Engine [here](https://cloud.google.com/).
-* Amazon EC2 [here](https://aws.amazon.com/).
+
+- Google App Engine [here](https://cloud.google.com/).
+- Amazon EC2 [here](https://aws.amazon.com/).
 
 ## Design Patterns
 

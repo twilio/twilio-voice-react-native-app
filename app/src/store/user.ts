@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import config from '../../config';
+import { getEnvVariable } from '../util/env';
 import Auth0, { type SaveCredentialsParams } from 'react-native-auth0';
 import { State, Dispatch, type AsyncStoreSlice } from './app';
 import { settlePromise } from '../util/settlePromise';
@@ -67,8 +67,8 @@ export const userSlice = createSlice({
 });
 
 const auth0 = new Auth0({
-  domain: config.domain,
-  clientId: config.clientId,
+  domain: getEnvVariable('DOMAIN_NAME'),
+  clientId: getEnvVariable('CLIENT_ID'),
 });
 
 export const checkLoginStatus = createAsyncThunk<
@@ -112,8 +112,8 @@ export const login = createAsyncThunk<
 >('user/login', async (_, { rejectWithValue }) => {
   try {
     const credentials = await auth0.webAuth.authorize({
-      scope: config.auth0Scope,
-      audience: config.audience,
+      scope: getEnvVariable('AUTH0_SCOPE'),
+      audience: getEnvVariable('AUDIENCE'),
     });
 
     if (typeof credentials.idToken === 'undefined') {

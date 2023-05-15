@@ -132,6 +132,9 @@ def reactNativeArchitectures() {
     return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
+// Setup for react-native-config package: https://github.com/luggit/react-native-config 
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -144,7 +147,7 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-        manifestPlaceholders = [auth0Domain: "{DomainName}", auth0Scheme: "${applicationId}"]
+        manifestPlaceholders = [auth0Domain: project.env.get("DOMAIN_NAME"), auth0Scheme: "${applicationId}"]
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 

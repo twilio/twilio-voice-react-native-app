@@ -35,6 +35,19 @@ commands:
   ###
   # App commands
   ###
+  app-save-env-file:
+    steps:
+      - run:
+          name: "App: save env file"
+          command: |
+            cd app 
+            echo "DOMAIN_NAME=$DOMAIN_NAME" >> .env
+            echo "CLIENT_ID=$CLIENT_ID" >> .env
+            echo "AUTH0_SCOPE=$AUTH0_SCOPE" >> .env
+            echo "AUDIENCE=$AUDIENCE" >> .env
+            echo "DEFAULT_URL=$DEFAULT_URL" >> .env
+            cd ..
+
   app-install-dependencies:
     steps:
       - run:
@@ -178,6 +191,7 @@ jobs:
       tag: 2023.02.1
     steps:
       - checkout
+      - app-save-env-file
       - app-install-dependencies
       - app-save-google-services-json
       - app-detox-build:
@@ -198,6 +212,7 @@ jobs:
       xcode: 14.0.0
     steps:
       - checkout
+      - app-save-env-file
       - app-install-dependencies
       - app-install-applesimutils
       - app-install-pods
