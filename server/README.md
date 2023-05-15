@@ -21,7 +21,6 @@ See [example.env](example.env) for information on Auth0 environment variables re
 ### Running the Project Locally
 
 - Install dependencies
-
   ```sh
   yarn
   ```

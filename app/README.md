@@ -50,11 +50,11 @@ Once the Reference Server is up and running, the Reference App can be directed t
 DEFAULT_URL=...;
 ```
 
-If developing locally and running the Reference Server locally, consider using a tool like `ngrok` to proxy the server endpoints. Once proxied, change `defaultUrl` to the `ngrok` URL endpoints.
+If developing locally and running the Reference Server locally, consider using a tool like `ngrok` to proxy the server endpoints. Once proxied, change `DEFAULT_URL` to the `ngrok` URL endpoints.
 
 See more info about `ngrok` [here](https://ngrok.com/).
 
-If the Reference Server is deployed to a cloud service (some examples include Google App Engine, Amazon EC2, or similar), then point `defaultUrl` to the deployed service URL.
+If the Reference Server is deployed to a cloud service (some examples include Google App Engine, Amazon EC2, or similar), then point `DEFAULT_URL` to the deployed service URL.
 
 See some of the following cloud services for production deployment:
 
