@@ -141,7 +141,7 @@ commands:
             sudo tar xvzf ngrok-v3-stable-linux-amd64.tgz
             sudo chmod +x ngrok
             ./ngrok authtoken ${NGROK_AUTH_TOKEN}
-            ./ngrok http 3030 -log=stdout
+            ./ngrok http 3030
             sleep 60
 
 jobs:
