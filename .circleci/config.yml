@@ -134,11 +134,15 @@ commands:
   # Ngrok Commands
   ngrok-install:
     steps:
-      - run: wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-      - run: sudo tar xvzf ~/Downloads/ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
-      - run: ngrok config add-authtoken ${NGROK_AUTH_TOKEN}
-      - run: ngrok http 3030
-      - run: sleep 60
+      - run:
+          name: "ngrok install"
+          command: |
+            wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+            unzip ngrok-v3-stable-linux-amd64.tgz
+            chmod +x ngrok
+            ngrok config add-authtoken ${NGROK_AUTH_TOKEN}
+            ngrok http 3030
+            sleep 60
 
 jobs:
   ###
