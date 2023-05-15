@@ -141,7 +141,6 @@ commands:
             sudo tar xvzf ngrok-v3-stable-linux-amd64.tgz
             sudo chmod +x ngrok
             ./ngrok authtoken ${NGROK_AUTH_TOKEN}
-  # stdout of this: https://github.com/inconshreveable/ngrok/issues/57
             ./ngrok http 3030 -log=stdout
             sleep 60
 
