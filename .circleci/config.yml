@@ -143,6 +143,7 @@ commands:
             ./ngrok authtoken ${NGROK_AUTH_TOKEN}
             background: true
             ./ngrok http 3030
+            sleep 60
             curl http://127.0.0.1:4040/api/tunnels
             sleep 60
 
