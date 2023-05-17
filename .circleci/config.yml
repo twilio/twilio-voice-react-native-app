@@ -143,6 +143,7 @@ commands:
     steps:
       - run:
           name: "Server: start"
+          background: true
           command: |
             cd server 
             yarn start
