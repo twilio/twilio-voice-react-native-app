@@ -130,6 +130,15 @@ commands:
             yarn install --immutable
             cd ..
 
+  server-build:
+    steps:
+      - run:
+          name: "Server: build"
+          command: |
+            cd server
+            yarn build
+            cd ..
+
   server-start:
     steps:
       - run:
@@ -233,6 +242,7 @@ jobs:
       - app-save-google-services-json
       - ngrok-install
       - server-install-dependencies
+      - server-build
       - server-start
       - app-detox-build:
           configuration: android.emu.release
@@ -258,6 +268,7 @@ jobs:
       - app-install-pods
       - ngrok-install
       - server-install-dependencies
+      - server-build
       - server-start
       - app-detox-build:
           configuration: ios.sim.release
@@ -288,12 +299,7 @@ jobs:
     executor: default
     steps:
       - attach_project
-      - run:
-          name: "Server: build"
-          command: |
-            cd server
-            yarn build
-            cd ..
+      - server-build
 
   server-test:
     executor: default
