@@ -130,6 +130,15 @@ commands:
             yarn install --immutable
             cd ..
 
+  server-start:
+    steps:
+      - run:
+          name: "Server: start"
+          command: |
+            cd server 
+            yarn start
+            cd ..
+
   ##
   # Ngrok Commands
   ##
@@ -223,6 +232,8 @@ jobs:
       - app-install-dependencies
       - app-save-google-services-json
       - ngrok-install
+      - server-install-dependencies
+      - server-start
       - app-detox-build:
           configuration: android.emu.release
       - android/create-avd:
@@ -246,6 +257,8 @@ jobs:
       - app-install-applesimutils
       - app-install-pods
       - ngrok-install
+      - server-install-dependencies
+      - server-start
       - app-detox-build:
           configuration: ios.sim.release
       - app-detox-test:
@@ -314,12 +327,6 @@ workflows:
       - app-typecheck:
           requires:
             - app-cache-install-yarn-dependencies
-      - app-detox-android:
-          context:
-            - vblocks-js
-      - app-detox-ios:
-          context:
-            - vblocks-js
       # server jobs
       - server-cache-install-dependencies
       - server-test:
@@ -328,3 +335,10 @@ workflows:
       - server-build:
           requires:
             - server-cache-install-dependencies
+      # e2e jobs
+      - app-detox-android:
+          context:
+            - vblocks-js
+      - app-detox-ios:
+          context:
+            - vblocks-js
