@@ -4,9 +4,7 @@ import { ServerCredentials } from '../common/types';
 import { getUserInfo } from '../utils/auth';
 import { log } from '../utils/log';
 
-export function createTokenRoute(
-  serverCredentials: ServerCredentials,
-) {
+export function createTokenRoute(serverCredentials: ServerCredentials) {
   const {
     AccessToken,
     AccessToken: { VoiceGrant },
@@ -45,7 +43,7 @@ export function createTokenRoute(
 
     const voiceGrant = new VoiceGrant({
       incomingAllow: true,
-      outgoingApplicationSid: serverCredentials.OUTGOING_APPLICATION_SID,
+      outgoingApplicationSid: serverCredentials.TWIML_APP_SID,
       pushCredentialSid: serverCredentials.PUSH_CREDENTIAL_SID,
     });
 

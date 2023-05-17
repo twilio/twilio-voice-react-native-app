@@ -11,7 +11,7 @@ const mockServerConfig = {
   AUTH_TOKEN: 'mock-twiliocredentials-authtoken',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
-  OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
+  TWIML_APP_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
@@ -79,7 +79,7 @@ describe('createTokenRoute()', () => {
         [
           {
             incomingAllow: true,
-            outgoingApplicationSid: mockServerConfig.OUTGOING_APPLICATION_SID,
+            outgoingApplicationSid: mockServerConfig.TWIML_APP_SID,
             pushCredentialSid: mockServerConfig.PUSH_CREDENTIAL_SID,
           },
         ],

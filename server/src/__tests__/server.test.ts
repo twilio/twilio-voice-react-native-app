@@ -14,7 +14,7 @@ const mockServerConfig = {
   AUTH_TOKEN: 'mock-twiliocredentials-authtoken',
   API_KEY_SID: 'mock-twiliocredentials-apikeysid',
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
-  OUTGOING_APPLICATION_SID: 'mock-twiliocredentials-outgoingapplicationsid',
+  TWIML_APP_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
@@ -54,11 +54,13 @@ describe('/token', () => {
   });
 
   it('responds with 404 if user info cannot be found', async () => {
-    const getUserInfo = jest.spyOn(authUtil, 'getUserInfo').mockResolvedValueOnce({
-      success: false,
-      reason: 'AUTH_ERROR',
-      error: new Error() as any,
-    });
+    const getUserInfo = jest
+      .spyOn(authUtil, 'getUserInfo')
+      .mockResolvedValueOnce({
+        success: false,
+        reason: 'AUTH_ERROR',
+        error: new Error() as any,
+      });
     const response = await tokenRouteTest().send();
     expect(getUserInfo.mock.calls).toEqual([
       ['mock-auth0-issuer-base-url', 'some valid token'],

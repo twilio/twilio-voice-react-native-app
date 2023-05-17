@@ -113,7 +113,7 @@ export const login = createAsyncThunk<
   try {
     const credentials = await auth0.webAuth.authorize({
       scope: getEnvVariable('AUTH0_SCOPE'),
-      audience: getEnvVariable('AUDIENCE'),
+      audience: getEnvVariable('AUTH0_AUDIENCE'),
     });
 
     if (typeof credentials.idToken === 'undefined') {
