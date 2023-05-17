@@ -152,7 +152,6 @@ commands:
             cd scripts
             node UpdateTwimlApp.js
             cd ..
-    
 
 jobs:
   ###
@@ -310,11 +309,11 @@ workflows:
       - app-typecheck:
           requires:
             - app-cache-install-yarn-dependencies
-      - app-detox-android
-          context: 
+      - app-detox-android:
+          context:
             - vblocks-js
-      - app-detox-ios
-          context: 
+      - app-detox-ios:
+          context:
             - vblocks-js
       # server jobs
       - server-cache-install-dependencies
