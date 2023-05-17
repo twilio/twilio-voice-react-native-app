@@ -147,6 +147,11 @@ commands:
           background: true
           command: ./ngrok http 3030
       - run:
+          name: "check ngrok"
+          command: |
+            sleep 30
+            curl http://127.0.0.1:4040/api/tunnels
+      - run:
           name: "update twiML app with ngrok public_url"
           command: |
             cd scripts
