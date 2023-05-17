@@ -19,6 +19,11 @@ const mockServerConfig = {
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
+  AUTH0_URL: 'mock-auth0-url',
+  AUTH0_USERNAME: 'mock-auth0-username',
+  AUTH0_PASSWORD: 'mock-auth0-passowrd',
+  AUTH0_CLIENT_ID: 'mock-auth0-client-id',
+  AUTH0_CLIENT_SECRET: 'mock-auth0-client-secret',
 };
 
 describe('/token', () => {

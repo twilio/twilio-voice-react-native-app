@@ -84,7 +84,8 @@ const SignIn: React.FC = () => {
         </Text>
         <TouchableOpacity
           style={styles.loginScreenButton}
-          onPress={handleLogin}>
+          onPress={handleLogin}
+          testID="login_button">
           <Text style={styles.loginText}>Log in</Text>
           <Image
             source={ArrowForward}
