@@ -20,7 +20,7 @@ export type UserState = AsyncStoreSlice<
 
 export const userSlice = createSlice({
   name: 'user',
-  initialState: null as UserState,
+  initialState: { status: 'idle' } as UserState,
   reducers: {},
   extraReducers: (builder) => {
     builder

@@ -67,7 +67,7 @@ export type AudioDevicesState = AsyncStoreSlice<
 
 export const audioDevicesSlice = createSlice({
   name: 'audioDevices',
-  initialState: null as AudioDevicesState,
+  initialState: { status: 'idle' } as AudioDevicesState,
   reducers: {},
   extraReducers(builder) {
     builder
