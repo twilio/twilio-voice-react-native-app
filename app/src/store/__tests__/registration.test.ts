@@ -91,7 +91,7 @@ describe('registration', () => {
       });
 
       it('register', async () => {
-        jest.spyOn(voiceSdk, 'register').mockRejectedValueOnce(undefined);
+        voiceSdk.voiceRegister.mockRejectedValueOnce(undefined);
 
         const loginAndRegisterResult = await store.dispatch(
           registrationStoreModule.loginAndRegister(),
