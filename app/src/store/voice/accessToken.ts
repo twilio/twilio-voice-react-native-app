@@ -29,7 +29,7 @@ export const getAccessToken = createAsyncThunk<
     rejectValue: GetAccessTokenRejectValue;
   }
 >('voice/getAccessToken', async (_, { getState, rejectWithValue }) => {
-  const user = getState().voice.user;
+  const user = getState().user;
   if (user?.status !== 'fulfilled') {
     return rejectWithValue({ reason: 'USER_NOT_FULFILLED' });
   }
@@ -77,7 +77,7 @@ export type AccessTokenState = AsyncStoreSlice<
 
 export const accessTokenSlice = createSlice({
   name: 'accessToken',
-  initialState: null as AccessTokenState,
+  initialState: { status: 'idle' } as AccessTokenState,
   reducers: {},
   extraReducers(builder) {
     builder.addCase(getAccessToken.pending, () => {
