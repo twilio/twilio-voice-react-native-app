@@ -118,6 +118,12 @@ commands:
             yarn detox:test --configuration << parameters.configuration >> --headless
             cd ..
 
+  app-expose-port:
+    steps:
+      - run:
+        name: "App: expose port"
+        command: adb reverse tcp:${PORT} tcp:${PORT}
+
   ##
   # Server commands
   ##
@@ -255,6 +261,7 @@ jobs:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
+      - app-expose-port
       - app-detox-test:
           configuration: android.emu.release
 

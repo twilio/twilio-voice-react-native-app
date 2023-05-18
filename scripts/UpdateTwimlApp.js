@@ -1,7 +1,6 @@
 "use strict";
 const https = require("node:https");
 const http = require("node:http");
-// const readline = require("node:readline");
 const process = require("node:process");
 const NGROK_URL = "http://localhost:4040/api/tunnels";
 const TWIML_APP_URL = (accountSid, appSid) =>
@@ -97,30 +96,8 @@ async function updateTwimlApp(
   return promise;
 }
 
-// function createPrompter() {
-//   const rl = readline.createInterface({
-//     input: process.stdin,
-//     output: process.stdout,
-//   });
-//   const question = (promptString) => {
-//     return new Promise((resolve) => {
-//       rl.question(promptString, resolve);
-//     });
-//   };
-//   return { rl, question };
-// }
-
 async function main() {
-  // const { rl, question } = createPrompter();
   const tunnel = await getNgrokTunnel();
-  // const userResponse = await question(
-  //   `Detected tunnel with URL "${tunnel.public_url}"\n` +
-  //     `Set "VoiceUrl" of TwiML App with SID "${TWIML_APP_SID}"? (y/n) `
-  // );
-  // if (userResponse !== "y") {
-  //   console.log("Aborting.");
-  //   return;
-  // }
   const twimlApp = await updateTwimlApp(
     `${tunnel.public_url}/twiml`,
     ACCOUNT_SID,
@@ -129,7 +106,5 @@ async function main() {
     API_KEY_SECRET
   );
   console.log(JSON.stringify(twimlApp, null, 2));
-  // await question("Success. Press <enter> to close.");
-  // rl.close();
 }
 main().catch(console.error);
