@@ -11,14 +11,12 @@ export type UserState = AsyncStoreSlice<
   },
   {
     reason:
-      | 'ID_TOKEN_UNDEFINED'
       | 'LOGIN_ERROR'
       | 'LOGOUT_ERROR'
       | 'CHECK_LOGIN_STATUS'
       | 'FETCH_ERROR'
       | 'AUTH0_TOKEN_RESPONSE_NOT_OK'
       | 'FETCH_JSON_ERROR'
-      | 'LOGIN_ERROR'
       | undefined;
     error?: any;
   }
@@ -110,6 +108,7 @@ export const login = createAsyncThunk<
         },
       }),
     );
+
     if (fetchResult.status === 'rejected') {
       return rejectWithValue({
         reason: 'FETCH_ERROR',
@@ -131,6 +130,7 @@ export const login = createAsyncThunk<
         error: auth0TokenResult.reason,
       });
     }
+
     return {
       accessToken: auth0TokenResult.value.access_token,
       email: 'test_email@twilio.com',

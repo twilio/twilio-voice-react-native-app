@@ -102,7 +102,7 @@ commands:
           name: "App: Detox build"
           command: |
             cd app
-            MY_APP_MODE=mocked yarn detox:build --configuration << parameters.configuration >>
+            yarn detox:build --configuration << parameters.configuration >>
             cd ..
 
   app-detox-test:
@@ -177,7 +177,7 @@ commands:
             sleep 30
             curl http://127.0.0.1:4040/api/tunnels
       - run:
-          name: "update twiML app with ngrok public_url"
+          name: "ngrok: update twiML app with ngrok public_url"
           command: |
             cd scripts
             node UpdateTwimlApp.js
@@ -191,7 +191,7 @@ commands:
             brew install ngrok/ngrok/ngrok
             ngrok config add-authtoken ${NGROK_AUTH_TOKEN}
       - run:
-          name: "ngrok: run"
+          name: "ngrok: start tunnel"
           background: true
           command: ngrok http ${PORT}
       - run:
