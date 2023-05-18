@@ -1,11 +1,10 @@
 import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { useTypedDispatch } from '../../store/app';
-import {
-  makeOutgoingCall as makeOutgoingCallAction,
-  type RecipientType,
-} from '../../store/voice/call/outgoingCall';
+import { match } from 'ts-pattern';
+import { useTypedDispatch } from '../../store/common';
+import { makeOutgoingCall as makeOutgoingCallAction } from '../../store/voice/call/outgoingCall';
+import { type RecipientType } from '../../store/voice/call';
 import { getAccessToken } from '../../store/voice/accessToken';
 import { type StackNavigationProp } from '../types';
 import { useActiveCall } from '../../hooks/activeCall';
@@ -142,18 +141,17 @@ const useDialer = () => {
 
   const activeCall = useActiveCall();
 
-  const isDialerDisabled = React.useMemo(() => {
-    switch (activeCall?.status) {
-      case undefined:
-        return false;
-      case 'fulfilled':
-        return activeCall.callInfo.state !== TwilioCall.State.Disconnected;
-      case 'pending':
-        return true;
-      case 'rejected':
-        return false;
-    }
-  }, [activeCall]);
+  const isDialerDisabled = React.useMemo(
+    () =>
+      match(activeCall)
+        .with({ status: 'pending' }, () => true)
+        .with(
+          { status: 'fulfilled' },
+          (c) => c.info.state !== TwilioCall.State.Disconnected,
+        )
+        .otherwise(() => false),
+    [activeCall],
+  );
 
   const [outgoingClient, setOutgoingClient] = React.useState<string>('');
   const [outgoingNumber, setOutgoingNumber] = React.useState<string>('');
