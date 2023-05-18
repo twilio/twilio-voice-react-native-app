@@ -183,6 +183,23 @@ commands:
             node UpdateTwimlApp.js
             cd ..
 
+    ngrok-install-mac:
+      steps:
+        - run:
+            name: "ngrok: install mac"
+            command: |
+              brew install ngrok/ngrok/ngrok
+              ngrok config add-authtoken ${NGROK_AUTH_TOKEN}
+        - run:
+            name: "ngrok: run"
+            background: true
+            command: ngrok http ${PORT}
+        - run:
+            name: "ngrok: check"
+            command: |
+              sleep 30
+              curl http://127.0.0.1:4040/api/tunnels
+
 jobs:
   ###
   # App jobs
@@ -274,7 +291,7 @@ jobs:
       - app-install-dependencies
       - app-install-applesimutils
       - app-install-pods
-      - ngrok-install
+      - ngrok-install-mac
       - server-install-dependencies
       - server-build
       - server-start
