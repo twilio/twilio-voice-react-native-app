@@ -102,7 +102,7 @@ commands:
           name: "App: Detox build"
           command: |
             cd app
-            yarn detox:build --configuration << parameters.configuration >>
+            MY_APP_MODE=mocked yarn detox:build --configuration << parameters.configuration >>
             cd ..
 
   app-detox-test:
@@ -155,18 +155,18 @@ commands:
   ngrok-install:
     steps:
       - run:
-          name: "ngrok install"
+          name: "ngrok: install"
           command: |
             wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
             sudo tar xvzf ngrok-v3-stable-linux-amd64.tgz
             sudo chmod +x ngrok
             ./ngrok authtoken ${NGROK_AUTH_TOKEN}
       - run:
-          name: "run ngrok"
+          name: "ngrok: run"
           background: true
           command: ./ngrok http ${PORT}
       - run:
-          name: "check ngrok"
+          name: "ngrok: check"
           command: |
             sleep 30
             curl http://127.0.0.1:4040/api/tunnels
