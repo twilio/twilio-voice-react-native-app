@@ -121,8 +121,8 @@ commands:
   app-expose-port:
     steps:
       - run:
-        name: "App: expose port"
-        command: adb reverse tcp:${PORT} tcp:${PORT}
+          name: "App: expose port"
+          command: adb reverse tcp:${PORT} tcp:${PORT}
 
   ##
   # Server commands
