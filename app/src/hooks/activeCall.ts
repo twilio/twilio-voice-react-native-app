@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { match, P } from 'ts-pattern';
 import { type State } from '../store/app';
 import { type ActiveCall } from '../store/voice/call/activeCall';
 import { setTimeout } from '../util/setTimeout';
@@ -11,18 +12,33 @@ const DEFAULT_TIME_INTERVAL_UPDATE_MS = 250;
 
 /**
  * Active call hook. Selects the active call from the application state.
+ *
+ * ====
+ * TODO
+ * ====
+ *
+ * Revisit for active call heuristics. Currently this function may anticipate
+ * multiple calls with the state "connected", and will select the first one.
+ *
  * @returns the active call
  */
 export const useActiveCall = () => {
-  const activeCall = useSelector<State, ActiveCall>(
-    (store) => store.voice.call.outgoingCall,
-  );
+  const activeCall = useSelector<State, ActiveCall | undefined>((store) => {
+    const connectedActiveCalls = Object.values(
+      store.voice.call.activeCall,
+    ).filter((c) =>
+      match(c)
+        .with({ info: { state: 'connected' } }, () => true)
+        .otherwise(() => false),
+    );
+    return connectedActiveCalls[0];
+  });
 
   return activeCall;
 };
 
 /**
- * Active call status hook. Returns the status of a call in a human-readable
+ * Active call duration hook. Returns the duration of a call in a human-readable
  * format. If the call is ongoing, i.e. has state "connected", then returns
  * a formatted time. Introduces statefullness via the {@link useActiveCallTime}
  * hook.
@@ -30,37 +46,33 @@ export const useActiveCall = () => {
  * @param activeCallTimeMs - The time the call has been active for.
  * @returns - The active call status.
  */
-export const useActiveCallStatus = (
-  activeCall: ActiveCall,
+export const useActiveCallDuration = (
+  activeCall: ActiveCall | undefined,
   timeIntervalUpdateMs?: number,
 ) => {
   const activeCallTimeMs = useActiveCallTime(activeCall, timeIntervalUpdateMs);
 
-  const callStatus = React.useMemo<string>(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return '';
-    }
+  const callDuration = React.useMemo<string>(
+    () =>
+      match([activeCall, activeCallTimeMs])
+        .with(
+          [{ info: { state: 'connected' } }, P.not(P.nullish)],
+          ([_, t]) => {
+            const totalSeconds = Math.floor(t / 1000);
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const remainderSeconds = Math.floor(totalSeconds % 60);
 
-    const state = activeCall.callInfo.state;
-    if (state !== 'connected') {
-      return state || '';
-    }
+            const minutesRepr = String(totalMinutes).padStart(2, '0');
+            const secondsRepr = String(remainderSeconds).padStart(2, '0');
 
-    if (!activeCallTimeMs) {
-      return '';
-    }
+            return `${minutesRepr}:${secondsRepr}`;
+          },
+        )
+        .otherwise(() => ''),
+    [activeCall, activeCallTimeMs],
+  );
 
-    const totalSeconds = Math.floor(activeCallTimeMs / 1000);
-    const totalMinutes = Math.floor(totalSeconds / 60);
-    const remainderSeconds = Math.floor(totalSeconds % 60);
-
-    const minutesRepr = String(totalMinutes).padStart(2, '0');
-    const secondsRepr = String(remainderSeconds).padStart(2, '0');
-
-    return `${minutesRepr}:${secondsRepr}`;
-  }, [activeCall, activeCallTimeMs]);
-
-  return callStatus;
+  return callDuration;
 };
 
 /**
@@ -68,14 +80,20 @@ export const useActiveCallStatus = (
  * @param activeCall - The active call.
  * @returns - The remote participant identity.
  */
-export const useActiveCallRemoteParticipant = (activeCall: ActiveCall) => {
-  const remoteParticipantId = React.useMemo<string>(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return '';
-    }
-
-    return activeCall.to || '';
-  }, [activeCall]);
+export const useActiveCallRemoteParticipant = (
+  activeCall: ActiveCall | undefined,
+) => {
+  const remoteParticipantId = React.useMemo<string>(
+    () =>
+      match(activeCall)
+        .with(
+          { direction: 'incoming', status: 'fulfilled' },
+          (c) => c.info.from || '',
+        )
+        .with({ direction: 'outgoing' }, (c) => c.to)
+        .otherwise(() => ''),
+    [activeCall],
+  );
 
   return remoteParticipantId;
 };
@@ -90,7 +108,7 @@ export const useActiveCallRemoteParticipant = (activeCall: ActiveCall) => {
  * @returns - The time in milliseconds since the first call connect event.
  */
 export const useActiveCallTime = (
-  activeCall: ActiveCall,
+  activeCall: ActiveCall | undefined,
   timeIntervalUpdatesMs: number = DEFAULT_TIME_INTERVAL_UPDATE_MS,
 ) => {
   const [activeCallTimeMs, setActiveCallTimeMs] = React.useState<number | null>(
@@ -104,19 +122,14 @@ export const useActiveCallTime = (
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(() => {
-        if (
-          (activeCall?.status === 'fulfilled' &&
-            activeCall?.callInfo.state === 'disconnected') ||
-          activeCall?.status !== 'fulfilled' ||
-          typeof activeCall.initialConnectTimestamp === 'undefined'
-        ) {
-          return;
-        }
-        setActiveCallTimeMs(Date.now() - activeCall.initialConnectTimestamp);
-
-        if (!doneAnimating) {
-          timeoutId = setTimeout(animate, timeIntervalUpdatesMs);
-        }
+        match(activeCall)
+          .with({ initialConnectTimestamp: P.not(undefined) }, (c) => {
+            setActiveCallTimeMs(Date.now() - c.initialConnectTimestamp);
+            if (!doneAnimating) {
+              timeoutId = setTimeout(animate, timeIntervalUpdatesMs);
+            }
+          })
+          .otherwise(() => {});
       });
     };
 

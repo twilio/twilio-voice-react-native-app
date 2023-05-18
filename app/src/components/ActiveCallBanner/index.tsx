@@ -4,25 +4,32 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const ActiveCallSource = require('../../../assets/icons/active-call.png');
 
 export type Props = {
+  hidden: boolean;
   subtitle: string;
   title: string;
   onPress: () => void;
 };
 
-const ActiveCallBanner: React.FC<Props> = ({ subtitle, title, onPress }) => (
-  <TouchableOpacity style={styles.container} onPress={onPress}>
-    <View style={styles.title}>
-      <Image
-        style={styles.titleImage}
-        source={ActiveCallSource}
-        resizeMode="contain"
-      />
-      <Text style={styles.titleText}>{title}</Text>
-    </View>
-    <View style={styles.spacer} />
-    <Text style={styles.subtitle}>{subtitle}</Text>
-  </TouchableOpacity>
-);
+const ActiveCallBanner: React.FC<Props> = ({
+  hidden,
+  subtitle,
+  title,
+  onPress,
+}) =>
+  hidden ? null : (
+    <TouchableOpacity style={styles.container} onPress={onPress}>
+      <View style={styles.title}>
+        <Image
+          style={styles.titleImage}
+          source={ActiveCallSource}
+          resizeMode="contain"
+        />
+        <Text style={styles.titleText}>{title}</Text>
+      </View>
+      <View style={styles.spacer} />
+      <Text style={styles.subtitle}>{subtitle}</Text>
+    </TouchableOpacity>
+  );
 
 const styles = StyleSheet.create({
   container: {

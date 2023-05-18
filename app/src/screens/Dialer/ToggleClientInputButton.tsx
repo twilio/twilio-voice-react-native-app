@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, Text } from 'react-native';
 import Button, { type Props as ButtonProps } from '../../components/Button';
-import { type RecipientType } from '../../store/voice/call/outgoingCall';
+import { type RecipientType } from '../../store/voice/call';
 
 const TypeSource = require('../../../assets/icons/type.png');
 

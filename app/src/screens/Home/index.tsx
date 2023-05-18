@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
 
 const Home: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
-  const user = useSelector((state: State) => state.voice.user);
+  const user = useSelector((state: State) => state.user);
 
   const handleLogout = async () => {
     const logoutAction = await dispatch(logout());
