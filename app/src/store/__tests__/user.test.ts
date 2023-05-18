@@ -37,14 +37,14 @@ describe('user store', () => {
     store = app.createStore();
   });
 
-  it('should initially be null', () => {
-    const userState = store.getState().voice.user;
-    expect(userState).toEqual(null);
+  it('should initially be idle', () => {
+    const userState = store.getState().user;
+    expect(userState).toEqual({ status: 'idle' });
   });
 
   it('should login a user', async () => {
     await store.dispatch(auth.login());
-    const userState = store.getState().voice.user;
+    const userState = store.getState().user;
     expect(userState).toEqual({
       status: 'fulfilled',
       accessToken: 'test token',
@@ -55,7 +55,7 @@ describe('user store', () => {
   it('should logout a user', async () => {
     await store.dispatch(auth.login());
     await store.dispatch(auth.logout());
-    const userState = store.getState().voice.user;
+    const userState = store.getState().user;
     expect(userState).toEqual({
       status: 'fulfilled',
       accessToken: '',
@@ -66,7 +66,7 @@ describe('user store', () => {
   it('should check if a user is NOT logged in', async () => {
     jest.spyOn(auth0, 'getCredentials').mockRejectedValueOnce(undefined);
     await store.dispatch(auth.checkLoginStatus());
-    const userState = store.getState().voice.user;
+    const userState = store.getState().user;
     expect(userState).toEqual({
       status: 'rejected',
       reason: 'NOT_LOGGED_IN',
@@ -77,7 +77,7 @@ describe('user store', () => {
 
   it('should check if a user IS logged in', async () => {
     await store.dispatch(auth.checkLoginStatus());
-    const userState = store.getState().voice.user;
+    const userState = store.getState().user;
     expect(userState).toEqual({
       status: 'fulfilled',
       accessToken: 'test token',
@@ -89,7 +89,7 @@ describe('user store', () => {
     const authorizeError = new Error('login failed');
     jest.spyOn(auth0, 'authorize').mockRejectedValue(authorizeError);
     await store.dispatch(auth.login());
-    const userState = store.getState().voice.user;
+    const userState = store.getState().user;
     expect(userState).toEqual({
       status: 'rejected',
       error: authorizeError,
@@ -103,7 +103,7 @@ describe('user store', () => {
       .mockRejectedValue(new Error('logout failed'));
     await store.dispatch(auth.login());
     await store.dispatch(auth.logout());
-    const userState = store.getState().voice.user;
+    const userState = store.getState().user;
     expect(userState).toEqual({
       status: 'rejected',
       error: new Error('logout failed'),

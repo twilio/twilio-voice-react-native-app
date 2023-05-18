@@ -1,8 +1,10 @@
+import { type Middleware } from '@reduxjs/toolkit';
 import { createStore, Store } from '../app';
-import { bootstrapApp } from '../bootstrap';
-import * as authStoreModule from '../../util/auth';
-import * as accessTokenStoreModule from '../voice/accessToken';
-import * as registrationStoreModule from '../voice/registration';
+import { bootstrapUser, bootstrapCallInvites } from '../bootstrap';
+import { checkLoginStatus } from '../../util/auth';
+import { getAccessToken } from '../voice/accessToken';
+import { setCallInvite } from '../voice/call/callInvite';
+import { register } from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
 
@@ -11,100 +13,183 @@ let fetchMock: jest.Mock;
 jest.mock('../../../src/util/fetch', () => ({
   fetch: (fetchMock = jest.fn().mockResolvedValue({
     ok: true,
-    text: jest.fn().mockResolvedValue(undefined),
+    text: jest.fn().mockResolvedValue('some mock token'),
   })),
 }));
 
 describe('bootstrap', () => {
   let store: Store;
-  let actionCreatorSpies: ReturnType<typeof spyOnActionCreators>;
-
-  beforeAll(() => {
-    actionCreatorSpies = spyOnActionCreators();
-  });
+  const dispatchedActions: any[] = [];
 
   beforeEach(() => {
-    store = createStore();
+    dispatchedActions.splice(0);
+    const logAction: Middleware = () => (next) => (action) => {
+      dispatchedActions.push(action);
+      next(action);
+    };
+    store = createStore(logAction);
     jest.clearAllMocks();
   });
 
-  const spyOnActionCreator = (module: any, actionCreator: string) => {
-    const rejected = module[actionCreator].rejected;
-    const spy = jest.spyOn(module, actionCreator);
-    (spy as any).rejected = rejected;
-    return spy;
+  const matchDispatchedActions = (actions: any[], actionCreators: any[]) => {
+    if (actions.length !== actionCreators.length) {
+      throw new Error('different lengths of actions and actionCreators');
+    }
+
+    for (let idx = 0; idx < actions.length; idx++) {
+      const action = actions[idx];
+      const creator = actionCreators[idx];
+
+      if (!creator.match(action)) {
+        throw new Error('action does not match creator');
+      }
+    }
   };
 
-  const spyOnActionCreators = () => {
-    const checkLoginStatusSpy = spyOnActionCreator(
-      authStoreModule,
-      'checkLoginStatus',
-    );
-    const getAccessTokenSpy = spyOnActionCreator(
-      accessTokenStoreModule,
-      'getAccessToken',
-    );
-    const registerSpy = spyOnActionCreator(registrationStoreModule, 'register');
-    return {
-      checkLoginStatusSpy,
-      getAccessTokenSpy,
-      registerSpy,
-    };
-  };
+  describe('bootstrapUser', () => {
+    it('succeeds', async () => {
+      const { type, payload } = await store.dispatch(bootstrapUser());
+      expect(type).toStrictEqual('bootstrap/user/fulfilled');
+      expect(payload).toStrictEqual('LOGGED_IN');
 
-  describe('handles rejection', () => {
-    it('checkLoginStatus', async () => {
-      jest.spyOn(auth0, 'getCredentials').mockRejectedValueOnce(undefined);
-      const { checkLoginStatusSpy, getAccessTokenSpy, registerSpy } =
-        actionCreatorSpies;
-
-      const bootstrapAppResult = await store.dispatch(bootstrapApp());
-      expect(bootstrapAppResult.type).toEqual('app/bootstrap/rejected');
-
-      expect(checkLoginStatusSpy.mock.calls).toEqual([[]]);
-      expect(getAccessTokenSpy.mock.calls).toEqual([]);
-      expect(registerSpy.mock.calls).toEqual([]);
-    });
-
-    it('getAccessToken', async () => {
-      fetchMock.mockResolvedValueOnce({
-        ok: false,
+      expect(store.getState().user).toStrictEqual({
+        accessToken: 'test token',
+        email: 'test email',
+        status: 'fulfilled',
       });
-      const { checkLoginStatusSpy, getAccessTokenSpy, registerSpy } =
-        actionCreatorSpies;
 
-      const bootstrapAppResult = await store.dispatch(bootstrapApp());
-      expect(bootstrapAppResult.type).toEqual('app/bootstrap/rejected');
+      expect(store.getState().voice.accessToken).toStrictEqual({
+        status: 'fulfilled',
+        value: 'some mock token',
+      });
 
-      expect(checkLoginStatusSpy.mock.calls).toEqual([[]]);
-      expect(getAccessTokenSpy.mock.calls).toEqual([[]]);
-      expect(registerSpy.mock.calls).toEqual([]);
+      expect(store.getState().voice.registration).toStrictEqual({
+        status: 'fulfilled',
+      });
+
+      matchDispatchedActions(dispatchedActions, [
+        bootstrapUser.pending,
+        checkLoginStatus.pending,
+        checkLoginStatus.fulfilled,
+        getAccessToken.pending,
+        getAccessToken.fulfilled,
+        register.pending,
+        register.fulfilled,
+        bootstrapUser.fulfilled,
+      ]);
     });
 
-    it('register', async () => {
-      jest.spyOn(voiceSdk, 'register').mockRejectedValueOnce(undefined);
-      const { checkLoginStatusSpy, getAccessTokenSpy, registerSpy } =
-        actionCreatorSpies;
+    describe('handles rejection of', () => {
+      it('checkLoginStatus', async () => {
+        auth0.userInfo.mockRejectedValueOnce('foobar');
 
-      const bootstrapAppResult = await store.dispatch(bootstrapApp());
-      expect(bootstrapAppResult.type).toEqual('app/bootstrap/rejected');
+        const { type, payload } = await store.dispatch(bootstrapUser());
+        expect(type).toStrictEqual('bootstrap/user/rejected');
+        expect(payload).toStrictEqual({
+          reason: 'CHECK_LOGIN_STATUS_REJECTED',
+        });
 
-      expect(checkLoginStatusSpy.mock.calls).toEqual([[]]);
-      expect(getAccessTokenSpy.mock.calls).toEqual([[]]);
-      expect(registerSpy.mock.calls).toEqual([[]]);
+        matchDispatchedActions(dispatchedActions, [
+          bootstrapUser.pending,
+          checkLoginStatus.pending,
+          checkLoginStatus.rejected,
+          bootstrapUser.rejected,
+        ]);
+      });
+
+      it('getAccessToken', async () => {
+        fetchMock.mockRejectedValueOnce('foobar');
+
+        const { type, payload } = await store.dispatch(bootstrapUser());
+        expect(type).toStrictEqual('bootstrap/user/rejected');
+        expect(payload).toStrictEqual({ reason: 'GET_ACCESS_TOKEN_REJECTED' });
+
+        matchDispatchedActions(dispatchedActions, [
+          bootstrapUser.pending,
+          checkLoginStatus.pending,
+          checkLoginStatus.fulfilled,
+          getAccessToken.pending,
+          getAccessToken.rejected,
+          bootstrapUser.rejected,
+        ]);
+      });
+
+      it('register', async () => {
+        voiceSdk.voiceRegister.mockRejectedValueOnce('foobar');
+
+        const { type, payload } = await store.dispatch(bootstrapUser());
+        expect(type).toStrictEqual('bootstrap/user/rejected');
+        expect(payload).toStrictEqual({ reason: 'REGISTER_REJECTED' });
+
+        matchDispatchedActions(dispatchedActions, [
+          bootstrapUser.pending,
+          checkLoginStatus.pending,
+          checkLoginStatus.fulfilled,
+          getAccessToken.pending,
+          getAccessToken.fulfilled,
+          register.pending,
+          register.rejected,
+          bootstrapUser.rejected,
+        ]);
+      });
     });
   });
 
-  it('resolves when all sub-actions resolve', async () => {
-    const { checkLoginStatusSpy, getAccessTokenSpy, registerSpy } =
-      actionCreatorSpies;
+  describe('bootstrapCallInvites', () => {
+    it('handles rejection of native module', async () => {
+      voiceSdk.voiceGetCallInvites.mockRejectedValueOnce('foobar');
 
-    const bootstrapAppResult = await store.dispatch(bootstrapApp());
-    expect(bootstrapAppResult.type).toEqual('app/bootstrap/fulfilled');
-    expect(bootstrapAppResult.payload).toEqual('LOGGED_IN');
+      const { type, payload } = await store.dispatch(bootstrapCallInvites());
+      expect(type).toStrictEqual('bootstrap/callInvites/rejected');
+      expect(payload).toStrictEqual({
+        reason: 'NATIVE_MODULE_REJECTED',
+        error: { message: 'foobar' },
+      });
 
-    expect(checkLoginStatusSpy.mock.calls).toEqual([[]]);
-    expect(getAccessTokenSpy.mock.calls).toEqual([[]]);
-    expect(registerSpy.mock.calls).toEqual([[]]);
+      matchDispatchedActions(dispatchedActions, [
+        bootstrapCallInvites.pending,
+        bootstrapCallInvites.rejected,
+      ]);
+    });
+
+    it('succeeds', async () => {
+      const { type, payload } = await store.dispatch(bootstrapCallInvites());
+      expect(type).toStrictEqual('bootstrap/callInvites/fulfilled');
+      expect(payload).toStrictEqual(undefined);
+
+      const { entities, ids } = store.getState().voice.call.callInvite;
+      expect(ids).toHaveLength(2);
+      expect(entities).toStrictEqual({
+        [ids[0]]: {
+          id: ids[0],
+          info: {
+            callSid: 'mock call sid 1',
+            customParameters: 'mock custom parameters 1',
+            from: 'mock from 1',
+            state: 'mock state 1',
+            to: 'mock to 1',
+          },
+          status: 'idle',
+        },
+        [ids[1]]: {
+          id: ids[1],
+          info: {
+            callSid: 'mock call sid 2',
+            customParameters: 'mock custom parameters 2',
+            from: 'mock from 2',
+            state: 'mock state 2',
+            to: 'mock to 2',
+          },
+          status: 'idle',
+        },
+      });
+
+      matchDispatchedActions(dispatchedActions, [
+        bootstrapCallInvites.pending,
+        setCallInvite,
+        setCallInvite,
+        bootstrapCallInvites.fulfilled,
+      ]);
+    });
   });
 });
