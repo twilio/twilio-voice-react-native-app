@@ -180,7 +180,7 @@ commands:
           name: "ngrok: update twiML app with ngrok public_url"
           command: |
             cd scripts
-            node UpdateTwimlApp.js
+            node updateTwimlApp.js
             cd ..
 
   ngrok-install-mac:
