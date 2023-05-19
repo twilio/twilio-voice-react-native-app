@@ -93,7 +93,7 @@ const useHangup = (
   const [handle, isDisabled] = React.useMemo(
     () =>
       match<typeof activeCall, [() => void, boolean]>(activeCall)
-        .with({ info: { state: 'connected' } }, (c) => [
+        .with({ info: { state: P.not('disconnected') } }, (c) => [
           () => {
             dispatch(disconnectActiveCall({ id: c.id }));
           },
@@ -131,7 +131,7 @@ const matchOnAudioDevices = (
           dispatch(selectAudioDevice({ audioDeviceUuid: uuid }));
         },
         false,
-        false,
+        true,
       ],
     )
     .with(
@@ -142,7 +142,7 @@ const matchOnAudioDevices = (
           dispatch(selectAudioDevice({ audioDeviceUuid: uuid }));
         },
         false,
-        true,
+        false,
       ],
     )
     .otherwise(() => [() => {}, true, false]);

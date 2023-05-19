@@ -18,27 +18,21 @@ const DEFAULT_TIME_INTERVAL_UPDATE_MS = 250;
  * ====
  *
  * Revisit for active call heuristics. Currently this function may anticipate
- * multiple calls with the state "connected", and will select the first one.
+ * multiple calls and will select the most recent one.
  *
  * @returns the active call
  */
 export const useActiveCall = () => {
   const activeCall = useSelector<State, ActiveCall | undefined>((store) => {
-    const connectedActiveCalls = Object.values(
-      store.voice.call.activeCall,
-    ).filter((c) =>
-      match(c)
-        .with({ info: { state: 'connected' } }, () => true)
-        .otherwise(() => false),
-    );
-    return connectedActiveCalls[0];
+    const { entities, ids } = store.voice.call.activeCall;
+    return entities[ids[ids.length - 1]];
   });
 
   return activeCall;
 };
 
 /**
- * Active call duration hook. Returns the duration of a call in a human-readable
+ * Active call status hook. Returns the status of a call in a human-readable
  * format. If the call is ongoing, i.e. has state "connected", then returns
  * a formatted time. Introduces statefullness via the {@link useActiveCallTime}
  * hook.
@@ -52,7 +46,7 @@ export const useActiveCallDuration = (
 ) => {
   const activeCallTimeMs = useActiveCallTime(activeCall, timeIntervalUpdateMs);
 
-  const callDuration = React.useMemo<string>(
+  const callStatus = React.useMemo<string>(
     () =>
       match([activeCall, activeCallTimeMs])
         .with(
@@ -68,11 +62,14 @@ export const useActiveCallDuration = (
             return `${minutesRepr}:${secondsRepr}`;
           },
         )
+        .with([{ info: { state: P.select(P.string) } }, P._], (callState) => {
+          return callState;
+        })
         .otherwise(() => ''),
     [activeCall, activeCallTimeMs],
   );
 
-  return callDuration;
+  return callStatus;
 };
 
 /**
