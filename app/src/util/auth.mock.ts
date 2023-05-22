@@ -1,73 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetch } from '../util/fetch';
 import Config from 'react-native-config';
-
-import { State, Dispatch, type AsyncStoreSlice } from './app';
-import { settlePromise } from '../util/settlePromise';
-
-export type UserState = AsyncStoreSlice<
-  {
-    accessToken: string;
-    email: string;
-  },
-  {
-    reason:
-      | 'LOGIN_ERROR'
-      | 'LOGOUT_ERROR'
-      | 'CHECK_LOGIN_STATUS'
-      | 'FETCH_ERROR'
-      | 'AUTH0_TOKEN_RESPONSE_NOT_OK'
-      | 'FETCH_JSON_ERROR'
-      | undefined;
-    error?: any;
-  }
->;
-
-export const userSlice = createSlice({
-  name: 'user',
-  initialState: null as UserState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(checkLoginStatus.pending, () => {
-        return { status: 'pending' };
-      })
-      .addCase(checkLoginStatus.fulfilled, (_, action) => {
-        return { status: 'fulfilled', ...action.payload };
-      })
-      .addCase(checkLoginStatus.rejected, () => {
-        return { status: 'rejected', reason: 'CHECK_LOGIN_STATUS' };
-      });
-    builder
-      .addCase(login.pending, () => {
-        return { status: 'pending' };
-      })
-      .addCase(login.fulfilled, (_, action) => {
-        return { status: 'fulfilled', ...action.payload };
-      })
-      .addCase(login.rejected, (_, action) => {
-        return {
-          status: 'rejected',
-          reason: action.payload?.reason,
-          error: action.payload?.error || action.error,
-        };
-      });
-    builder
-      .addCase(logout.pending, () => {
-        return { status: 'pending' };
-      })
-      .addCase(logout.fulfilled, (_, action) => {
-        return { status: 'fulfilled', ...action.payload };
-      })
-      .addCase(logout.rejected, (_, action) => {
-        return {
-          status: 'rejected',
-          reason: action.payload?.reason,
-          error: action.payload?.error || action.error,
-        };
-      });
-  },
-});
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { State, Dispatch } from '../store/app';
+import { settlePromise } from './settlePromise';
 
 export const checkLoginStatus = createAsyncThunk<
   {

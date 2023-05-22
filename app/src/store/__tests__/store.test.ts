@@ -2,7 +2,7 @@ import * as app from '../app';
 import * as token from '../voice/accessToken';
 import * as outgoingCall from '../voice/call/outgoingCall';
 import * as activeCall from '../voice/call/activeCall';
-import * as user from '../user';
+import * as auth from '../../util/auth';
 
 let fetchMock: jest.Mock;
 let voiceConnectMock: jest.Mock;
@@ -37,7 +37,7 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
 it('should make an outgoing call and mute it', async () => {
   const store: app.Store = app.createStore();
 
-  await store.dispatch(user.checkLoginStatus());
+  await store.dispatch(auth.checkLoginStatus());
 
   fetchMock.mockResolvedValueOnce({
     ok: true,

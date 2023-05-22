@@ -1,6 +1,6 @@
 import { createStore, Store } from '../app';
 import { bootstrapApp } from '../bootstrap';
-import * as userStoreModule from '../user';
+import * as authStoreModule from '../../util/auth';
 import * as accessTokenStoreModule from '../voice/accessToken';
 import * as registrationStoreModule from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
@@ -37,7 +37,7 @@ describe('bootstrap', () => {
 
   const spyOnActionCreators = () => {
     const checkLoginStatusSpy = spyOnActionCreator(
-      userStoreModule,
+      authStoreModule,
       'checkLoginStatus',
     );
     const getAccessTokenSpy = spyOnActionCreator(
