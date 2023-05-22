@@ -4,8 +4,8 @@
  - [ ] New unit tests and integration tests have beed added
  - [ ] Code coverage is more or equal to the previous coverage
  - [ ] A visual inspection of the `Files changed` tab was made prior to submitting the pull request ensuring the style guide was followed
- - [ ] [CI pipeline](https://app.circleci.com/pipelines/github/twilio/twilio-voice-react-native-app) is green 
-- [ ] Included screenshot if necessary
+ - [ ] [CI pipeline](https://app.circleci.com/pipelines/github/twilio/twilio-voice-react-native-app) is green
+ - [ ] Included screenshot if necessary
 
 ## Description
 
@@ -31,5 +31,4 @@
 
 > All third-party contributors acknowledge that any contributions they provide will be made under the same open-source license that the open-source project is provided under.
 
-- [] I acknowledge that all my contributions will be made under the project's license.
-
+- [ ] I acknowledge that all my contributions will be made under the project's license.
