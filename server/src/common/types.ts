@@ -15,15 +15,6 @@ export interface Auth0Credentials {
   readonly [EnvVars.Auth0IssuerBaseUrl]: string;
 }
 
-export interface CircleCIAuth0Credentials {
-  readonly [EnvVars.Auth0Url]: string;
-  readonly [EnvVars.Auth0Username]: string;
-  readonly [EnvVars.Auth0Password]: string;
-  readonly [EnvVars.Auth0ClientID]: string;
-  readonly [EnvVars.Auth0ClientSecret]: string;
-}
-
 export interface ServerCredentials
   extends TwilioCredentials,
-    Auth0Credentials,
-    CircleCIAuth0Credentials {}
+    Auth0Credentials {}

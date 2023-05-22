@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetch, defaultUrl } from '../util/fetch';
+import { fetch } from '../util/fetch';
+import Config from 'react-native-config';
 
 import { State, Dispatch, type AsyncStoreSlice } from './app';
 import { settlePromise } from '../util/settlePromise';
@@ -101,11 +102,18 @@ export const login = createAsyncThunk<
 >('user/login', async (_, { rejectWithValue }) => {
   try {
     const fetchResult = await settlePromise(
-      fetch(`${defaultUrl}/auth0`, {
+      fetch(Config.AUTH0_URL as string, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          grant_type: 'password',
+          username: Config.AUTH0_USERNAME,
+          password: Config.AUTH0_PASSWORD,
+          audience: Config.AUTH0_AUDIENCE,
+          scope: 'openid profile email',
+          client_id: Config.AUTH0_CLIENT_ID,
+          client_secret: Config.AUTH0_CLIENT_SECRET,
+        }),
       }),
     );
 

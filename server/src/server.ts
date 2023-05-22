@@ -2,7 +2,6 @@ import express, { Router } from 'express';
 import type { ServerCredentials } from './common/types';
 import { createTokenRoute } from './routes/token';
 import { createTwimlRoute } from './routes/twiml';
-import { createAuth0Route } from './routes/auth0';
 import { createLogMiddleware } from './middlewares/log';
 import { auth } from 'express-oauth2-jwt-bearer';
 
@@ -38,10 +37,6 @@ export function createExpressApp(serverConfig: ServerCredentials) {
   const twimlRouter = Router();
   twimlRouter.use(createTwimlRoute(serverConfig));
   app.post('/twiml', twimlRouter);
-
-  const auth0Router = Router();
-  auth0Router.use(createAuth0Route(serverConfig));
-  app.post('/auth0', auth0Router);
 
   return app;
 }
