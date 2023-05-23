@@ -2,11 +2,23 @@
 
 The Twilio Voice React Native Reference App is an example implementation of the Twilio Voice React Native SDK and serves to inspire developers who want to leverage the power of Twilio Programmable Voice in their React Native applications. See the Twilio Voice React Native SDK [here](https://github.com/twilio/twilio-voice-react-native).
 
-### Setting up Auth0
+## Incoming call notifications
+
+### Android
+On Android platforms, the Twilio Voice Android SDK uses Firebase Cloud Messaging (FCM) to deliver call notifications to users. FCM requires a `google-services.json` file that can be generated in a Firebase project. Once the `google-services.json` file is generated, it must be placed in the `app/android/app` folder before any Android build can be completed.
+
+See the Twilio Voice Android SDK [Quickstart](https://github.com/twilio/voice-quickstart-android#bullet1) for more information.
+
+### iOS
+On iOS platforms, the Twilio Voice iOS SDK does not need an equivalent file.
+
+Please follow the Twilio Voice iOS SDK [Quickstart](https://github.com/twilio/voice-quickstart-ios#6-create-a-push-credential-with-your-voip-service-certificate) for more information.
+
+## Setting up Auth0
 
 See [example.env](example.env) for information on Auth0 environment variables required to run the app.
 
-### Launching the App
+## Launching the App
 
 Ensure that you are within the `app/` folder.
 
