@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { type AsyncStoreSlice } from './app';
-import * as Auth from '../util/auth';
+import * as auth from '../util/auth';
 
 export type UserState = AsyncStoreSlice<
   {
@@ -24,23 +24,23 @@ export const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(Auth.checkLoginStatus.pending, () => {
+      .addCase(auth.checkLoginStatus.pending, () => {
         return { status: 'pending' };
       })
-      .addCase(Auth.checkLoginStatus.fulfilled, (_, action) => {
+      .addCase(auth.checkLoginStatus.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
       })
-      .addCase(Auth.checkLoginStatus.rejected, () => {
+      .addCase(auth.checkLoginStatus.rejected, () => {
         return { status: 'rejected', reason: 'CHECK_LOGIN_STATUS' };
       });
     builder
-      .addCase(Auth.login.pending, () => {
+      .addCase(auth.login.pending, () => {
         return { status: 'pending' };
       })
-      .addCase(Auth.login.fulfilled, (_, action) => {
+      .addCase(auth.login.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
       })
-      .addCase(Auth.login.rejected, (_, action) => {
+      .addCase(auth.login.rejected, (_, action) => {
         return {
           status: 'rejected',
           reason: action.payload?.reason,
@@ -48,13 +48,13 @@ export const userSlice = createSlice({
         };
       });
     builder
-      .addCase(Auth.logout.pending, () => {
+      .addCase(auth.logout.pending, () => {
         return { status: 'pending' };
       })
-      .addCase(Auth.logout.fulfilled, (_, action) => {
+      .addCase(auth.logout.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
       })
-      .addCase(Auth.logout.rejected, (_, action) => {
+      .addCase(auth.logout.rejected, (_, action) => {
         return {
           status: 'rejected',
           reason: action.payload?.reason,
