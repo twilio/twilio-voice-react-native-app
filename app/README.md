@@ -10,6 +10,9 @@ On Android platforms, the Twilio Voice Android SDK uses Firebase Cloud Messaging
 See the Twilio Voice Android SDK [Quickstart](https://github.com/twilio/voice-quickstart-android#bullet1) for more information.
 
 ### iOS
+On iOS platforms, the Twilio Voice iOS SDK does not need an equivalent file.
+
+Please follow the Twilio Voice iOS SDK [Quickstart](https://github.com/twilio/voice-quickstart-ios#6-create-a-push-credential-with-your-voip-service-certificate) for more information.
 
 ## Setting up Auth0
 
