@@ -84,7 +84,7 @@ export const logout = createAsyncThunk<
   }
 >('user/logout', async (_, { rejectWithValue }) => {
   try {
-    await auth0.webAuth.clearSession();
+    await auth0.webAuth.clearSession({ federated: true });
     await auth0.credentialsManager.clearCredentials();
     return { accessToken: '', email: '' };
   } catch (error) {
