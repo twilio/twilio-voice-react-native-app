@@ -9,7 +9,7 @@ export enum EnvVars {
   AuthToken = 'AUTH_TOKEN',
   ApiKeySid = 'API_KEY_SID',
   CallerId = 'CALLER_ID',
-  OutgoingApplicationSid = 'OUTGOING_APPLICATION_SID',
+  OutgoingApplicationSid = 'TWIML_APP_SID',
   Port = 'PORT',
   PushCredentialSid = 'PUSH_CREDENTIAL_SID',
   Auth0Audience = 'AUTH0_AUDIENCE',

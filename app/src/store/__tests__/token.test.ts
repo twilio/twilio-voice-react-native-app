@@ -1,5 +1,5 @@
 import * as token from '../voice/accessToken';
-import * as user from '../user';
+import * as auth from '../../util/auth';
 import * as app from '../app';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 
@@ -44,7 +44,7 @@ describe('token store', () => {
       ok: true,
       text: jest.fn().mockResolvedValueOnce('foo'),
     });
-    await store.dispatch(user.login());
+    await store.dispatch(auth.login());
     await store.dispatch(token.getAccessToken());
     expect(fetchMock).toBeCalledTimes(1);
     expect(store.getState().voice.accessToken).toEqual({
@@ -55,7 +55,7 @@ describe('token store', () => {
 
   it('rejects if no user', async () => {
     jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({ undefined });
-    await store.dispatch(user.login());
+    await store.dispatch(auth.login());
     await store.dispatch(token.getAccessToken());
     expect(store.getState().voice.accessToken).toEqual({
       status: 'rejected',
@@ -69,7 +69,7 @@ describe('token store', () => {
       idToken: 'test id token',
     });
     fetchMock.mockRejectedValueOnce(new Error('error'));
-    await store.dispatch(user.login());
+    await store.dispatch(auth.login());
     await store.dispatch(token.getAccessToken());
     expect(store.getState().voice.accessToken?.status).toEqual('rejected');
   });

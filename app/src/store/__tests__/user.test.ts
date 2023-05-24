@@ -1,6 +1,6 @@
-import * as user from '../user';
 import * as app from '../app';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
+import * as auth from '../../util/auth';
 
 let MockCall: { Event: Record<string, string> };
 
@@ -43,7 +43,7 @@ describe('user store', () => {
   });
 
   it('should login a user', async () => {
-    await store.dispatch(user.login());
+    await store.dispatch(auth.login());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({
       status: 'fulfilled',
@@ -53,8 +53,8 @@ describe('user store', () => {
   });
 
   it('should logout a user', async () => {
-    await store.dispatch(user.login());
-    await store.dispatch(user.logout());
+    await store.dispatch(auth.login());
+    await store.dispatch(auth.logout());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({
       status: 'fulfilled',
@@ -65,7 +65,7 @@ describe('user store', () => {
 
   it('should check if a user is NOT logged in', async () => {
     jest.spyOn(auth0, 'getCredentials').mockRejectedValueOnce(undefined);
-    await store.dispatch(user.checkLoginStatus());
+    await store.dispatch(auth.checkLoginStatus());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({
       status: 'fulfilled',
@@ -75,7 +75,7 @@ describe('user store', () => {
   });
 
   it('should check if a user IS logged in', async () => {
-    await store.dispatch(user.checkLoginStatus());
+    await store.dispatch(auth.checkLoginStatus());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({
       status: 'fulfilled',
@@ -87,7 +87,7 @@ describe('user store', () => {
   it('should handle login error', async () => {
     const authorizeError = new Error('login failed');
     jest.spyOn(auth0, 'authorize').mockRejectedValue(authorizeError);
-    await store.dispatch(user.login());
+    await store.dispatch(auth.login());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({
       status: 'rejected',
@@ -100,8 +100,8 @@ describe('user store', () => {
     jest
       .spyOn(auth0, 'clearSession')
       .mockRejectedValue(new Error('logout failed'));
-    await store.dispatch(user.login());
-    await store.dispatch(user.logout());
+    await store.dispatch(auth.login());
+    await store.dispatch(auth.logout());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({
       status: 'rejected',

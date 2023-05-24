@@ -44,8 +44,13 @@ commands:
             echo "DOMAIN_NAME=$DOMAIN_NAME" >> .env
             echo "CLIENT_ID=$CLIENT_ID" >> .env
             echo "AUTH0_SCOPE=$AUTH0_SCOPE" >> .env
-            echo "AUDIENCE=$AUDIENCE" >> .env
+            echo "AUTH0_AUDIENCE=$AUTH0_AUDIENCE" >> .env
             echo "DEFAULT_URL=$DEFAULT_URL" >> .env
+            echo "AUTH0_URL"="$AUTH0_URL" >> .env
+            echo "AUTH0_USERNAME"="$AUTH0_USERNAME" >> .env
+            echo "AUTH0_PASSWORD"="$AUTH0_PASSWORD" >> .env
+            echo "AUTH0_CLIENT_ID"="$AUTH0_CLIENT_ID" >> .env
+            echo "AUTH0_CLIENT_SECRET"="$AUTH0_CLIENT_SECRET" >> .env
             cd ..
 
   app-install-dependencies:
@@ -118,6 +123,12 @@ commands:
             yarn detox:test --configuration << parameters.configuration >> --headless
             cd ..
 
+  app-expose-port:
+    steps:
+      - run:
+          name: "App: expose port"
+          command: adb reverse tcp:${PORT} tcp:${PORT}
+
   ##
   # Server commands
   ##
@@ -129,6 +140,70 @@ commands:
             cd server
             yarn install --immutable
             cd ..
+
+  server-build:
+    steps:
+      - run:
+          name: "Server: build"
+          command: |
+            cd server
+            yarn build
+            cd ..
+
+  server-start:
+    steps:
+      - run:
+          name: "Server: start"
+          background: true
+          command: |
+            cd server 
+            yarn start
+            cd ..
+
+  ##
+  # Ngrok Commands
+  ##
+  ngrok-install:
+    steps:
+      - run:
+          name: "ngrok: install"
+          command: |
+            wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+            sudo tar xvzf ngrok-v3-stable-linux-amd64.tgz
+            sudo chmod +x ngrok
+            ./ngrok authtoken ${NGROK_AUTH_TOKEN}
+      - run:
+          name: "ngrok: run"
+          background: true
+          command: ./ngrok http ${PORT}
+      - run:
+          name: "ngrok: check"
+          command: |
+            sleep 30
+            curl http://127.0.0.1:4040/api/tunnels
+      - run:
+          name: "ngrok: update twiML app with ngrok public_url"
+          command: |
+            cd scripts
+            node updateTwimlApp.js
+            cd ..
+
+  ngrok-install-mac:
+    steps:
+      - run:
+          name: "ngrok: install mac"
+          command: |
+            brew install ngrok/ngrok/ngrok
+            ngrok config add-authtoken ${NGROK_AUTH_TOKEN}
+      - run:
+          name: "ngrok: start tunnel"
+          background: true
+          command: ngrok http ${PORT}
+      - run:
+          name: "ngrok: check"
+          command: |
+            sleep 30
+            curl http://127.0.0.1:4040/api/tunnels
 
 jobs:
   ###
@@ -194,6 +269,10 @@ jobs:
       - app-save-env-file
       - app-install-dependencies
       - app-save-google-services-json
+      - ngrok-install
+      - server-install-dependencies
+      - server-build
+      - server-start
       - app-detox-build:
           configuration: android.emu.release
       - android/create-avd:
@@ -204,6 +283,7 @@ jobs:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
+      - app-expose-port
       - app-detox-test:
           configuration: android.emu.release
 
@@ -216,6 +296,10 @@ jobs:
       - app-install-dependencies
       - app-install-applesimutils
       - app-install-pods
+      - ngrok-install-mac
+      - server-install-dependencies
+      - server-build
+      - server-start
       - app-detox-build:
           configuration: ios.sim.release
       - app-detox-test:
@@ -245,12 +329,7 @@ jobs:
     executor: default
     steps:
       - attach_project
-      - run:
-          name: "Server: build"
-          command: |
-            cd server
-            yarn build
-            cd ..
+      - server-build
 
   server-test:
     executor: default
@@ -284,8 +363,6 @@ workflows:
       - app-typecheck:
           requires:
             - app-cache-install-yarn-dependencies
-      - app-detox-android
-      - app-detox-ios
       # server jobs
       - server-cache-install-dependencies
       - server-test:
@@ -294,3 +371,12 @@ workflows:
       - server-build:
           requires:
             - server-cache-install-dependencies
+      # e2e jobs
+      - app-detox-android:
+          context:
+            - vblocks-js
+      - app-detox-ios:
+          requires:
+            - app-detox-android
+          context:
+            - vblocks-js

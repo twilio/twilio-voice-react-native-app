@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { type Dispatch, type State } from '../../store/app';
-import { logout } from '../../store/user';
+import { logout } from '../../util/auth';
 
 const TwilioLogo = require('../../../assets/icons/twilio-logo.png');
 

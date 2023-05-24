@@ -18,4 +18,16 @@ describe('Login', () => {
       ),
     ).toBeVisible();
   });
+
+  it('should login the user', async () => {
+    await element(by.id('login_button')).tap();
+    await expect(element(by.text('Ahoy!'))).toBeVisible();
+    await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
+  });
+
+  it('should navigate to the dialer tab', async () => {
+    await element(by.id('login_button')).tap();
+    await element(by.id('dialer_button')).tap();
+    await expect(element(by.id('dialer'))).toBeVisible();
+  });
 });

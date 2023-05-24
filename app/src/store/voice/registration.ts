@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AsyncStoreSlice, type Dispatch, type State } from '../app';
 import { voice } from '../../util/voice';
 import { settlePromise } from '../../util/settlePromise';
-import { login } from '../user';
+import { login } from '../../util/auth';
 import { getAccessToken } from './accessToken';
 
 export type RegisterRejectValue =

@@ -1,6 +1,6 @@
 import { Middleware } from '@reduxjs/toolkit';
 import { createStore, Store } from '../app';
-import * as userStoreModule from '../user';
+import * as authStoreModule from '../../util/auth';
 import * as accessTokenStoreModule from '../voice/accessToken';
 import * as registrationStoreModule from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
@@ -61,8 +61,8 @@ describe('registration', () => {
 
         matchDispatchedActions(dispatchedActions, [
           registrationStoreModule.loginAndRegister.pending,
-          userStoreModule.login.pending,
-          userStoreModule.login.rejected,
+          authStoreModule.login.pending,
+          authStoreModule.login.rejected,
           registrationStoreModule.loginAndRegister.rejected,
         ]);
       });
@@ -82,8 +82,8 @@ describe('registration', () => {
 
         matchDispatchedActions(dispatchedActions, [
           registrationStoreModule.loginAndRegister.pending,
-          userStoreModule.login.pending,
-          userStoreModule.login.fulfilled,
+          authStoreModule.login.pending,
+          authStoreModule.login.fulfilled,
           accessTokenStoreModule.getAccessToken.pending,
           accessTokenStoreModule.getAccessToken.rejected,
           registrationStoreModule.loginAndRegister.rejected,
@@ -105,8 +105,8 @@ describe('registration', () => {
 
         matchDispatchedActions(dispatchedActions, [
           registrationStoreModule.loginAndRegister.pending,
-          userStoreModule.login.pending,
-          userStoreModule.login.fulfilled,
+          authStoreModule.login.pending,
+          authStoreModule.login.fulfilled,
           accessTokenStoreModule.getAccessToken.pending,
           accessTokenStoreModule.getAccessToken.fulfilled,
           registrationStoreModule.register.pending,
@@ -127,8 +127,8 @@ describe('registration', () => {
 
       matchDispatchedActions(dispatchedActions, [
         registrationStoreModule.loginAndRegister.pending,
-        userStoreModule.login.pending,
-        userStoreModule.login.fulfilled,
+        authStoreModule.login.pending,
+        authStoreModule.login.fulfilled,
         accessTokenStoreModule.getAccessToken.pending,
         accessTokenStoreModule.getAccessToken.fulfilled,
         registrationStoreModule.register.pending,

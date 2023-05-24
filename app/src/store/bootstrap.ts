@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { type Dispatch } from './app';
-import { checkLoginStatus } from './user';
+import { checkLoginStatus } from './../util/auth';
 import { getAccessToken } from './voice/accessToken';
 import { register } from './voice/registration';
 
