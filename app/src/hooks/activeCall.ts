@@ -105,6 +105,8 @@ export const useActiveCallTime = (
     const animate = () => {
       animationFrameId = requestAnimationFrame(() => {
         if (
+          (activeCall?.status === 'fulfilled' &&
+            activeCall?.callInfo.state === 'disconnected') ||
           activeCall?.status !== 'fulfilled' ||
           typeof activeCall.initialConnectTimestamp === 'undefined'
         ) {
