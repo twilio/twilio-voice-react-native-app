@@ -26,9 +26,12 @@ const OutgoingRemoteParticipant: React.FC<Props> = ({
           defaultValue={outgoingIdentity}
           onChangeText={setOutgoingIdentity}
           style={styles.title}
+          testID="client_text_input"
         />
       ) : (
-        <Text style={numberStyle}>{formattedNumber}</Text>
+        <Text style={numberStyle} testID="formatted_number">
+          {formattedNumber}
+        </Text>
       )}
       <Text style={styles.subtitle} />
     </View>

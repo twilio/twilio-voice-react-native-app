@@ -16,6 +16,7 @@ const MakeOutgoingCallButton: React.FC<Props> = ({ disabled, onPress }) => (
       source={MakeOutgoingCallSource}
       resizeMode="contain"
       style={styles.image}
+      testID="call_button"
     />
   </Button>
 );

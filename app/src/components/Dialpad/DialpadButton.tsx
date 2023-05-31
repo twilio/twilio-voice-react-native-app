@@ -14,7 +14,9 @@ const DialpadButton: React.FC<Props> = ({
   onPress,
 }) => (
   <Button disabled={disabled} size={96} onPress={onPress}>
-    <Text style={styles.title}>{title}</Text>
+    <Text style={styles.title} testID={`dialpad_button_${title}`}>
+      {title}
+    </Text>
     <Text style={styles.subtitle}>{subtitle}</Text>
   </Button>
 );
