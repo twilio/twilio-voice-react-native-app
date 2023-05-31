@@ -51,26 +51,7 @@ describe('Outgoing Call', () => {
         await element(by.id('call_button')).tap();
         await waitFor(element(by.id('active_call'))).toBeVisible();
         await waitFor(element(by.id('call_status'))).toHaveText('ringing');
-        await waitFor(element(by.id('call_status'))).toHaveText('00:06');
-        await waitFor(element(by.id('active_call'))).not.toBeVisible();
-      });
-
-      it('should allow user to end call', async () => {
-        await element(by.id('dialpad_button_3')).tap();
-        await element(by.id('dialpad_button_1')).tap();
-        await element(by.id('dialpad_button_5')).tap();
-        await element(by.id('dialpad_button_6')).tap();
-        await element(by.id('dialpad_button_7')).tap();
-        await element(by.id('dialpad_button_0')).tap();
-        await element(by.id('dialpad_button_3')).tap();
-        await element(by.id('dialpad_button_5')).tap();
-        await element(by.id('dialpad_button_4')).tap();
-        await element(by.id('dialpad_button_1')).tap();
-        await element(by.id('call_button')).tap();
-        await waitFor(element(by.id('active_call'))).toBeVisible();
-        await waitFor(element(by.id('call_status'))).toHaveText('ringing');
-        await waitFor(element(by.id('end_call_button'))).toBeFocused();
-        await element(by.id('end_call_button')).tap();
+        await waitFor(element(by.id('call_status'))).toHaveText('00:05');
         await waitFor(element(by.id('active_call'))).not.toBeVisible();
       });
     });

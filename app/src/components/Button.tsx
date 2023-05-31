@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 type InheritedTouchableOpacityProps = Pick<
   TouchableOpacity['props'],
-  'disabled' | 'onPress' | 'accessibilityLabel'
+  'disabled' | 'onPress' | 'accessibilityLabel' | 'testID'
 >;
 
 export type Props = React.PropsWithChildren<
@@ -18,6 +18,7 @@ const Button: React.FC<Props> = ({
   disabled,
   onPress,
   size,
+  testID,
 }) => {
   const containerStyle = React.useMemo(
     () => ({
@@ -35,7 +36,8 @@ const Button: React.FC<Props> = ({
     <TouchableOpacity
       disabled={disabled}
       onPress={onPress}
-      accessibilityLabel={accessibilityLabel}>
+      accessibilityLabel={accessibilityLabel}
+      testID={testID}>
       <View style={containerStyle}>{children}</View>
     </TouchableOpacity>
   );

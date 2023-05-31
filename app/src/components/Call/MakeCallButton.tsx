@@ -11,12 +11,12 @@ const MakeOutgoingCallButton: React.FC<Props> = ({ disabled, onPress }) => (
     accessibilityLabel="make call"
     disabled={disabled}
     size={96}
-    onPress={onPress}>
+    onPress={onPress}
+    testID="call_button">
     <Image
       source={MakeOutgoingCallSource}
       resizeMode="contain"
       style={styles.image}
-      testID="call_button"
     />
   </Button>
 );
