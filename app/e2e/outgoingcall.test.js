@@ -55,28 +55,28 @@ describe('Outgoing Call', () => {
         await waitFor(element(by.id('active_call'))).not.toBeVisible();
       });
     });
+
+    describe('disconnect', () => {
+      it('should disconnect if invalid number', async () => {
+        await element(by.id('dialpad_button_1')).tap();
+        await element(by.id('dialpad_button_2')).tap();
+        await element(by.id('dialpad_button_3')).tap();
+        await element(by.id('call_button')).tap();
+        await waitFor(element(by.id('active_call'))).toBeVisible();
+        await waitFor(element(by.id('call_status'))).toHaveText('ringing');
+        await waitFor(element(by.id('call_status'))).toHaveText('disconnected');
+        await waitFor(element(by.id('active_call'))).not.toBeVisible();
+      });
+
+      it('should disconnect if invalid Client-ID', async () => {
+        await element(by.text('Client')).tap();
+        await element(by.id('client_text_input')).typeText('hi\n');
+        await element(by.id('call_button')).tap();
+        await waitFor(element(by.id('active_call'))).toBeVisible();
+        await waitFor(element(by.id('call_status'))).toHaveText('ringing');
+        await waitFor(element(by.id('call_status'))).toHaveText('disconnected');
+        await waitFor(element(by.id('active_call'))).not.toBeVisible();
+      });
+    });
   }
-
-  describe('disconnect', () => {
-    it('should disconnect if invalid number', async () => {
-      await element(by.id('dialpad_button_1')).tap();
-      await element(by.id('dialpad_button_2')).tap();
-      await element(by.id('dialpad_button_3')).tap();
-      await element(by.id('call_button')).tap();
-      await waitFor(element(by.id('active_call'))).toBeVisible();
-      await waitFor(element(by.id('call_status'))).toHaveText('ringing');
-      await waitFor(element(by.id('call_status'))).toHaveText('disconnected');
-      await waitFor(element(by.id('active_call'))).not.toBeVisible();
-    });
-
-    it('should disconnect if invalid Client-ID', async () => {
-      await element(by.text('Client')).tap();
-      await element(by.id('client_text_input')).typeText('hi\n');
-      await element(by.id('call_button')).tap();
-      await waitFor(element(by.id('active_call'))).toBeVisible();
-      await waitFor(element(by.id('call_status'))).toHaveText('ringing');
-      await waitFor(element(by.id('call_status'))).toHaveText('disconnected');
-      await waitFor(element(by.id('active_call'))).not.toBeVisible();
-    });
-  });
 });
