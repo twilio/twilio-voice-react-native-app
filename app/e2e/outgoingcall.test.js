@@ -64,7 +64,8 @@ describe('Outgoing Call', () => {
       await element(by.id('dialpad_button_3')).tap();
       await element(by.id('call_button')).tap();
       await waitFor(element(by.id('active_call'))).toBeVisible();
-      await expect(element(by.id('call_status'))).toHaveText('ringing');
+      await waitFor(element(by.id('call_status'))).toHaveText('ringing');
+      await waitFor(element(by.id('call_status'))).toHaveText('disconnected');
       await waitFor(element(by.id('active_call'))).not.toBeVisible();
     });
 
@@ -72,6 +73,9 @@ describe('Outgoing Call', () => {
       await element(by.text('Client')).tap();
       await element(by.id('client_text_input')).typeText('hi\n');
       await element(by.id('call_button')).tap();
+      await waitFor(element(by.id('active_call'))).toBeVisible();
+      await waitFor(element(by.id('call_status'))).toHaveText('ringing');
+      await waitFor(element(by.id('call_status'))).toHaveText('disconnected');
       await waitFor(element(by.id('active_call'))).not.toBeVisible();
     });
   });
