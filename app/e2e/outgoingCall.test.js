@@ -86,11 +86,13 @@ describe('Outgoing Call', () => {
           await element(by.id('dialpad_button_5')).tap();
           await element(by.id('dialpad_button_4')).tap();
           await element(by.id('dialpad_button_1')).tap();
+          await device.disableSynchronization();
           await element(by.id('call_button')).tap();
           await waitFor(element(by.id('end_call_button')))
             .toExist()
             .withTimeout(3000);
           await element(by.id('end_call_button')).tap();
+          await device.enableSynchronization();
           await waitFor(element(by.id('active_call')))
             .not.toBeFocused()
             .withTimeout(2000);
