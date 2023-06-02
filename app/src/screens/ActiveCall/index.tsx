@@ -67,7 +67,7 @@ const ActiveCall: React.FC = () => {
   }, [callStatus, navigation]);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="active_call">
       <View style={styles.containerSpacer} />
       <View style={styles.remoteParticipant}>
         <RemoteParticipant title={remoteParticipant} subtitle={callStatus} />

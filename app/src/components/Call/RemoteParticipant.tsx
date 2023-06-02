@@ -7,7 +7,9 @@ const RemoteParticipant: React.FC<Props> = ({ title, subtitle }) => {
   return (
     <View style={styles.container} accessibilityLabel="remote participant">
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+      <Text style={styles.subtitle} testID="call_status">
+        {subtitle}
+      </Text>
     </View>
   );
 };

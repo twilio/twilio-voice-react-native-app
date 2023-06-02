@@ -11,7 +11,8 @@ const HangupButton: React.FC<Props> = ({ disabled, onPress }) => (
     accessibilityLabel="end call"
     size={96}
     disabled={disabled}
-    onPress={onPress}>
+    onPress={onPress}
+    testID="end_call_button">
     <Image source={HangupSource} resizeMode="contain" style={styles.image} />
   </Button>
 );
