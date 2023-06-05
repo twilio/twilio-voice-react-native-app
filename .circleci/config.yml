@@ -184,9 +184,9 @@ commands:
       - run:
           name: "ngrok: update twiML app with ngrok public_url"
           command: |
-            cd scripts
+            cd server/scripts
             node updateTwimlApp.js
-            cd ..
+            cd ../..
 
   ngrok-install-mac:
     steps:
@@ -269,8 +269,8 @@ jobs:
       - app-save-env-file
       - app-install-dependencies
       - app-save-google-services-json
-      - ngrok-install
       - server-install-dependencies
+      - ngrok-install
       - server-build
       - server-start
       - app-detox-build:
@@ -296,8 +296,8 @@ jobs:
       - app-install-dependencies
       - app-install-applesimutils
       - app-install-pods
-      - ngrok-install-mac
       - server-install-dependencies
+      - ngrok-install-mac
       - server-build
       - server-start
       - app-detox-build:
