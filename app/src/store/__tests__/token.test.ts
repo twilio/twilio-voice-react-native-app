@@ -63,7 +63,7 @@ describe('token store', () => {
     });
   });
 
-  it('handles rejected case for fetch error', async () => {
+  it('rejects if "FETCH_ERROR"', async () => {
     jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
       accessToken: 'test token',
       idToken: 'test id token',
@@ -71,6 +71,44 @@ describe('token store', () => {
     fetchMock.mockRejectedValueOnce(new Error('error'));
     await store.dispatch(auth.login());
     await store.dispatch(token.getAccessToken());
-    expect(store.getState().voice.accessToken?.status).toEqual('rejected');
+    expect(store.getState().voice.accessToken).toEqual({
+      status: 'rejected',
+      reason: 'FETCH_ERROR',
+      error: new Error('error'),
+    });
+  });
+
+  it('rejects if "TOKEN_RESPONSE_NOT_OK"', async () => {
+    jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
+      accessToken: 'test token',
+      idToken: 'test id token',
+    });
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+    });
+    await store.dispatch(auth.login());
+    await store.dispatch(token.getAccessToken());
+    expect(store.getState().voice.accessToken).toEqual({
+      reason: 'TOKEN_RESPONSE_NOT_OK',
+      status: 'rejected',
+    });
+  });
+
+  it('rejects if "FETCH_TEXT_ERROR"', async () => {
+    jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
+      accessToken: 'test token',
+      idToken: 'test id token',
+    });
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      text: jest.fn().mockRejectedValueOnce('invalid text'),
+    });
+    await store.dispatch(auth.login());
+    await store.dispatch(token.getAccessToken());
+    expect(store.getState().voice.accessToken).toEqual({
+      status: 'rejected',
+      reason: 'FETCH_TEXT_ERROR',
+      error: 'invalid text',
+    });
   });
 });

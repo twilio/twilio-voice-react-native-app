@@ -5,6 +5,7 @@ import * as accessTokenStoreModule from '../voice/accessToken';
 import * as registrationStoreModule from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
+import * as fetchUtil from '../../util/fetch';
 
 let fetchMock: jest.Mock;
 
@@ -45,6 +46,27 @@ describe('registration', () => {
   };
 
   describe('loginAndRegister', () => {
+    it('resolves when all sub-actions resolve', async () => {
+      const loginAndRegisterResult = await store.dispatch(
+        registrationStoreModule.loginAndRegister(),
+      );
+      expect(loginAndRegisterResult.type).toEqual(
+        'registration/loginAndRegister/fulfilled',
+      );
+      expect(loginAndRegisterResult.payload).toEqual(undefined);
+
+      matchDispatchedActions(dispatchedActions, [
+        registrationStoreModule.loginAndRegister.pending,
+        authStoreModule.login.pending,
+        authStoreModule.login.fulfilled,
+        accessTokenStoreModule.getAccessToken.pending,
+        accessTokenStoreModule.getAccessToken.fulfilled,
+        registrationStoreModule.register.pending,
+        registrationStoreModule.register.fulfilled,
+        registrationStoreModule.loginAndRegister.fulfilled,
+      ]);
+    });
+
     describe('handles rejection', () => {
       it('login', async () => {
         jest.spyOn(auth0, 'authorize').mockRejectedValueOnce(undefined);
@@ -114,27 +136,31 @@ describe('registration', () => {
           registrationStoreModule.loginAndRegister.rejected,
         ]);
       });
-    });
 
-    it('resolves when all sub-actions resolve', async () => {
-      const loginAndRegisterResult = await store.dispatch(
-        registrationStoreModule.loginAndRegister(),
-      );
-      expect(loginAndRegisterResult.type).toEqual(
-        'registration/loginAndRegister/fulfilled',
-      );
-      expect(loginAndRegisterResult.payload).toEqual(undefined);
+      it('handles "ACCESS_TOKEN_NOT_FULFILLED"', async () => {
+        const register = await store.dispatch(
+          registrationStoreModule.register(),
+        );
+        expect(register.payload).toEqual({
+          reason: 'ACCESS_TOKEN_NOT_FULFILLED',
+        });
+      });
 
-      matchDispatchedActions(dispatchedActions, [
-        registrationStoreModule.loginAndRegister.pending,
-        authStoreModule.login.pending,
-        authStoreModule.login.fulfilled,
-        accessTokenStoreModule.getAccessToken.pending,
-        accessTokenStoreModule.getAccessToken.fulfilled,
-        registrationStoreModule.register.pending,
-        registrationStoreModule.register.fulfilled,
-        registrationStoreModule.loginAndRegister.fulfilled,
-      ]);
+      it('handles "NO_ACCESS_TOKEN"', async () => {
+        jest.spyOn(fetchUtil, 'fetch').mockImplementation(
+          jest.fn().mockResolvedValue({
+            ok: true,
+            text: jest.fn().mockResolvedValue(''),
+          }),
+        );
+        await store.dispatch(registrationStoreModule.loginAndRegister());
+        const register = await store.dispatch(
+          registrationStoreModule.register(),
+        );
+        expect(register.payload).toEqual({
+          reason: 'NO_ACCESS_TOKEN',
+        });
+      });
     });
   });
 });

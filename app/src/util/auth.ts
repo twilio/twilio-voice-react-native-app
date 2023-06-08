@@ -18,9 +18,9 @@ export const checkLoginStatus = createAsyncThunk<
   {
     state: State;
     dispatch: Dispatch;
-    rejectValue: undefined;
+    rejectValue: { reason: 'NOT_LOGGED_IN' };
   }
->('user/checkLoginStatus', async () => {
+>('user/checkLoginStatus', async (_, { rejectWithValue }) => {
   const getCredentialsResult = await settlePromise(
     auth0.credentialsManager.getCredentials(),
   );
@@ -35,7 +35,9 @@ export const checkLoginStatus = createAsyncThunk<
       email: user.email,
     };
   } else {
-    return { accessToken: '', email: '' };
+    return rejectWithValue({
+      reason: 'NOT_LOGGED_IN',
+    });
   }
 });
 

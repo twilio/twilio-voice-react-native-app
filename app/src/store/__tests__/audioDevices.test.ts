@@ -36,7 +36,9 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
       QualityWarningsChanged: 'qualityWarningsChanged',
     },
   };
-  return { Call: MockCall };
+  return {
+    Call: MockCall,
+  };
 });
 
 describe('audioDevices store', () => {
@@ -57,5 +59,24 @@ describe('audioDevices store', () => {
       .mockRejectedValue(new Error('audio device error'));
     await store.dispatch(audioDevices.getAudioDevices());
     expect(store.getState().voice.audioDevices?.status).toEqual('rejected');
+  });
+
+  it('handles no selected device', async () => {
+    const audioDevicesMap = [
+      { uuid: '1111', type: 'speaker', name: 'device1' },
+      { uuid: '2222', type: 'bluetooth', name: 'device2' },
+      { uuid: '3333', type: 'earpiece', name: 'device3' },
+    ];
+    jest.spyOn(voice, 'getAudioDevices').mockImplementation(
+      jest.fn().mockReturnValue({
+        audioDevices: audioDevicesMap,
+      }),
+    );
+    await store.dispatch(audioDevices.getAudioDevices());
+    expect(store.getState().voice.audioDevices).toEqual({
+      status: 'fulfilled',
+      selectedDevice: null,
+      audioDevices: audioDevicesMap,
+    });
   });
 });

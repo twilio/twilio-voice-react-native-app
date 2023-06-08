@@ -59,8 +59,7 @@ describe('bootstrap', () => {
         actionCreatorSpies;
 
       const bootstrapAppResult = await store.dispatch(bootstrapApp());
-      expect(bootstrapAppResult.type).toEqual('app/bootstrap/fulfilled');
-      expect(bootstrapAppResult.payload).toEqual('NOT_LOGGED_IN');
+      expect(bootstrapAppResult.type).toEqual('app/bootstrap/rejected');
 
       expect(checkLoginStatusSpy.mock.calls).toEqual([[]]);
       expect(getAccessTokenSpy.mock.calls).toEqual([]);

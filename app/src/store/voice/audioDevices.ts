@@ -81,7 +81,7 @@ export const audioDevicesSlice = createSlice({
         return {
           status: 'rejected',
           reason: action.payload?.reason,
-          error: action.payload?.error || action.error,
+          error: action.payload?.error,
         };
       });
   },

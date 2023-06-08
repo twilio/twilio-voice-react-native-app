@@ -12,7 +12,7 @@ export type UserState = AsyncStoreSlice<
       | 'ID_TOKEN_UNDEFINED'
       | 'LOGIN_ERROR'
       | 'LOGOUT_ERROR'
-      | 'CHECK_LOGIN_STATUS'
+      | 'NOT_LOGGED_IN'
       | undefined;
     error?: any;
   }
@@ -30,8 +30,13 @@ export const userSlice = createSlice({
       .addCase(auth.checkLoginStatus.fulfilled, (_, action) => {
         return { status: 'fulfilled', ...action.payload };
       })
-      .addCase(auth.checkLoginStatus.rejected, () => {
-        return { status: 'rejected', reason: 'CHECK_LOGIN_STATUS' };
+      .addCase(auth.checkLoginStatus.rejected, (_, action) => {
+        return {
+          status: 'rejected',
+          reason: action.payload?.reason,
+          accessToken: '',
+          email: '',
+        };
       });
     builder
       .addCase(auth.login.pending, () => {
@@ -58,7 +63,7 @@ export const userSlice = createSlice({
         return {
           status: 'rejected',
           reason: action.payload?.reason,
-          error: action.payload?.error || action.error,
+          error: action.payload?.error,
         };
       });
   },
