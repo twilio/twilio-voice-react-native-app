@@ -16,11 +16,11 @@ export const useConnectedActiveCallBanner = () => {
   }, [navigation]);
 
   const activeCall = useActiveCall();
-  const title = useActiveCallRemoteParticipant(activeCall);
-  const subtitle = useActiveCallDuration(activeCall);
+  const participant = useActiveCallRemoteParticipant(activeCall);
+  const callDuration = useActiveCallDuration(activeCall);
   const hidden = match(activeCall)
     .with({ info: { state: 'connected' } }, () => false)
     .otherwise(() => true);
 
-  return { hidden, onPress, title, subtitle };
+  return { hidden, onPress, participant, callDuration };
 };
