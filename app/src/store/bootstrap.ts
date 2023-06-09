@@ -103,17 +103,10 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 /**
  * Bootstrap calls. Retrieves all existing calls.
  *
- * ====
- * TODO
- * ====
- *
+ * TODO(mhuynh):
  * Re-evaluate the "active calls" map that we use on the native layer. There
  * really only should be one active call, the Android/iOS SDKs do not support
  * multiple active calls.
- *
- * ====
- * TODO
- * ====
  */
 export type BootstrapCallsRejectValue = {
   reason: 'NATIVE_MODULE_REJECTED';
@@ -135,5 +128,5 @@ export const bootstrapCalls = createTypedAsyncThunk<
     });
   }
 
-  // TODO
+  // TODO(mhuynh): Dispatch the existing calls to the application state.
 });
