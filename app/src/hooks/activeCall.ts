@@ -13,14 +13,11 @@ const DEFAULT_TIME_INTERVAL_UPDATE_MS = 250;
 /**
  * Active call hook. Selects the active call from the application state.
  *
- * ====
- * TODO
- * ====
- *
+ * TODO(mhuynh):
  * Revisit for active call heuristics. Currently this function may anticipate
  * multiple calls and will select the most recent one.
  *
- * @returns the active call
+ * @returns - The active call.
  */
 export const useActiveCall = () => {
   const activeCall = useSelector<State, ActiveCall | undefined>((store) => {
@@ -56,10 +53,10 @@ export const useActiveCallDuration = (
             const totalMinutes = Math.floor(totalSeconds / 60);
             const remainderSeconds = Math.floor(totalSeconds % 60);
 
-            const minutesRepr = String(totalMinutes).padStart(2, '0');
-            const secondsRepr = String(remainderSeconds).padStart(2, '0');
+            const minutes = String(totalMinutes).padStart(2, '0');
+            const seconds = String(remainderSeconds).padStart(2, '0');
 
-            return `${minutesRepr}:${secondsRepr}`;
+            return `${minutes}:${seconds}`;
           },
         )
         .with([{ info: { state: P.select(P.string) } }, P._], (callState) => {
@@ -75,7 +72,7 @@ export const useActiveCallDuration = (
 /**
  * Active call remote participant identity hook.
  * @param activeCall - The active call.
- * @returns - The remote participant identity.
+ * @returns - A string representing the remote participant identity.
  */
 export const useActiveCallRemoteParticipant = (
   activeCall: ActiveCall | undefined,

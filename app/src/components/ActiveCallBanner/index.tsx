@@ -4,30 +4,30 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const ActiveCallSource = require('../../../assets/icons/active-call.png');
 
 export type Props = {
+  callDuration: string;
   hidden: boolean;
-  subtitle: string;
-  title: string;
   onPress: () => void;
+  participant: string;
 };
 
 const ActiveCallBanner: React.FC<Props> = ({
+  callDuration,
   hidden,
-  subtitle,
-  title,
   onPress,
+  participant,
 }) =>
   hidden ? null : (
     <TouchableOpacity style={styles.container} onPress={onPress}>
-      <View style={styles.title}>
+      <View style={styles.participant}>
         <Image
-          style={styles.titleImage}
+          style={styles.participantImage}
           source={ActiveCallSource}
           resizeMode="contain"
         />
-        <Text style={styles.titleText}>{title}</Text>
+        <Text style={styles.participantText}>{participant}</Text>
       </View>
       <View style={styles.spacer} />
-      <Text style={styles.subtitle}>{subtitle}</Text>
+      <Text style={styles.callDuration}>{callDuration}</Text>
     </TouchableOpacity>
   );
 
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     paddingRight: 4,
     paddingLeft: 4,
   },
-  subtitle: {
+  callDuration: {
     fontSize: 14,
     fontWeight: '300',
     padding: 4,
@@ -50,17 +50,17 @@ const styles = StyleSheet.create({
   spacer: {
     flexGrow: 1,
   },
-  title: {
+  participant: {
     alignItems: 'center',
     display: 'flex',
     flexDirection: 'row',
     padding: 4,
   },
-  titleImage: {
+  participantImage: {
     maxHeight: '50%',
     maxWidth: '50%',
   },
-  titleText: {
+  participantText: {
     color: 'black',
     fontSize: 16,
   },
