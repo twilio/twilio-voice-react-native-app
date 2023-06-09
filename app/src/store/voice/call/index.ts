@@ -83,7 +83,7 @@ export type BaseCall = {
     disconnect: AsyncStoreSlice;
     hold: AsyncStoreSlice;
     mute: AsyncStoreSlice;
-    sendDtmf: AsyncStoreSlice;
+    sendDigits: AsyncStoreSlice;
   };
   initialConnectTimestamp: number | undefined;
   info: CallInfo;

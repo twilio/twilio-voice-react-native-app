@@ -67,17 +67,17 @@ export type MuteRejectValue =
     };
 export const muteActiveCall = createTypedAsyncThunk<
   void,
-  { id: string; mute: boolean },
+  { id: string; shouldMute: boolean },
   { rejectValue: MuteRejectValue }
 >(
   muteActionType.prefix,
-  async ({ id, mute }, { dispatch, rejectWithValue }) => {
+  async ({ id, shouldMute }, { dispatch, rejectWithValue }) => {
     const call = callMap.get(id);
     if (typeof call === 'undefined') {
       return rejectWithValue({ reason: 'CALL_ID_NOT_FOUND' });
     }
 
-    const muteResult = await settlePromise(call.mute(mute));
+    const muteResult = await settlePromise(call.mute(shouldMute));
     if (muteResult.status === 'rejected') {
       return rejectWithValue({
         reason: 'NATIVE_MODULE_REJECTED',
@@ -103,17 +103,17 @@ export type HoldRejectValue =
     };
 export const holdActiveCall = createTypedAsyncThunk<
   void,
-  { id: string; hold: boolean },
+  { id: string; shouldHold: boolean },
   { rejectValue: MuteRejectValue }
 >(
   holdActionType.prefix,
-  async ({ id, hold }, { dispatch, rejectWithValue }) => {
+  async ({ id, shouldHold }, { dispatch, rejectWithValue }) => {
     const call = callMap.get(id);
     if (typeof call === 'undefined') {
       return rejectWithValue({ reason: 'CALL_ID_NOT_FOUND' });
     }
 
-    const holdResult = await settlePromise(call.hold(hold));
+    const holdResult = await settlePromise(call.hold(shouldHold));
     if (holdResult.status === 'rejected') {
       return rejectWithValue({
         reason: 'NATIVE_MODULE_REJECTED',
@@ -128,10 +128,10 @@ export const holdActiveCall = createTypedAsyncThunk<
 /**
  * Action to send DTMF tones over active call.
  */
-export const sendDtmfActionType = generateThunkActionTypes(
-  `${sliceName}/sendDtmf`,
+export const sendDigitsActionType = generateThunkActionTypes(
+  `${sliceName}/sendDigits`,
 );
-export type SendDtmfRejectValue =
+export type SendDigitsRejectValue =
   | {
       reason: 'CALL_ID_NOT_FOUND';
     }
@@ -139,21 +139,21 @@ export type SendDtmfRejectValue =
       reason: 'NATIVE_MODULE_REJECTED';
       error: SerializedError;
     };
-export const sendDtmfActiveCall = createTypedAsyncThunk<
+export const sendDigitsActiveCall = createTypedAsyncThunk<
   void,
-  { id: string; dtmf: string },
-  { rejectValue: SendDtmfRejectValue }
->(sendDtmfActionType.prefix, async ({ id, dtmf }, { rejectWithValue }) => {
+  { id: string; digits: string },
+  { rejectValue: SendDigitsRejectValue }
+>(sendDigitsActionType.prefix, async ({ id, digits }, { rejectWithValue }) => {
   const call = callMap.get(id);
   if (typeof call === 'undefined') {
     return rejectWithValue({ reason: 'CALL_ID_NOT_FOUND' });
   }
 
-  const sendDtmfResult = await settlePromise(call.sendDigits(dtmf));
-  if (sendDtmfResult.status === 'rejected') {
+  const sendDigitsResult = await settlePromise(call.sendDigits(digits));
+  if (sendDigitsResult.status === 'rejected') {
     return rejectWithValue({
       reason: 'NATIVE_MODULE_REJECTED',
-      error: miniSerializeError(sendDtmfResult.reason),
+      error: miniSerializeError(sendDigitsResult.reason),
     });
   }
 });
@@ -233,7 +233,7 @@ export const activeCallSlice = createSlice({
                 disconnect: { status: 'idle' },
                 hold: { status: 'idle' },
                 mute: { status: 'idle' },
-                sendDtmf: { status: 'idle' },
+                sendDigits: { status: 'idle' },
               },
               direction,
               id: requestId,
@@ -300,7 +300,7 @@ export const activeCallSlice = createSlice({
               disconnect: { status: 'idle' },
               hold: { status: 'idle' },
               mute: { status: 'idle' },
-              sendDtmf: { status: 'idle' },
+              sendDigits: { status: 'idle' },
             },
             direction,
             id: arg.id,
@@ -334,7 +334,7 @@ export const activeCallSlice = createSlice({
         [disconnectActiveCall, 'disconnect'],
         [holdActiveCall, 'hold'],
         [muteActiveCall, 'mute'],
-        [sendDtmfActiveCall, 'sendDtmf'],
+        [sendDigitsActiveCall, 'sendDigits'],
       ] as const
     ).forEach(([thunk, sliceKey]) => {
       builder.addCase(thunk.pending, (state, action) => {
