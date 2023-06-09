@@ -7,7 +7,7 @@ import {
   type ActiveCall,
   disconnectActiveCall,
   muteActiveCall,
-  sendDtmfActiveCall,
+  sendDigitsActiveCall,
 } from '../../store/voice/call/activeCall';
 import {
   type AudioDeviceInfo,
@@ -39,7 +39,7 @@ const useDialpad = (
       match<typeof activeCall, [(s: string) => void, boolean]>(activeCall)
         .with({ info: { state: 'connected' } }, (c) => [
           (dialpadInput: string) => {
-            dispatch(sendDtmfActiveCall({ id: c.id, dtmf: dialpadInput }));
+            dispatch(sendDigitsActiveCall({ id: c.id, digits: dialpadInput }));
           },
           false,
         ])
@@ -67,7 +67,7 @@ const useMute = (
           const isMuted = Boolean(c.info.isMuted);
           return [
             () => {
-              dispatch(muteActiveCall({ id: c.id, mute: !isMuted }));
+              dispatch(muteActiveCall({ id: c.id, shouldMute: !isMuted }));
             },
             false,
             isMuted,

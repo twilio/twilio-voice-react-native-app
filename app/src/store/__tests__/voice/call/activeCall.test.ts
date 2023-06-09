@@ -147,7 +147,10 @@ describe('store', () => {
       describe('hold', () => {
         it('rejects when the id is not in the call map', async () => {
           const holdPromise = await store.dispatch(
-            activeCall.holdActiveCall({ id: 'not a real id', hold: true }),
+            activeCall.holdActiveCall({
+              id: 'not a real id',
+              shouldHold: true,
+            }),
           );
 
           expect(activeCall.holdActiveCall.rejected.match(holdPromise)).toBe(
@@ -163,7 +166,7 @@ describe('store', () => {
           const defer = deferNative(call, 'hold');
 
           const holdPromise = store.dispatch(
-            activeCall.holdActiveCall({ id, hold: true }),
+            activeCall.holdActiveCall({ id, shouldHold: true }),
           );
 
           match(store.getState().voice.call.activeCall.entities[id])
@@ -187,7 +190,7 @@ describe('store', () => {
           const defer = deferNative(call, 'hold');
 
           const holdPromise = store.dispatch(
-            activeCall.holdActiveCall({ id, hold: true }),
+            activeCall.holdActiveCall({ id, shouldHold: true }),
           );
 
           match(store.getState().voice.call.activeCall.entities[id])
@@ -212,7 +215,10 @@ describe('store', () => {
       describe('mute', () => {
         it('rejects when the id is not in the call map', async () => {
           const mutePromise = await store.dispatch(
-            activeCall.muteActiveCall({ id: 'not a real id', mute: true }),
+            activeCall.muteActiveCall({
+              id: 'not a real id',
+              shouldMute: true,
+            }),
           );
 
           expect(activeCall.muteActiveCall.rejected.match(mutePromise)).toBe(
@@ -228,7 +234,7 @@ describe('store', () => {
           const defer = deferNative(call, 'mute');
 
           const mutePromise = store.dispatch(
-            activeCall.muteActiveCall({ id, mute: true }),
+            activeCall.muteActiveCall({ id, shouldMute: true }),
           );
 
           match(store.getState().voice.call.activeCall.entities[id])
@@ -252,7 +258,7 @@ describe('store', () => {
           const defer = deferNative(call, 'mute');
 
           const mutePromise = store.dispatch(
-            activeCall.muteActiveCall({ id, mute: true }),
+            activeCall.muteActiveCall({ id, shouldMute: true }),
           );
 
           match(store.getState().voice.call.activeCall.entities[id])
@@ -277,14 +283,14 @@ describe('store', () => {
       describe('sendDtmf', () => {
         it('rejects when the id is not in the call map', async () => {
           const sendDtmfPromise = await store.dispatch(
-            activeCall.sendDtmfActiveCall({
+            activeCall.sendDigitsActiveCall({
               id: 'not a real id',
-              dtmf: '1234',
+              digits: '1234',
             }),
           );
 
           expect(
-            activeCall.sendDtmfActiveCall.rejected.match(sendDtmfPromise),
+            activeCall.sendDigitsActiveCall.rejected.match(sendDtmfPromise),
           ).toBe(true);
 
           expect(store.getState().voice.call.activeCall.ids).not.toContain(
@@ -296,23 +302,23 @@ describe('store', () => {
           const defer = deferNative(call, 'sendDigits');
 
           const disconnectPromise = store.dispatch(
-            activeCall.sendDtmfActiveCall({ id, dtmf: '1234' }),
+            activeCall.sendDigitsActiveCall({ id, digits: '1234' }),
           );
 
           match(store.getState().voice.call.activeCall.entities[id])
-            .with({ action: { sendDtmf: { status: 'pending' } } }, () => {})
+            .with({ action: { sendDigits: { status: 'pending' } } }, () => {})
             .run();
 
           defer.reject();
           await disconnectPromise;
 
           match(store.getState().voice.call.activeCall.entities[id])
-            .with({ action: { sendDtmf: { status: 'rejected' } } }, () => {})
+            .with({ action: { sendDigits: { status: 'rejected' } } }, () => {})
             .run();
 
           matchDispatchedActions(dispatchedActions, [
-            activeCall.sendDtmfActiveCall.pending,
-            activeCall.sendDtmfActiveCall.rejected,
+            activeCall.sendDigitsActiveCall.pending,
+            activeCall.sendDigitsActiveCall.rejected,
           ]);
         });
 
@@ -320,23 +326,23 @@ describe('store', () => {
           const defer = deferNative(call, 'sendDigits');
 
           const disconnectPromise = store.dispatch(
-            activeCall.sendDtmfActiveCall({ id, dtmf: '1234' }),
+            activeCall.sendDigitsActiveCall({ id, digits: '1234' }),
           );
 
           match(store.getState().voice.call.activeCall.entities[id])
-            .with({ action: { sendDtmf: { status: 'pending' } } }, () => {})
+            .with({ action: { sendDigits: { status: 'pending' } } }, () => {})
             .run();
 
           defer.resolve();
           await disconnectPromise;
 
           match(store.getState().voice.call.activeCall.entities[id])
-            .with({ action: { sendDtmf: { status: 'fulfilled' } } }, () => {})
+            .with({ action: { sendDigits: { status: 'fulfilled' } } }, () => {})
             .run();
 
           matchDispatchedActions(dispatchedActions, [
-            activeCall.sendDtmfActiveCall.pending,
-            activeCall.sendDtmfActiveCall.fulfilled,
+            activeCall.sendDigitsActiveCall.pending,
+            activeCall.sendDigitsActiveCall.fulfilled,
           ]);
         });
       });
