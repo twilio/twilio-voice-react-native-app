@@ -128,5 +128,5 @@ export const bootstrapCalls = createTypedAsyncThunk<
     });
   }
 
-  // TODO(mhuynh): Dispatch the existing calls to the application state.
+  // TODO(mhuynh): [VBLOCKS-1676] Dispatch the existing calls to the application state.
 });
