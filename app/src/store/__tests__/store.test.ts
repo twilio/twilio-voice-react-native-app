@@ -75,5 +75,5 @@ it('should make an outgoing call and mute it', async () => {
   });
   await store.dispatch(makeOutgoingCallAction);
 
-  // TODO
+  // TODO(mhuynh): perform actions on the call
 });
