@@ -4,6 +4,7 @@ import { createStore, type Store } from '../../../app';
 import {
   acceptCallInvite,
   receiveCallInvite,
+  removeCallInvite,
   rejectCallInvite,
   setCallInvite,
 } from '../../../voice/call/callInvite';
@@ -181,6 +182,7 @@ describe('store', () => {
           matchDispatchedActions(dispatchedActions, [
             acceptCallInvite.pending,
             setCallInvite,
+            removeCallInvite,
             acceptCallInvite.fulfilled,
           ]);
         });
@@ -273,6 +275,7 @@ describe('store', () => {
           matchDispatchedActions(dispatchedActions, [
             rejectCallInvite.pending,
             setCallInvite,
+            removeCallInvite,
             rejectCallInvite.fulfilled,
           ]);
         });
