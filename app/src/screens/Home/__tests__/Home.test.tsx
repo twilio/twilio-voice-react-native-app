@@ -2,10 +2,9 @@ import '@testing-library/jest-native/extend-expect';
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';
 import { Provider } from 'react-redux';
+import configureStore from 'redux-mock-store';
 import Home from '..';
 import { createStore } from '../../../store/app';
-
-import configureStore from 'redux-mock-store';
 
 describe('<Home />', () => {
   let wrapper: React.ComponentType<any>;
