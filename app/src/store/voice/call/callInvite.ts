@@ -101,7 +101,7 @@ export const acceptCallInvite = createTypedAsyncThunk<
       });
     }
 
-    // dispatch(removeCallInvite(id));
+    dispatch(removeCallInvite(id));
 
     const call = acceptResult.value;
     const callInfo = getCallInfo(call);
@@ -167,7 +167,7 @@ export const rejectCallInvite = createTypedAsyncThunk<
       });
     }
 
-    // dispatch(removeCallInvite(id));
+    dispatch(removeCallInvite(id));
   },
 );
 
