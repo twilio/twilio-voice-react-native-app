@@ -176,7 +176,7 @@ describe('store', () => {
 
           expect(
             store.getState().voice.call.callInvite.entities[id],
-          ).toBeDefined();
+          ).toBeUndefined();
 
           matchDispatchedActions(dispatchedActions, [
             acceptCallInvite.pending,
@@ -268,7 +268,7 @@ describe('store', () => {
 
           expect(
             store.getState().voice.call.callInvite.entities[id],
-          ).toBeDefined();
+          ).toBeUndefined();
 
           matchDispatchedActions(dispatchedActions, [
             rejectCallInvite.pending,
