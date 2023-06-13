@@ -3,7 +3,7 @@ import { createStore, Store } from '../app';
 import { bootstrapUser, bootstrapCallInvites } from '../bootstrap';
 import { checkLoginStatus } from '../user';
 import { getAccessToken } from '../voice/accessToken';
-import { setCallInvite } from '../voice/call/callInvite';
+import { receiveCallInvite, setCallInvite } from '../voice/call/callInvite';
 import { register } from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
@@ -187,8 +187,12 @@ describe('bootstrap', () => {
 
       matchDispatchedActions(dispatchedActions, [
         bootstrapCallInvites.pending,
+        receiveCallInvite.pending,
         setCallInvite,
+        receiveCallInvite.pending,
         setCallInvite,
+        receiveCallInvite.fulfilled,
+        receiveCallInvite.fulfilled,
         bootstrapCallInvites.fulfilled,
       ]);
     });

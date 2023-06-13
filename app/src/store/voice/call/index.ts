@@ -1,11 +1,8 @@
-import { combineReducers } from '@reduxjs/toolkit';
 import {
   type Call as TwilioCall,
   type CallInvite as TwilioCallInvite,
   type CustomParameters,
 } from '@twilio/voice-react-native-sdk';
-import { activeCallSlice } from './activeCall';
-import { callInviteSlice } from './callInvite';
 import { type AsyncStoreSlice } from '../../app';
 
 export type RecipientType = 'client' | 'number';
@@ -98,8 +95,3 @@ export type OutgoingCall = {
   recipientType: RecipientType;
   to: string;
 } & BaseCall;
-
-export const callReducer = combineReducers({
-  [activeCallSlice.name]: activeCallSlice.reducer,
-  [callInviteSlice.name]: callInviteSlice.reducer,
-});
