@@ -1,21 +1,48 @@
 import React from 'react';
-import { type Props as RemoteParticipantProps } from '../../components/Call/RemoteParticipant';
-
-export const useIncomingRemoteParticipant = () => {
-  const [title] = React.useState<string>('foo');
-
-  return {
-    subtitle: 'Incoming Call',
-    title,
-  };
-};
+import { useSelector } from 'react-redux';
+import { type State } from '../../store/app';
+import { useTypedDispatch } from '../../store/common';
+import {
+  acceptCallInvite,
+  type CallInviteEntity,
+  rejectCallInvite,
+} from '../../store/voice/call/callInvite';
 
 type HookReturnValue = {
-  remoteParticipant: RemoteParticipantProps;
+  callInviteEntity?: CallInviteEntity;
+  handleAccept: () => Promise<void>;
+  handleReject: () => Promise<void>;
 };
 
-export const useIncomingCall = (): HookReturnValue => {
+export const useCallInvite = (): HookReturnValue => {
+  const dispatch = useTypedDispatch();
+
+  // Get the first incoming call invite.
+  const callInviteEntity: CallInviteEntity | undefined = useSelector(
+    (state: State) => {
+      if (state.voice.call.callInvite.ids.length === 0) {
+        return undefined;
+      }
+      const [id] = state.voice.call.callInvite.ids;
+      return state.voice.call.callInvite.entities[id];
+    },
+  );
+
+  const handleAccept = React.useCallback(async () => {
+    if (callInviteEntity?.id) {
+      await dispatch(acceptCallInvite({ id: callInviteEntity.id }));
+    }
+  }, [callInviteEntity, dispatch]);
+
+  const handleReject = React.useCallback(async () => {
+    if (callInviteEntity?.id) {
+      await dispatch(rejectCallInvite({ id: callInviteEntity.id }));
+    }
+  }, [callInviteEntity, dispatch]);
+
   return {
-    remoteParticipant: useIncomingRemoteParticipant(),
+    callInviteEntity,
+    handleAccept,
+    handleReject,
   };
 };

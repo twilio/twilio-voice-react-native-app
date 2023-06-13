@@ -1,17 +1,14 @@
-import {
-  miniSerializeError,
-  nanoid,
-  type SerializedError,
-} from '@reduxjs/toolkit';
+import { miniSerializeError, type SerializedError } from '@reduxjs/toolkit';
 import { Voice, CallInvite } from '@twilio/voice-react-native-sdk';
 import { createTypedAsyncThunk, generateThunkActionTypes } from './common';
 import { checkLoginStatus } from './user';
 import { getAccessToken } from './voice/accessToken';
-import { getCallInviteInfo } from './voice/call';
-import { setCallInvite } from './voice/call/callInvite';
+import { receiveCallInvite } from './voice/call/callInvite';
 import { register } from './voice/registration';
+import { navigate } from '../util/navigation';
 import { settlePromise } from '../util/settlePromise';
-import { callInviteMap, voice } from '../util/voice';
+import { voice } from '../util/voice';
+import { StackParamList } from '../screens/types';
 
 /**
  * Bootstrap user action. Gets the login-state of the user, and if logged in
@@ -70,17 +67,8 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 >(
   bootstrapCallInvitesActionTypes.prefix,
   async (_, { dispatch, rejectWithValue }) => {
-    const handleCallInvite = (callInvite: CallInvite) => {
-      const callInviteInfo = getCallInviteInfo(callInvite);
-      const id = nanoid();
-      callInviteMap.set(id, callInvite);
-      dispatch(
-        setCallInvite({
-          id,
-          info: callInviteInfo,
-          status: 'idle',
-        }),
-      );
+    const handleCallInvite = async (callInvite: CallInvite) => {
+      await dispatch(receiveCallInvite(callInvite));
     };
 
     voice.on(Voice.Event.CallInvite, handleCallInvite);
@@ -128,5 +116,34 @@ export const bootstrapCalls = createTypedAsyncThunk<
     });
   }
 
-  // TODO(mhuynh): [VBLOCKS-1676] Dispatch the existing calls to the application state.
+  // TODO(mhuynh): [VBLOCKS-1676] Dispatch the existing calls to the application
+  // state.
 });
+
+/**
+ * Bootstrap proper screen. Navigate to the proper screen depending on
+ * application state.
+ *
+ * For example, navigate to the call invite screen when there are call invites.
+ */
+export const bootstrapNavigationActionTypes = generateThunkActionTypes(
+  'bootstrap/navigation',
+);
+export const bootstrapNavigation = createTypedAsyncThunk<keyof StackParamList>(
+  bootstrapNavigationActionTypes.prefix,
+  (_, { getState }) => {
+    const state = getState();
+
+    if (state.voice.call.callInvite.ids.length) {
+      navigate('Incoming Call');
+      return 'Incoming Call';
+    }
+
+    if (state.voice.call.activeCall.ids.length) {
+      navigate('Call');
+      return 'Call';
+    }
+
+    return 'App';
+  },
+);

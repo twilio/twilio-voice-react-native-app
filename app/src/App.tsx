@@ -1,9 +1,14 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { defaultStore } from './store/app';
 import StackNavigator from './screens/StackNavigator';
-import { bootstrapUser } from './store/bootstrap';
+import { defaultStore } from './store/app';
+import {
+  bootstrapCallInvites,
+  bootstrapUser,
+  bootstrapNavigation,
+} from './store/bootstrap';
+import { navigationRef } from './util/navigation';
 
 const App = () => {
   /**
@@ -17,11 +22,19 @@ const App = () => {
    * then the `abort` functions are called so the `bootstrap` actions can no
    * longer dispatch actions.
    */
-  React.useEffect(() => defaultStore.dispatch(bootstrapUser()).abort, []);
+  React.useEffect(() => {
+    const effect = async () => {
+      await defaultStore.dispatch(bootstrapUser());
+      await defaultStore.dispatch(bootstrapCallInvites());
+      await defaultStore.dispatch(bootstrapNavigation());
+    };
+
+    effect();
+  }, []);
 
   return (
     <Provider store={defaultStore}>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <StackNavigator />
       </NavigationContainer>
     </Provider>
