@@ -4,4 +4,4 @@
 * Upgrade React Native from `0.70.6` to `0.70.9`.
   * Potentially fixes iOS builds for newer versions of Xcode.
 * Added e2e tests for outgoing calls
-* Added Unit Tests for store and screens
+* Added unit tests for store and screens
