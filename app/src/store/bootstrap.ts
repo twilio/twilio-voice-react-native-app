@@ -15,7 +15,7 @@ type BootstrapAppRejectValue =
       reason: 'REGISTER_REJECTED';
     };
 
-type BootstrapAppFulfillValue = 'NOT_LOGGED_IN' | 'LOGGED_IN';
+type BootstrapAppFulfillValue = 'LOGGED_IN';
 
 export const bootstrapApp = createAsyncThunk<
   BootstrapAppFulfillValue,
@@ -28,11 +28,6 @@ export const bootstrapApp = createAsyncThunk<
   const checkLoginStatusResult = await dispatch(checkLoginStatus());
   if (checkLoginStatus.rejected.match(checkLoginStatusResult)) {
     return rejectWithValue({ reason: 'CHECK_LOGIN_STATUS_REJECTED' });
-  }
-
-  const { accessToken, email } = checkLoginStatusResult.payload;
-  if (accessToken === '' || email === '') {
-    return 'NOT_LOGGED_IN';
   }
 
   const getAccessTokenResult = await dispatch(getAccessToken());

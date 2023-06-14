@@ -68,7 +68,8 @@ describe('user store', () => {
     await store.dispatch(auth.checkLoginStatus());
     const userState = store.getState().voice.user;
     expect(userState).toEqual({
-      status: 'fulfilled',
+      status: 'rejected',
+      reason: 'NOT_LOGGED_IN',
       accessToken: '',
       email: '',
     });
