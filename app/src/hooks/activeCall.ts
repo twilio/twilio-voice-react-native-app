@@ -110,19 +110,25 @@ export const useActiveCallTime = (
   );
 
   React.useEffect(() => {
-    let timeoutId: number | null;
-    let animationFrameId: number | null;
+    let timeoutId: number | null = null;
+    let animationFrameId: number | null = null;
     let doneAnimating: boolean = false;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(() => {
         match(activeCall)
-          .with({ initialConnectTimestamp: P.not(undefined) }, (c) => {
-            setActiveCallTimeMs(Date.now() - c.initialConnectTimestamp);
-            if (!doneAnimating) {
-              timeoutId = setTimeout(animate, timeIntervalUpdatesMs);
-            }
-          })
+          .with(
+            {
+              initialConnectTimestamp: P.not(undefined),
+              info: { state: P.not('disconnected') },
+            },
+            (c) => {
+              setActiveCallTimeMs(Date.now() - c.initialConnectTimestamp);
+              if (!doneAnimating) {
+                timeoutId = setTimeout(animate, timeIntervalUpdatesMs);
+              }
+            },
+          )
           .otherwise(() => {});
       });
     };
