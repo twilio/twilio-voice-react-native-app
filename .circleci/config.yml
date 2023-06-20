@@ -262,7 +262,7 @@ jobs:
   app-detox-android:
     executor:
       name: android/android-machine
-      resource-class: large
+      resource-class: 2xlarge
       tag: 2023.02.1
     steps:
       - checkout
@@ -281,9 +281,14 @@ jobs:
           system-image: system-images;android-29;google_apis;x86_64
       - android/start-emulator:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
+          memory: 8192
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
       - app-expose-port
+      - run:
+          name: "Wait for emulator to settle"
+          command: |
+            sleep 300
       - app-detox-test:
           configuration: android.emu.release
 
