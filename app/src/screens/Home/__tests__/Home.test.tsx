@@ -23,11 +23,9 @@ describe('<Home />', () => {
   it('should display the user', () => {
     const mockStore = configureStore();
     const initialState = {
-      voice: {
-        user: {
-          status: 'fulfilled',
-          email: 'vblocks@gmail.com',
-        },
+      user: {
+        status: 'fulfilled',
+        email: 'vblocks@gmail.com',
       },
     };
     const store = mockStore(initialState);
