@@ -1,9 +1,14 @@
 import { miniSerializeError, type SerializedError } from '@reduxjs/toolkit';
-import { Voice, CallInvite } from '@twilio/voice-react-native-sdk';
+import {
+  Voice,
+  Call as TwilioCall,
+  CallInvite as TwilioCallInvite,
+} from '@twilio/voice-react-native-sdk';
 import { createTypedAsyncThunk, generateThunkActionTypes } from './common';
 import { checkLoginStatus } from './user';
 import { getAccessToken } from './voice/accessToken';
-import { receiveCallInvite } from './voice/call/callInvite';
+import { handleCall } from './voice/call/activeCall';
+import { receiveCallInvite, removeCallInvite } from './voice/call/callInvite';
 import { register } from './voice/registration';
 import { navigate } from '../util/navigation';
 import { settlePromise } from '../util/settlePromise';
@@ -67,7 +72,7 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 >(
   bootstrapCallInvitesActionTypes.prefix,
   async (_, { dispatch, rejectWithValue }) => {
-    const handleCallInvite = async (callInvite: CallInvite) => {
+    const handleCallInvite = async (callInvite: TwilioCallInvite) => {
       await dispatch(receiveCallInvite(callInvite));
     };
 
@@ -106,19 +111,85 @@ export const bootstrapCalls = createTypedAsyncThunk<
   void,
   void,
   { rejectValue: BootstrapCallsRejectValue }
->(bootstrapCallsActionTypes.prefix, async (_, { rejectWithValue }) => {
-  const callsResult = await settlePromise(voice.getCalls());
+>(
+  bootstrapCallsActionTypes.prefix,
+  async (_, { dispatch, getState, rejectWithValue }) => {
+    // TODO(mhuynh): consider placing this logic somewhere else
+    voice.on(
+      Voice.Event.CallInviteAccepted,
+      (callInvite: TwilioCallInvite, call: TwilioCall) => {
+        // dispatch the new call
+        dispatch(handleCall({ call }));
 
-  if (callsResult.status === 'rejected') {
-    return rejectWithValue({
-      reason: 'NATIVE_MODULE_REJECTED',
-      error: miniSerializeError(callsResult.reason),
+        // invalidate the existing call invite if it exists
+        const callInvites = getState().voice.call.callInvite.entities;
+        const callInviteEntity = Object.entries(callInvites).find(([__, e]) => {
+          if (typeof e === 'undefined') {
+            return false;
+          }
+          return e.info.callSid === callInvite.getCallSid();
+        });
+        if (typeof callInviteEntity === 'undefined') {
+          return;
+        }
+        const [id] = callInviteEntity;
+        dispatch(removeCallInvite(id));
+        navigate('Call');
+      },
+    );
+
+    voice.on(Voice.Event.CallInviteRejected, (callInvite: TwilioCallInvite) => {
+      // invalidate the existing call invite if it exists
+      const callInvites = getState().voice.call.callInvite.entities;
+      const callInviteEntity = Object.entries(callInvites).find(([__, e]) => {
+        if (typeof e === 'undefined') {
+          return false;
+        }
+        return e.info.callSid === callInvite.getCallSid();
+      });
+      if (typeof callInviteEntity === 'undefined') {
+        return;
+      }
+      const [id] = callInviteEntity;
+      dispatch(removeCallInvite(id));
+      navigate('App');
     });
-  }
 
-  // TODO(mhuynh): [VBLOCKS-1676] Dispatch the existing calls to the application
-  // state.
-});
+    voice.on(
+      Voice.Event.CancelledCallInvite,
+      (callInvite: TwilioCallInvite) => {
+        // invalidate the existing call invite if it exists
+        const callInvites = getState().voice.call.callInvite.entities;
+        const callInviteEntity = Object.entries(callInvites).find(([__, e]) => {
+          if (typeof e === 'undefined') {
+            return false;
+          }
+          return e.info.callSid === callInvite.getCallSid();
+        });
+        if (typeof callInviteEntity === 'undefined') {
+          return;
+        }
+        const [id] = callInviteEntity;
+        dispatch(removeCallInvite(id));
+        navigate('App');
+      },
+    );
+
+    const callsResult = await settlePromise(voice.getCalls());
+    if (callsResult.status === 'rejected') {
+      return rejectWithValue({
+        reason: 'NATIVE_MODULE_REJECTED',
+        error: miniSerializeError(callsResult.reason),
+      });
+    }
+
+    const calls = callsResult.value;
+    for (const call of calls.values()) {
+      console.log(call);
+      await dispatch(handleCall({ call }));
+    }
+  },
+);
 
 /**
  * Bootstrap proper screen. Navigate to the proper screen depending on
@@ -144,6 +215,7 @@ export const bootstrapNavigation = createTypedAsyncThunk<keyof StackParamList>(
       return 'Call';
     }
 
+    navigate('App');
     return 'App';
   },
 );

@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import StackNavigator from './screens/StackNavigator';
 import { defaultStore } from './store/app';
 import {
+  bootstrapCalls,
   bootstrapCallInvites,
   bootstrapUser,
   bootstrapNavigation,
@@ -25,6 +26,7 @@ const App = () => {
   React.useEffect(() => {
     const effect = async () => {
       await defaultStore.dispatch(bootstrapUser());
+      await defaultStore.dispatch(bootstrapCalls());
       await defaultStore.dispatch(bootstrapCallInvites());
       await defaultStore.dispatch(bootstrapNavigation());
     };

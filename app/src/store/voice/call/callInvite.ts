@@ -202,6 +202,8 @@ export const rejectCallInvite = createTypedAsyncThunk<
     }
 
     dispatch(removeCallInvite(id));
+
+    navigate('App');
   },
 );
 
