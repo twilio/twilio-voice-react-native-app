@@ -1,13 +1,16 @@
 import { AudioDevice as TwilioAudioDevice } from '@twilio/voice-react-native-sdk';
 import React from 'react';
-import { useTypedDispatch } from '../../store/app';
+import { match, P } from 'ts-pattern';
+import { type Dispatch } from '../../store/app';
+import { useTypedDispatch } from '../../store/common';
 import {
   type ActiveCall,
   disconnectActiveCall,
   muteActiveCall,
-  sendDtmfActiveCall,
+  sendDigitsActiveCall,
 } from '../../store/voice/call/activeCall';
 import {
+  type AudioDeviceInfo,
   type AudioDevicesState,
   getAudioDevices,
   selectAudioDevice,
@@ -15,7 +18,7 @@ import {
 import {
   useActiveCall,
   useActiveCallRemoteParticipant,
-  useActiveCallStatus,
+  useActiveCallDuration,
 } from '../../hooks/activeCall';
 import { useAudioDevices } from '../../hooks/audioDevices';
 
@@ -26,27 +29,23 @@ import { useAudioDevices } from '../../hooks/audioDevices';
  * @returns - Handlers and state for the dialpad.
  */
 const useDialpad = (
-  activeCall: ActiveCall,
+  activeCall: ActiveCall | undefined,
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
   const [isVisible, setIsVisible] = React.useState<boolean>(false);
 
-  const [handle, isDisabled] = React.useMemo(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return [undefined, true];
-    }
-
-    if (activeCall.callInfo.state === 'disconnected') {
-      return [undefined, true];
-    }
-
-    return [
-      (dialpadInput: string) => {
-        dispatch(sendDtmfActiveCall({ dtmf: dialpadInput }));
-      },
-      false,
-    ];
-  }, [dispatch, activeCall]);
+  const [handle, isDisabled] = React.useMemo(
+    () =>
+      match<typeof activeCall, [(s: string) => void, boolean]>(activeCall)
+        .with({ info: { state: 'connected' } }, (c) => [
+          (dialpadInput: string) => {
+            dispatch(sendDigitsActiveCall({ id: c.id, digits: dialpadInput }));
+          },
+          false,
+        ])
+        .otherwise(() => [() => {}, true]),
+    [dispatch, activeCall],
+  );
 
   return { handle, isDisabled, isVisible, setIsVisible };
 };
@@ -58,25 +57,25 @@ const useDialpad = (
  * @returns - Handlers and state for the mute button.
  */
 const useMute = (
-  activeCall: ActiveCall,
+  activeCall: ActiveCall | undefined,
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
-  const [handle, isDisabled, isActive] = React.useMemo(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return [undefined, true, false];
-    }
-
-    if (activeCall.callInfo.state === 'disconnected') {
-      return [undefined, true, false];
-    }
-
-    const isMuted = activeCall.callInfo.isMuted;
-    if (typeof isMuted === 'undefined') {
-      return [undefined, true, false];
-    }
-
-    return [() => dispatch(muteActiveCall({ mute: !isMuted })), false, isMuted];
-  }, [dispatch, activeCall]);
+  const [handle, isDisabled, isActive] = React.useMemo(
+    () =>
+      match<typeof activeCall, [() => void, boolean, boolean]>(activeCall)
+        .with({ info: { state: 'connected' } }, (c) => {
+          const isMuted = Boolean(c.info.isMuted);
+          return [
+            () => {
+              dispatch(muteActiveCall({ id: c.id, shouldMute: !isMuted }));
+            },
+            false,
+            isMuted,
+          ];
+        })
+        .otherwise(() => [() => {}, true, false]),
+    [dispatch, activeCall],
+  );
 
   return { handle, isActive, isDisabled };
 };
@@ -88,22 +87,65 @@ const useMute = (
  * @returns - Handlers and state for the hangup button.
  */
 const useHangup = (
-  activeCall: ActiveCall,
+  activeCall: ActiveCall | undefined,
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
-  const [handle, isDisabled] = React.useMemo(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return [undefined, true];
-    }
-
-    if (activeCall.callInfo.state === 'disconnected') {
-      return [undefined, true];
-    }
-
-    return [() => dispatch(disconnectActiveCall()), false];
-  }, [dispatch, activeCall]);
+  const [handle, isDisabled] = React.useMemo(
+    () =>
+      match<typeof activeCall, [() => void, boolean]>(activeCall)
+        .with({ info: { state: P.not('disconnected') } }, (c) => [
+          () => {
+            dispatch(disconnectActiveCall({ id: c.id }));
+          },
+          false,
+        ])
+        .otherwise(() => [() => {}, true]),
+    [dispatch, activeCall],
+  );
 
   return { handle, isDisabled };
+};
+
+const matchOnAudioDevices = (
+  audioDevices: AudioDeviceInfo[],
+  selectedDevice: AudioDeviceInfo | null,
+  dispatch: Dispatch,
+) => {
+  const earpieceDevice = audioDevices.find(
+    (dev) => dev.type === TwilioAudioDevice.Type.Earpiece,
+  );
+
+  const speakerDevice = audioDevices.find(
+    (dev) => dev.type === TwilioAudioDevice.Type.Speaker,
+  );
+
+  return match<
+    [typeof earpieceDevice, typeof speakerDevice, typeof selectedDevice],
+    [() => void, boolean, boolean]
+  >([earpieceDevice, speakerDevice, selectedDevice])
+    .with(
+      [P.not(undefined), P._, null],
+      [P.not(undefined), P._, { type: TwilioAudioDevice.Type.Speaker }],
+      ([{ uuid }]) => [
+        () => {
+          dispatch(selectAudioDevice({ audioDeviceUuid: uuid }));
+        },
+        false,
+        true,
+      ],
+    )
+    .with(
+      [P._, P.not(undefined), null],
+      [P._, P.not(undefined), { type: TwilioAudioDevice.Type.Earpiece }],
+      ([_, { uuid }]) => [
+        () => {
+          dispatch(selectAudioDevice({ audioDeviceUuid: uuid }));
+        },
+        false,
+        false,
+      ],
+    )
+    .otherwise(() => [() => {}, true, false]);
 };
 
 /**
@@ -114,82 +156,24 @@ const useHangup = (
  * @returns - Handlers and state for the audio device selection button.
  */
 const useSelectAudioOutputDevice = (
-  activeCall: ActiveCall,
+  activeCall: ActiveCall | undefined,
   audioDevices: AudioDevicesState,
   dispatch: ReturnType<typeof useTypedDispatch>,
 ) => {
-  const [handle, isDisabled, isActive] = React.useMemo(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return [undefined, true, false];
-    }
-
-    if (activeCall.callInfo.state === 'disconnected') {
-      return [undefined, true, false];
-    }
-
-    if (audioDevices?.status !== 'fulfilled') {
-      return [undefined, true, false];
-    }
-
-    const earpieceDevice = audioDevices.audioDevices.find(
-      (dev) => dev.type === TwilioAudioDevice.Type.Earpiece,
-    );
-
-    const speakerDevice = audioDevices.audioDevices.find(
-      (dev) => dev.type === TwilioAudioDevice.Type.Speaker,
-    );
-
-    if (
-      typeof earpieceDevice === 'undefined' ||
-      typeof speakerDevice === 'undefined'
-    ) {
-      return [undefined, true, false];
-    }
-
-    if (audioDevices.selectedDevice === null) {
-      return [
-        () =>
-          dispatch(selectAudioDevice({ audioDeviceUuid: earpieceDevice.uuid })),
-        false,
-        false,
-      ];
-    }
-
-    if (audioDevices.selectedDevice.type === TwilioAudioDevice.Type.Speaker) {
-      return [
-        () =>
-          dispatch(selectAudioDevice({ audioDeviceUuid: earpieceDevice.uuid })),
-        false,
-        false,
-      ];
-    }
-
-    if (audioDevices.selectedDevice.type === TwilioAudioDevice.Type.Earpiece) {
-      return [
-        () =>
-          dispatch(selectAudioDevice({ audioDeviceUuid: speakerDevice.uuid })),
-        false,
-        true,
-      ];
-    }
-
-    return [undefined, false, false];
-  }, [dispatch, audioDevices, activeCall]);
-
-  /**
-   * Refresh the list of audio devices when the call screen is mounted.
-   */
-  React.useEffect(() => {
-    const getAudioDevicesEffect = async () => {
-      const getAudioDevicesAction = await dispatch(getAudioDevices());
-      if (getAudioDevices.rejected.match(getAudioDevicesAction)) {
-        console.error(
-          getAudioDevicesAction.payload || getAudioDevicesAction.error,
-        );
-      }
-    };
-    getAudioDevicesEffect();
-  }, [dispatch]);
+  const [handle, isDisabled, isActive] = React.useMemo(
+    () =>
+      match<
+        [typeof activeCall, typeof audioDevices],
+        [() => void, boolean, boolean]
+      >([activeCall, audioDevices])
+        .with(
+          [{ info: { state: 'connected' } }, { status: 'fulfilled' }],
+          ([_, au]) =>
+            matchOnAudioDevices(au.audioDevices, au.selectedDevice, dispatch),
+        )
+        .otherwise(() => [() => {}, false, false]),
+    [dispatch, audioDevices, activeCall],
+  );
 
   return { handle, isActive, isDisabled };
 };
@@ -206,7 +190,22 @@ const useActiveCallScreen = () => {
 
   const activeCall = useActiveCall();
   const remoteParticipant = useActiveCallRemoteParticipant(activeCall);
-  const callStatus = useActiveCallStatus(activeCall);
+  const callStatus = useActiveCallDuration(activeCall);
+
+  /**
+   * Refresh the list of audio devices when the call screen is mounted.
+   */
+  React.useEffect(() => {
+    const getAudioDevicesEffect = async () => {
+      const getAudioDevicesAction = await dispatch(getAudioDevices());
+      if (getAudioDevices.rejected.match(getAudioDevicesAction)) {
+        console.error(
+          getAudioDevicesAction.payload || getAudioDevicesAction.error,
+        );
+      }
+    };
+    getAudioDevicesEffect();
+  }, [dispatch]);
 
   return {
     button: {

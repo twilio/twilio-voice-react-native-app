@@ -1,6 +1,6 @@
-import { configureStore, Middleware } from '@reduxjs/toolkit';
-import { useDispatch } from 'react-redux';
+import { configureStore, type Middleware } from '@reduxjs/toolkit';
 import { voiceReducer } from './voice';
+import { userSlice } from './user';
 
 export const logActionType: Middleware = () => (next) => (action) => {
   console.log(
@@ -15,6 +15,7 @@ export const logActionType: Middleware = () => (next) => (action) => {
 export const createStore = (...middlewares: Middleware[]) =>
   configureStore({
     reducer: {
+      [userSlice.name]: userSlice.reducer,
       voice: voiceReducer,
     },
     middleware(getDefaultMiddleware) {
@@ -22,16 +23,16 @@ export const createStore = (...middlewares: Middleware[]) =>
     },
   });
 
+export const defaultStore = createStore(logActionType);
+
 export type Store = ReturnType<typeof createStore>;
 
 export type State = ReturnType<Store['getState']>;
 
 export type Dispatch = Store['dispatch'];
 
-export type AsyncStoreSlice<R = {}, S = {}, T = {}> =
-  | null
+export type AsyncStoreSlice<R = {}, S = {}, T = {}, U = {}> =
   | ({ status: 'fulfilled' } & R)
   | ({ status: 'rejected' } & S)
-  | ({ status: 'pending' } & T);
-
-export const useTypedDispatch: () => Dispatch = useDispatch;
+  | ({ status: 'pending' } & T)
+  | ({ status: 'idle' } & U);

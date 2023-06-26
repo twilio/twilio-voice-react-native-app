@@ -14,7 +14,9 @@ describe('<Dialer />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     const mockStore = configureStore();
-    const initialState = { voice: { call: { outgoingCall: {} } } };
+    const initialState = {
+      voice: { call: { activeCall: { entities: {}, ids: [] } } },
+    };
     const store = mockStore(initialState);
     wrapper = ({ children }) => (
       <Provider store={store}>

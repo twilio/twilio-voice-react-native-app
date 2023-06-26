@@ -40,17 +40,17 @@ commands:
       - run:
           name: "App: save env file"
           command: |
-            cd app 
+            cd app
             echo "DOMAIN_NAME=$DOMAIN_NAME" >> .env
             echo "CLIENT_ID=$CLIENT_ID" >> .env
             echo "AUTH0_SCOPE=$AUTH0_SCOPE" >> .env
             echo "AUTH0_AUDIENCE=$AUTH0_AUDIENCE" >> .env
             echo "DEFAULT_URL=$DEFAULT_URL" >> .env
-            echo "AUTH0_URL"="$AUTH0_URL" >> .env
-            echo "AUTH0_USERNAME"="$AUTH0_USERNAME" >> .env
-            echo "AUTH0_PASSWORD"="$AUTH0_PASSWORD" >> .env
-            echo "AUTH0_CLIENT_ID"="$AUTH0_CLIENT_ID" >> .env
-            echo "AUTH0_CLIENT_SECRET"="$AUTH0_CLIENT_SECRET" >> .env
+            echo "AUTH0_URL=$AUTH0_URL" >> .env
+            echo "AUTH0_USERNAME=$AUTH0_USERNAME" >> .env
+            echo "AUTH0_PASSWORD=$AUTH0_PASSWORD" >> .env
+            echo "AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID" >> .env
+            echo "AUTH0_CLIENT_SECRET=$AUTH0_CLIENT_SECRET" >> .env
             cd ..
 
   app-install-dependencies:
@@ -156,7 +156,7 @@ commands:
           name: "Server: start"
           background: true
           command: |
-            cd server 
+            cd server
             yarn start
             cd ..
 
@@ -262,7 +262,7 @@ jobs:
   app-detox-android:
     executor:
       name: android/android-machine
-      resource-class: large
+      resource-class: 2xlarge
       tag: 2023.02.1
     steps:
       - checkout
@@ -273,17 +273,22 @@ jobs:
       - ngrok-install
       - server-build
       - server-start
-      - app-detox-build:
-          configuration: android.emu.release
       - android/create-avd:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
-          system-image: system-images;android-29;default;x86_64
+          system-image: system-images;android-29;google_apis;x86_64
       - android/start-emulator:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
+          memory: 8192
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
+      - app-detox-build:
+          configuration: android.emu.release
       - app-expose-port
+      - run:
+          name: "Wait for emulator to settle"
+          command: |
+            sleep 300
       - app-detox-test:
           configuration: android.emu.release
 

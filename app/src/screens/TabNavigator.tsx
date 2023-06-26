@@ -1,20 +1,14 @@
-import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 import {
   createBottomTabNavigator,
   type BottomTabNavigationOptions,
 } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import ActiveCallBanner from '../components/ActiveCallBanner';
-import {
-  useActiveCall,
-  useActiveCallRemoteParticipant,
-  useActiveCallStatus,
-} from '../hooks/activeCall';
+import { useConnectedActiveCallBanner } from '../components/ActiveCallBanner/hooks';
 import Home from './Home';
 import Dialer from './Dialer';
-import { type TabParamList, type StackNavigationProp } from './types';
+import { type TabParamList } from './types';
 
 const HomeSource = require('../../assets/icons/home.png');
 const HomeSelectedSource = require('../../assets/icons/home-selected.png');
@@ -61,33 +55,7 @@ const dialerTabOptions: BottomTabNavigationOptions = {
 };
 
 const TabNavigator: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<'App'>>();
-
-  const handleActiveCallBannerPress = React.useCallback(() => {
-    navigation.navigate('Call');
-  }, [navigation]);
-
-  const activeCall = useActiveCall();
-  const remoteParticipant = useActiveCallRemoteParticipant(activeCall);
-  const callStatus = useActiveCallStatus(activeCall);
-
-  const banner = React.useMemo(() => {
-    if (activeCall?.status !== 'fulfilled') {
-      return null;
-    }
-
-    if (activeCall.callInfo.state === TwilioCall.State.Disconnected) {
-      return null;
-    }
-
-    return (
-      <ActiveCallBanner
-        title={remoteParticipant}
-        subtitle={callStatus}
-        onPress={handleActiveCallBannerPress}
-      />
-    );
-  }, [activeCall, remoteParticipant, callStatus, handleActiveCallBannerPress]);
+  const bannerProps = useConnectedActiveCallBanner();
 
   const screen = React.useMemo(
     () => (
@@ -110,7 +78,7 @@ const TabNavigator: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {banner}
+      <ActiveCallBanner {...bannerProps} />
       {screen}
     </View>
   );

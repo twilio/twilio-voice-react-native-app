@@ -1,11 +1,9 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { createStore, logActionType } from './store/app';
+import { defaultStore } from './store/app';
 import StackNavigator from './screens/StackNavigator';
-import { bootstrapApp } from './store/bootstrap';
-
-const store = createStore(logActionType);
+import { bootstrapUser } from './store/bootstrap';
 
 const App = () => {
   /**
@@ -16,13 +14,13 @@ const App = () => {
    *
    * When a React component is unmounted, it will invoke the return value of any
    * `useEffect` functions. In this case, if the `App` component is unmounted
-   * then the `abort` function is called so the `bootstrapApp` action can no
+   * then the `abort` functions are called so the `bootstrap` actions can no
    * longer dispatch actions.
    */
-  React.useEffect(() => store.dispatch(bootstrapApp()).abort, []);
+  React.useEffect(() => defaultStore.dispatch(bootstrapUser()).abort, []);
 
   return (
-    <Provider store={store}>
+    <Provider store={defaultStore}>
       <NavigationContainer>
         <StackNavigator />
       </NavigationContainer>

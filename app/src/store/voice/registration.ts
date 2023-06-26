@@ -90,7 +90,7 @@ export type RegistrationSlice = AsyncStoreSlice<
 
 export const registrationSlice = createSlice({
   name: 'registration',
-  initialState: null as RegistrationSlice,
+  initialState: { status: 'idle' } as RegistrationSlice,
   reducers: {},
   extraReducers(builder) {
     builder.addCase(register.pending, () => ({ status: 'pending' }));
