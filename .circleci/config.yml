@@ -237,7 +237,7 @@ jobs:
             yarn test --coverage
             cd ..
       - store_artifacts:
-          path: coverage
+          path: app/coverage
 
   app-lint:
     executor: default
@@ -344,7 +344,7 @@ jobs:
             yarn test --coverage
             cd ..
       - store_artifacts:
-          path: coverage
+          path: server/coverage
 
 ###
 # Workflows
