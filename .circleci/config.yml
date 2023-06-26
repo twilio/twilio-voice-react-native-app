@@ -237,7 +237,7 @@ jobs:
             yarn test --coverage
             cd ..
       - store_artifacts:
-          path: app/jest-coverage
+          path: coverage
 
   app-lint:
     executor: default
@@ -288,8 +288,6 @@ jobs:
       - app-expose-port
       - app-detox-test:
           configuration: android.emu.release
-      - store_artifacts:
-          path: app/detox-android-coverage
 
   app-detox-ios:
     macos:
@@ -308,8 +306,6 @@ jobs:
           configuration: ios.sim.release
       - app-detox-test:
           configuration: ios.sim.release
-      - store_artifacts:
-          path: app/detox-ios-coverage
 
   ###
   # Server jobs
@@ -348,7 +344,7 @@ jobs:
             yarn test --coverage
             cd ..
       - store_artifacts:
-          path: server/jest-coverage
+          path: coverage
 
 ###
 # Workflows
