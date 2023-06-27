@@ -234,8 +234,10 @@ jobs:
           name: "App: unit tests"
           command: |
             cd app
-            yarn test
+            yarn test --coverage
             cd ..
+      - store_artifacts:
+          path: app/coverage
 
   app-lint:
     executor: default
@@ -344,8 +346,10 @@ jobs:
           name: "Server: unit tests"
           command: |
             cd server
-            yarn test
+            yarn test --coverage
             cd ..
+      - store_artifacts:
+          path: server/coverage
 
 ###
 # Workflows
