@@ -1,5 +1,7 @@
 #import "AppDelegate.h"
 
+#import <Intents/Intents.h>
+
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
@@ -65,6 +67,33 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  return YES;
+}
+
+- (BOOL)application:(UIApplication *)application willContinueUserActivityWithType:(NSString *)userActivityType {
+  return YES;
+}
+
+- (BOOL)application:(UIApplication *)application
+continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> *))restorationHandler {
+  if (@available(iOS 13, *)) {
+    if ([userActivity.activityType isEqual:@"INStartCallIntent"]) {
+      INInteraction *interaction = userActivity.interaction;
+      INStartCallIntent *intent = (INStartCallIntent *)interaction.intent;
+      
+      if ([intent.contacts count] == 0) {
+        return NO;
+      }
+      
+      INPerson *person = intent.contacts[0];
+      // Add observer to the event emitter class to handle the "INStartCallIntent" event
+      [[NSNotificationCenter defaultCenter] postNotificationName:@"INStartCallIntent"
+                                                          object:nil
+                                                        userInfo:@{@"contact": person}];
+    }
+  }
+
   return YES;
 }
 
