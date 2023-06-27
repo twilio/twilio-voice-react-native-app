@@ -94,3 +94,7 @@ See the Redux-Toolkit documentation [here](https://redux-toolkit.js.org/introduc
 React Navigation is used to provide "native"-feeling navigation for the application.
 
 See the React Navigation documentation [here](https://reactnavigation.org/docs/getting-started/).
+
+## Examples
+
+- [Starting a call from iOS Phone app history](docs/ios-call-from-recents.md)
