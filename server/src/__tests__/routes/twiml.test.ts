@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { twiml } from 'twilio';
 import { createTwimlRoute } from '../../routes/twiml';
 

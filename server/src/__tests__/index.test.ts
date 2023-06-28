@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as _server from '../server';
 import * as _env from '../utils/env';
 import * as _log from '../utils/log';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createTokenRoute } from '../../routes/token';
 import { jwt } from 'twilio';
 
