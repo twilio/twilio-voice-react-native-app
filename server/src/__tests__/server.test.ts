@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as auth0JwtCheck from 'express-oauth2-jwt-bearer';
 import request from 'supertest';
 import { validateExpressRequest } from 'twilio';
@@ -72,7 +73,7 @@ describe('/token', () => {
 
   it('responds with 401 if unauthorized', async () => {
     jest.spyOn(auth0JwtCheck, 'auth').mockImplementationOnce(() =>
-      jest.fn((_req: any, res: any, _next: any) => {
+      jest.fn((_req: any, res: any) => {
         throw Error(res.status(401));
       }),
     );

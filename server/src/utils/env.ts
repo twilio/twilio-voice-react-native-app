@@ -46,6 +46,7 @@ export function getServerCredentials(): ServerCredentials | undefined {
   ].map((envVarKey) => [envVarKey, getEnvVar(envVarKey)]);
 
   if (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     envVars.some(([_envVarKey, envVarVal]) => typeof envVarVal === 'undefined')
   ) {
     return;

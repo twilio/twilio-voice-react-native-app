@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const AccessToken: any = jest.fn().mockReturnValue({
   addGrant: jest.fn(),
   toJwt: jest.fn().mockReturnValue('mock-accesstoken-tojwt-foobar'),

@@ -332,6 +332,17 @@ jobs:
           root: .
           paths: .
 
+  server-lint:
+    executor: default
+    steps:
+      - attach_project
+      - run:
+          name: "Server: lint"
+          command: |
+            cd server
+            yarn lint
+            cd ..
+
   server-build:
     executor: default
     steps:
@@ -375,6 +386,9 @@ workflows:
       # server jobs
       - server-cache-install-dependencies
       - server-test:
+          requires:
+            - server-cache-install-dependencies
+      - server-lint:
           requires:
             - server-cache-install-dependencies
       - server-build:
