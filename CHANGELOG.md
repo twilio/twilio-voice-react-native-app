@@ -6,3 +6,4 @@
   * Potentially fixes iOS builds for newer versions of Xcode.
 * Added e2e tests for outgoing calls
 * Added unit tests for store and screens
+* Add linting to server
