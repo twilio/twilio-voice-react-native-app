@@ -1,4 +1,10 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createSlice,
+  miniSerializeError,
+  type SerializedError,
+} from '@reduxjs/toolkit';
+import { match } from 'ts-pattern';
 import { AsyncStoreSlice, type Dispatch, type State } from '../app';
 import { voice } from '../../util/voice';
 import { settlePromise } from '../../util/settlePromise';
@@ -14,7 +20,7 @@ export type RegisterRejectValue =
     }
   | {
       reason: 'NATIVE_MODULE_REJECTED';
-      error: any;
+      error: SerializedError;
     };
 
 export const register = createAsyncThunk<
@@ -42,7 +48,7 @@ export const register = createAsyncThunk<
   if (voiceRegisterResult.status === 'rejected') {
     return rejectWithValue({
       reason: 'NATIVE_MODULE_REJECTED',
-      error: voiceRegisterResult.reason,
+      error: miniSerializeError(voiceRegisterResult.reason),
     });
   }
 });
@@ -85,7 +91,7 @@ export const loginAndRegister = createAsyncThunk<
 
 export type RegistrationSlice = AsyncStoreSlice<
   {},
-  RegisterRejectValue | { error: any }
+  RegisterRejectValue | { error: SerializedError }
 >;
 
 export const registrationSlice = createSlice({
@@ -98,25 +104,27 @@ export const registrationSlice = createSlice({
     builder.addCase(register.fulfilled, () => ({ status: 'fulfilled' }));
 
     builder.addCase(register.rejected, (_, action) => {
-      switch (action.payload?.reason) {
-        case 'NATIVE_MODULE_REJECTED':
-          return {
-            status: 'rejected',
-            reason: action.payload.reason,
-            error: action.payload.error,
-          };
-        case 'ACCESS_TOKEN_NOT_FULFILLED':
-        case 'NO_ACCESS_TOKEN':
-          return {
-            status: 'rejected',
-            reason: action.payload.reason,
-          };
-        default:
-          return {
-            status: 'rejected',
-            error: action.error,
-          };
-      }
+      const { requestStatus } = action.meta;
+
+      return match(action.payload)
+        .with({ reason: 'NATIVE_MODULE_REJECTED' }, ({ reason, error }) => ({
+          status: requestStatus,
+          reason,
+          error,
+        }))
+        .with(
+          { reason: 'ACCESS_TOKEN_NOT_FULFILLED' },
+          { reason: 'NO_ACCESS_TOKEN' },
+          ({ reason }) => ({
+            status: requestStatus,
+            reason,
+          }),
+        )
+        .with(undefined, () => ({
+          status: requestStatus,
+          error: action.error,
+        }))
+        .exhaustive();
     });
   },
 });
