@@ -1,95 +1,66 @@
 import Config from 'react-native-config';
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { State, Dispatch } from '../store/app';
-import { settlePromise } from './settlePromise';
 
-export const checkLoginStatus = createAsyncThunk<
-  {
-    accessToken: string;
-    email: string;
-  },
-  void,
-  {
-    state: State;
-    dispatch: Dispatch;
-    rejectValue: undefined;
-  }
->('user/checkLoginStatus', async () => {
-  return { accessToken: '', email: '' };
-});
+export function initializeAuth() {
+  const grant_type = 'password';
+  const scope = 'openid profile email';
 
-export const login = createAsyncThunk<
-  { accessToken: string; email: string },
-  void,
-  {
-    state: State;
-    dispatch: Dispatch;
-    rejectValue: {
-      reason:
-        | 'FETCH_ERROR'
-        | 'AUTH0_TOKEN_RESPONSE_NOT_OK'
-        | 'FETCH_JSON_ERROR'
-        | 'LOGIN_ERROR';
-      error?: any;
-    };
+  const url = Config.AUTH0_URL;
+  const username = Config.AUTH0_USERNAME;
+  const password = Config.AUTH0_PASSWORD;
+  const audience = Config.AUTH0_AUDIENCE;
+  const client_id = Config.AUTH0_CLIENT_ID;
+  const client_secret = Config.AUTH0_CLIENT_SECRET;
+
+  const undefinedConfigs = [
+    url,
+    username,
+    password,
+    audience,
+    client_id,
+    client_secret,
+  ].filter((v) => typeof v === 'undefined');
+
+  if (undefinedConfigs.length) {
+    throw new Error('Undefined config value(s).');
   }
->('user/login', async (_, { rejectWithValue }) => {
-  try {
-    const fetchResult = await settlePromise(
-      fetch(Config.AUTH0_URL as string, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          grant_type: 'password',
-          username: Config.AUTH0_USERNAME,
-          password: Config.AUTH0_PASSWORD,
-          audience: Config.AUTH0_AUDIENCE,
-          scope: 'openid profile email',
-          client_id: Config.AUTH0_CLIENT_ID,
-          client_secret: Config.AUTH0_CLIENT_SECRET,
-        }),
+
+  const checkLoginStatus = async () => {
+    return { accessToken: '', email: '' };
+  };
+
+  const login = async () => {
+    const response = await fetch(url!, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        grant_type,
+        username,
+        password,
+        audience,
+        scope,
+        client_id,
+        client_secret,
       }),
-    );
-
-    if (fetchResult.status === 'rejected') {
-      return rejectWithValue({
-        reason: 'FETCH_ERROR',
-        error: fetchResult.reason,
-      });
+    });
+    if (!response.ok) {
+      throw new Error('AUTH0_TOKEN_RESPONSE_NOT_OK');
     }
-
-    const auth0TokenResponse = fetchResult.value;
-    if (!auth0TokenResponse.ok) {
-      return rejectWithValue({
-        reason: 'AUTH0_TOKEN_RESPONSE_NOT_OK',
-      });
-    }
-
-    const auth0TokenResult = await settlePromise(fetchResult.value.json());
-    if (auth0TokenResult.status === 'rejected') {
-      return rejectWithValue({
-        reason: 'FETCH_JSON_ERROR',
-        error: auth0TokenResult.reason,
-      });
-    }
-
+    const auth0Token = await response.json();
     return {
-      accessToken: auth0TokenResult.value.access_token,
+      accessToken: auth0Token.access_token,
       email: 'test_email@twilio.com',
     };
-  } catch (error) {
-    return rejectWithValue({ reason: 'LOGIN_ERROR', error });
-  }
-});
+  };
 
-export const logout = createAsyncThunk<
-  { accessToken: string; email: string },
-  void,
-  {
-    state: State;
-    dispatch: Dispatch;
-    rejectValue: { reason: 'LOGOUT_ERROR'; error: any };
-  }
->('user/logout', async () => {
-  return { accessToken: '', email: '' };
-});
+  const logout = async () => {
+    return { accessToken: '', email: '' };
+  };
+
+  return {
+    checkLoginStatus,
+    login,
+    logout,
+  };
+}
+
+export const auth = initializeAuth();

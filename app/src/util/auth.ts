@@ -1,95 +1,54 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getEnvVariable } from './env';
 import Auth0, { type SaveCredentialsParams } from 'react-native-auth0';
-import { State, Dispatch } from '../store/app';
-import { settlePromise } from './settlePromise';
 
-const auth0 = new Auth0({
-  domain: getEnvVariable('DOMAIN_NAME'),
-  clientId: getEnvVariable('CLIENT_ID'),
-});
+export function initializeAuth() {
+  const domain = getEnvVariable('DOMAIN_NAME');
+  const clientId = getEnvVariable('CLIENT_ID');
+  const scope = getEnvVariable('AUTH0_SCOPE');
+  const audience = getEnvVariable('AUTH0_AUDIENCE');
 
-export const checkLoginStatus = createAsyncThunk<
-  {
-    accessToken: string;
-    email: string;
-  },
-  void,
-  {
-    state: State;
-    dispatch: Dispatch;
-    rejectValue: { reason: 'NOT_LOGGED_IN' };
-  }
->('user/checkLoginStatus', async (_, { rejectWithValue }) => {
-  const getCredentialsResult = await settlePromise(
-    auth0.credentialsManager.getCredentials(),
-  );
+  const auth0 = new Auth0({
+    domain,
+    clientId,
+  });
 
-  if (getCredentialsResult.status === 'fulfilled') {
-    const credentials = getCredentialsResult.value;
-    const user = await auth0.auth.userInfo({
-      token: credentials.accessToken,
-    });
+  const checkLoginStatus = async () => {
+    const { accessToken } = await auth0.credentialsManager.getCredentials();
+    const { email } = await auth0.auth.userInfo({ token: accessToken });
     return {
-      accessToken: credentials.accessToken,
-      email: user.email,
+      accessToken,
+      email,
     };
-  } else {
-    return rejectWithValue({
-      reason: 'NOT_LOGGED_IN',
-    });
-  }
-});
+  };
 
-export const login = createAsyncThunk<
-  { accessToken: string; email: string },
-  void,
-  {
-    state: State;
-    dispatch: Dispatch;
-    rejectValue: { reason: 'ID_TOKEN_UNDEFINED' | 'LOGIN_ERROR'; error?: any };
-  }
->('user/login', async (_, { rejectWithValue }) => {
-  try {
-    const credentials = await auth0.webAuth.authorize({
-      scope: getEnvVariable('AUTH0_SCOPE'),
-      audience: getEnvVariable('AUTH0_AUDIENCE'),
-    });
-
-    if (typeof credentials.idToken === 'undefined') {
-      return rejectWithValue({ reason: 'ID_TOKEN_UNDEFINED' });
+  const login = async () => {
+    const credentials = await auth0.webAuth.authorize({ audience, scope });
+    if (!credentials.idToken) {
+      throw new Error('ID_TOKEN_UNDEFINED');
     }
-
-    auth0.credentialsManager.saveCredentials(
+    const { accessToken } = credentials;
+    await auth0.credentialsManager.saveCredentials(
       credentials as SaveCredentialsParams,
     );
-
-    const user = await auth0.auth.userInfo({
+    const { email } = await auth0.auth.userInfo({
       token: credentials.accessToken,
     });
     return {
-      accessToken: credentials.accessToken,
-      email: user.email,
+      accessToken,
+      email,
     };
-  } catch (error) {
-    return rejectWithValue({ reason: 'LOGIN_ERROR', error });
-  }
-});
+  };
 
-export const logout = createAsyncThunk<
-  { accessToken: string; email: string },
-  void,
-  {
-    state: State;
-    dispatch: Dispatch;
-    rejectValue: { reason: 'LOGOUT_ERROR'; error: any };
-  }
->('user/logout', async (_, { rejectWithValue }) => {
-  try {
+  const logout = async () => {
     await auth0.webAuth.clearSession({ federated: true });
     await auth0.credentialsManager.clearCredentials();
-    return { accessToken: '', email: '' };
-  } catch (error) {
-    return rejectWithValue({ reason: 'LOGOUT_ERROR', error });
-  }
-});
+  };
+
+  return {
+    checkLoginStatus,
+    login,
+    logout,
+  };
+}
+
+export const auth = initializeAuth();
