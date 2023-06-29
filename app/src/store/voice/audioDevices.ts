@@ -1,39 +1,48 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { type AudioDevice as TwilioAudioDevice } from '@twilio/voice-react-native-sdk';
 import { voice, audioDeviceMap } from '../../util/voice';
-import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
+import { type AsyncStoreSlice } from '../app';
+import { createTypedAsyncThunk } from '../common';
+import { settlePromise } from '../../util/settlePromise';
 
-export const selectAudioDevice = createAsyncThunk<
+export type AudioDeviceRejectValue =
+  | { reason: 'AUDIO_DEVICES_NOT_FOUND' }
+  | { reason: 'MISSING_AUDIO_DEVICE_UUID' }
+  | { reason: 'AUDIO_DEVICES_NOT_FULFILLED' };
+
+export const selectAudioDevice = createTypedAsyncThunk<
   void,
-  { audioDeviceUuid: string },
-  { state: State; dispatch: Dispatch }
+  { audioDeviceUuid: string }
 >('voice/selectAudioDevice', async () => {});
 
-export const getAudioDevices = createAsyncThunk<
+export const getAudioDevices = createTypedAsyncThunk<
   { audioDevices: AudioDeviceInfo[]; selectedDevice: AudioDeviceInfo | null },
   void,
   {
-    state: State;
-    dispatch: Dispatch;
-    rejectValue: { reason: 'VOICE_GET_AUDIO_DEVICES_ERROR'; error: any };
+    rejectValue: AudioDeviceRejectValue;
   }
 >('voice/getAudioDevices', async (_, { rejectWithValue }) => {
-  try {
-    const { audioDevices, selectedDevice } = await voice.getAudioDevices();
-
-    for (const audioDevice of audioDevices) {
-      audioDeviceMap.set(audioDevice.uuid, audioDevice);
-    }
-
-    return {
-      audioDevices: audioDevices.map(getAudioDeviceInfo),
-      selectedDevice: selectedDevice
-        ? getAudioDeviceInfo(selectedDevice)
-        : null,
-    };
-  } catch (error) {
-    return rejectWithValue({ reason: 'VOICE_GET_AUDIO_DEVICES_ERROR', error });
+  const fetchAudioDevices = await settlePromise(voice.getAudioDevices());
+  if (fetchAudioDevices?.status !== 'fulfilled') {
+    return rejectWithValue({ reason: 'AUDIO_DEVICES_NOT_FULFILLED' });
   }
+
+  const { audioDevices, selectedDevice } = fetchAudioDevices.value;
+  if (typeof audioDevices === 'undefined') {
+    return rejectWithValue({ reason: 'AUDIO_DEVICES_NOT_FOUND' });
+  }
+
+  for (const audioDevice of audioDevices) {
+    if (typeof audioDevice.uuid === 'undefined') {
+      return rejectWithValue({ reason: 'MISSING_AUDIO_DEVICE_UUID' });
+    }
+    audioDeviceMap.set(audioDevice.uuid, audioDevice);
+  }
+
+  return {
+    audioDevices: audioDevices.map(getAudioDeviceInfo),
+    selectedDevice: selectedDevice ? getAudioDeviceInfo(selectedDevice) : null,
+  };
 });
 
 const getAudioDeviceInfo = (audioDevice: TwilioAudioDevice) => {
@@ -59,10 +68,7 @@ export type AudioDevicesState = AsyncStoreSlice<
     audioDevices: AudioDeviceInfo[];
     selectedDevice: AudioDeviceInfo | null;
   },
-  {
-    reason: 'VOICE_GET_AUDIO_DEVICES_ERROR' | undefined;
-    error: any;
-  }
+  AudioDeviceRejectValue | { error: any }
 >;
 
 export const audioDevicesSlice = createSlice({
@@ -78,11 +84,28 @@ export const audioDevicesSlice = createSlice({
         return { status: 'fulfilled', ...action.payload };
       })
       .addCase(getAudioDevices.rejected, (_, action) => {
-        return {
-          status: 'rejected',
-          reason: action.payload?.reason,
-          error: action.payload?.error,
-        };
+        switch (action.payload?.reason) {
+          case 'AUDIO_DEVICES_NOT_FULFILLED':
+            return {
+              status: 'rejected',
+              reason: action.payload.reason,
+            };
+          case 'AUDIO_DEVICES_NOT_FOUND':
+            return {
+              status: 'rejected',
+              reason: action.payload.reason,
+            };
+          case 'MISSING_AUDIO_DEVICE_UUID':
+            return {
+              status: 'rejected',
+              reason: action.payload.reason,
+            };
+          default:
+            return {
+              status: 'rejected',
+              error: action.error,
+            };
+        }
       });
   },
 });
