@@ -89,6 +89,8 @@ See the Redux documentation [here](https://redux.js.org/introduction/getting-sta
 
 See the Redux-Toolkit documentation [here](https://redux-toolkit.js.org/introduction/getting-started).
 
+Please be sure to read the style guides and best practices within the above documentation.
+
 ### Navigation
 
 React Navigation is used to provide "native"-feeling navigation for the application.
