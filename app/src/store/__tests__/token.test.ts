@@ -1,3 +1,4 @@
+import { miniSerializeError } from '@reduxjs/toolkit';
 import * as token from '../voice/accessToken';
 import * as auth from '../../util/auth';
 import * as app from '../app';
@@ -68,13 +69,14 @@ describe('token store', () => {
       accessToken: 'test token',
       idToken: 'test id token',
     });
-    fetchMock.mockRejectedValueOnce(new Error('error'));
+    const error = new Error('error');
+    fetchMock.mockRejectedValueOnce(error);
     await store.dispatch(auth.login());
     await store.dispatch(token.getAccessToken());
     expect(store.getState().voice.accessToken).toEqual({
       status: 'rejected',
       reason: 'FETCH_ERROR',
-      error: new Error('error'),
+      error: miniSerializeError(error),
     });
   });
 
@@ -99,16 +101,17 @@ describe('token store', () => {
       accessToken: 'test token',
       idToken: 'test id token',
     });
+    const error = new Error('foobar');
     fetchMock.mockResolvedValueOnce({
       ok: true,
-      text: jest.fn().mockRejectedValueOnce('invalid text'),
+      text: jest.fn().mockRejectedValueOnce(error),
     });
     await store.dispatch(auth.login());
     await store.dispatch(token.getAccessToken());
     expect(store.getState().voice.accessToken).toEqual({
       status: 'rejected',
       reason: 'FETCH_TEXT_ERROR',
-      error: 'invalid text',
+      error: miniSerializeError(error),
     });
   });
 });

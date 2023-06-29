@@ -1,4 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {
+  createSlice,
+  createAsyncThunk,
+  miniSerializeError,
+  type SerializedError,
+} from '@reduxjs/toolkit';
 import { fetch, defaultUrl } from '../../util/fetch';
 import { settlePromise } from '../../util/settlePromise';
 import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
@@ -9,7 +14,7 @@ export type GetAccessTokenRejectValue =
     }
   | {
       reason: 'FETCH_ERROR';
-      error: any;
+      error: SerializedError;
     }
   | {
       reason: 'TOKEN_RESPONSE_NOT_OK';
@@ -17,7 +22,7 @@ export type GetAccessTokenRejectValue =
     }
   | {
       reason: 'FETCH_TEXT_ERROR';
-      error: any;
+      error: SerializedError;
     };
 
 export const getAccessToken = createAsyncThunk<
@@ -46,7 +51,7 @@ export const getAccessToken = createAsyncThunk<
   if (fetchResult.status === 'rejected') {
     return rejectWithValue({
       reason: 'FETCH_ERROR',
-      error: fetchResult.reason,
+      error: miniSerializeError(fetchResult.reason),
     });
   }
 
@@ -62,7 +67,7 @@ export const getAccessToken = createAsyncThunk<
   if (tokenTextResult.status === 'rejected') {
     return rejectWithValue({
       reason: 'FETCH_TEXT_ERROR',
-      error: tokenTextResult.reason,
+      error: miniSerializeError(tokenTextResult.reason),
     });
   }
 
