@@ -14,6 +14,10 @@ On iOS platforms, the Twilio Voice iOS SDK does not need an equivalent file.
 
 Please follow the Twilio Voice iOS SDK [Quickstart](https://github.com/twilio/voice-quickstart-ios#6-create-a-push-credential-with-your-voip-service-certificate) for more information.
 
+## Call history
+
+Please check this [page](docs/ios-call-from-recents.md) for details on how to start a call from the iOS Phone app history.
+
 ## Setting up Auth0
 
 See [example.env](example.env) for information on Auth0 environment variables required to run the app.
