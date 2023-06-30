@@ -76,7 +76,7 @@ describe('user store', () => {
     expect(userState).toEqual({
       action: 'checkLoginStatus',
       status: 'rejected',
-      reason: 'AUTH_UTIL_REJECTED',
+      reason: 'AUTH_REJECTED',
       error: miniSerializeError(error),
     });
   });
@@ -103,7 +103,7 @@ describe('user store', () => {
       action: 'login',
       status: 'rejected',
       error: miniSerializeError(authorizeError),
-      reason: 'AUTH_UTIL_REJECTED',
+      reason: 'AUTH_REJECTED',
     });
   });
 
@@ -119,7 +119,7 @@ describe('user store', () => {
       action: 'logout',
       status: 'rejected',
       error: miniSerializeError(error),
-      reason: 'AUTH_UTIL_REJECTED',
+      reason: 'AUTH_REJECTED',
     });
   });
 });

@@ -15,7 +15,7 @@ export const sliceName = 'user' as const;
  * Reusable type for all actions.
  */
 export type RejectValue = {
-  reason: 'AUTH_UTIL_REJECTED';
+  reason: 'AUTH_REJECTED';
   error: SerializedError;
 };
 
@@ -33,7 +33,7 @@ export const checkLoginStatus = createTypedAsyncThunk<
   const checkLoginStatusResult = await settlePromise(auth.checkLoginStatus());
   if (checkLoginStatusResult.status === 'rejected') {
     return rejectWithValue({
-      reason: 'AUTH_UTIL_REJECTED',
+      reason: 'AUTH_REJECTED',
       error: miniSerializeError(checkLoginStatusResult.reason),
     });
   }
@@ -53,7 +53,7 @@ export const login = createTypedAsyncThunk<
   const loginResult = await settlePromise(auth.login());
   if (loginResult.status === 'rejected') {
     return rejectWithValue({
-      reason: 'AUTH_UTIL_REJECTED',
+      reason: 'AUTH_REJECTED',
       error: miniSerializeError(loginResult.reason),
     });
   }
@@ -75,7 +75,7 @@ export const logout = createTypedAsyncThunk<
   const clearSessionResult = await settlePromise(auth.logout());
   if (clearSessionResult.status === 'rejected') {
     return rejectWithValue({
-      reason: 'AUTH_UTIL_REJECTED',
+      reason: 'AUTH_REJECTED',
       error: miniSerializeError(clearSessionResult.reason),
     });
   }
@@ -117,7 +117,7 @@ export const userSlice = createSlice({
       const { requestStatus } = action.meta;
 
       return match(action.payload)
-        .with({ reason: 'AUTH_UTIL_REJECTED' }, ({ reason, error }) => ({
+        .with({ reason: 'AUTH_REJECTED' }, ({ reason, error }) => ({
           action: actionType,
           status: requestStatus,
           reason,
@@ -153,7 +153,7 @@ export const userSlice = createSlice({
       const { requestStatus } = action.meta;
 
       return match(action.payload)
-        .with({ reason: 'AUTH_UTIL_REJECTED' }, ({ reason, error }) => ({
+        .with({ reason: 'AUTH_REJECTED' }, ({ reason, error }) => ({
           action: actionType,
           status: requestStatus,
           reason,
@@ -187,7 +187,7 @@ export const userSlice = createSlice({
       const { requestStatus } = action.meta;
 
       return match(action.payload)
-        .with({ reason: 'AUTH_UTIL_REJECTED' }, ({ reason, error }) => ({
+        .with({ reason: 'AUTH_REJECTED' }, ({ reason, error }) => ({
           action: actionType,
           status: requestStatus,
           reason,
