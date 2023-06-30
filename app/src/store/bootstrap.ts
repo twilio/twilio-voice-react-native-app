@@ -5,7 +5,7 @@ import {
 } from '@reduxjs/toolkit';
 import { Voice, CallInvite } from '@twilio/voice-react-native-sdk';
 import { createTypedAsyncThunk, generateThunkActionTypes } from './common';
-import { checkLoginStatus } from '../util/auth';
+import { checkLoginStatus } from './user';
 import { getAccessToken } from './voice/accessToken';
 import { getCallInviteInfo } from './voice/call';
 import { setCallInvite } from './voice/call/callInvite';

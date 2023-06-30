@@ -4,7 +4,7 @@ import { createStore, type Store } from '../../../app';
 import * as activeCall from '../../../voice/call/activeCall';
 import { makeOutgoingCall } from '../../../voice/call/outgoingCall';
 import { getAccessToken } from '../../../voice/accessToken';
-import { login } from '../../../../util/auth';
+import { login } from '../../../user';
 import * as mockVoiceSdk from '../../../../../__mocks__/@twilio/voice-react-native-sdk';
 
 jest.mock('../../../../util/fetch', () => ({

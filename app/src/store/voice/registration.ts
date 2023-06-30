@@ -4,12 +4,12 @@ import {
   type SerializedError,
 } from '@reduxjs/toolkit';
 import { match } from 'ts-pattern';
-import { AsyncStoreSlice } from '../app';
-import { voice } from '../../util/voice';
-import { settlePromise } from '../../util/settlePromise';
-import { login } from '../../util/auth';
 import { getAccessToken } from './accessToken';
+import { type AsyncStoreSlice } from '../app';
 import { createTypedAsyncThunk } from '../common';
+import { login } from '../user';
+import { settlePromise } from '../../util/settlePromise';
+import { voice } from '../../util/voice';
 
 export type RegisterRejectValue =
   | {

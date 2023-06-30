@@ -186,7 +186,7 @@ export const userSlice = createSlice({
 
       const { requestStatus } = action.meta;
 
-      match(action.payload)
+      return match(action.payload)
         .with({ reason: 'AUTH_UTIL_REJECTED' }, ({ reason, error }) => ({
           action: actionType,
           status: requestStatus,
