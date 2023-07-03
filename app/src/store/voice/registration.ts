@@ -1,15 +1,15 @@
 import {
-  createAsyncThunk,
   createSlice,
   miniSerializeError,
   type SerializedError,
 } from '@reduxjs/toolkit';
 import { match } from 'ts-pattern';
-import { AsyncStoreSlice, type Dispatch, type State } from '../app';
+import { AsyncStoreSlice } from '../app';
 import { voice } from '../../util/voice';
 import { settlePromise } from '../../util/settlePromise';
 import { login } from '../../util/auth';
 import { getAccessToken } from './accessToken';
+import { createTypedAsyncThunk } from '../common';
 
 export type RegisterRejectValue =
   | {
@@ -23,12 +23,10 @@ export type RegisterRejectValue =
       error: SerializedError;
     };
 
-export const register = createAsyncThunk<
+export const register = createTypedAsyncThunk<
   void,
   void,
   {
-    state: State;
-    dispatch: Dispatch;
     rejectValue: RegisterRejectValue;
   }
 >('registration/register', async (_, { getState, rejectWithValue }) => {
@@ -64,12 +62,10 @@ export type LoginAndRegisterRejectValue =
       reason: 'REGISTER_REJECTED';
     };
 
-export const loginAndRegister = createAsyncThunk<
+export const loginAndRegister = createTypedAsyncThunk<
   void,
   void,
   {
-    state: State;
-    dispatch: Dispatch;
     rejectValue: LoginAndRegisterRejectValue;
   }
 >('registration/loginAndRegister', async (_, { dispatch, rejectWithValue }) => {

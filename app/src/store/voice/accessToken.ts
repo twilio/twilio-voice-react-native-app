@@ -1,12 +1,12 @@
 import {
   createSlice,
-  createAsyncThunk,
   miniSerializeError,
   type SerializedError,
 } from '@reduxjs/toolkit';
 import { fetch, defaultUrl } from '../../util/fetch';
 import { settlePromise } from '../../util/settlePromise';
-import { type AsyncStoreSlice, type State, type Dispatch } from '../app';
+import { type AsyncStoreSlice } from '../app';
+import { createTypedAsyncThunk } from '../common';
 
 export type GetAccessTokenRejectValue =
   | {
@@ -25,12 +25,10 @@ export type GetAccessTokenRejectValue =
       error: SerializedError;
     };
 
-export const getAccessToken = createAsyncThunk<
+export const getAccessToken = createTypedAsyncThunk<
   string,
   void,
   {
-    state: State;
-    dispatch: Dispatch;
     rejectValue: GetAccessTokenRejectValue;
   }
 >('voice/getAccessToken', async (_, { getState, rejectWithValue }) => {
