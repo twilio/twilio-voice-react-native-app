@@ -1,7 +1,7 @@
 import { type Middleware } from '@reduxjs/toolkit';
 import { createStore, Store } from '../app';
 import { bootstrapUser, bootstrapCallInvites } from '../bootstrap';
-import { checkLoginStatus } from '../../util/auth';
+import { checkLoginStatus } from '../user';
 import { getAccessToken } from '../voice/accessToken';
 import { setCallInvite } from '../voice/call/callInvite';
 import { register } from '../voice/registration';
@@ -53,6 +53,7 @@ describe('bootstrap', () => {
       expect(payload).toStrictEqual('LOGGED_IN');
 
       expect(store.getState().user).toStrictEqual({
+        action: 'checkLoginStatus',
         accessToken: 'test token',
         email: 'test email',
         status: 'fulfilled',

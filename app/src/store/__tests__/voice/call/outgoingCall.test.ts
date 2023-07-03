@@ -3,7 +3,7 @@ import { match, P } from 'ts-pattern';
 import { createStore, type Store } from '../../../app';
 import { makeOutgoingCall } from '../../../voice/call/outgoingCall';
 import { getAccessToken } from '../../../voice/accessToken';
-import { login } from '../../../../util/auth';
+import { login } from '../../../user';
 import * as mockVoiceSdk from '../../../../../__mocks__/@twilio/voice-react-native-sdk';
 import * as voiceUtil from '../../../../util/voice';
 

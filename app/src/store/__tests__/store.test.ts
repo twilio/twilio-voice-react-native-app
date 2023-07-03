@@ -1,7 +1,7 @@
 import * as app from '../app';
 import * as token from '../voice/accessToken';
 import * as outgoingCall from '../voice/call/outgoingCall';
-import * as auth from '../../util/auth';
+import * as user from '../user';
 
 let fetchMock: jest.Mock;
 let voiceConnectMock: jest.Mock;
@@ -45,7 +45,7 @@ it('should export a default store', () => {
 it('should make an outgoing call and mute it', async () => {
   const store: app.Store = app.createStore();
 
-  await store.dispatch(auth.checkLoginStatus());
+  await store.dispatch(user.checkLoginStatus());
 
   fetchMock.mockResolvedValueOnce({
     ok: true,
