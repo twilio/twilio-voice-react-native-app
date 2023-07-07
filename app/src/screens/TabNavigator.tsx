@@ -78,7 +78,7 @@ const aboutTabOptions: BottomTabNavigationOptions = {
 
 const TabNavigator: React.FC = () => {
   const bannerProps = useConnectedActiveCallBanner();
-  const isDogFoodingEnabled = Boolean(getEnvVariable('ENABLE_DOG_FOODING'));
+  const isAboutPageEnabled = Boolean(getEnvVariable('ENABLE_ABOUT_PAGE'));
 
   const screen = React.useMemo(
     () => (
@@ -93,7 +93,7 @@ const TabNavigator: React.FC = () => {
             component={Dialer}
             options={dialerTabOptions}
           />
-          {isDogFoodingEnabled && (
+          {isAboutPageEnabled && (
             <Tab.Screen
               name="About"
               component={About}
@@ -103,7 +103,7 @@ const TabNavigator: React.FC = () => {
         </Tab.Navigator>
       </View>
     ),
-    [isDogFoodingEnabled],
+    [isAboutPageEnabled],
   );
 
   return (

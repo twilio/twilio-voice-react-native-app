@@ -24,17 +24,18 @@ describe('<About />', () => {
       ),
     ).toBeOnTheScreen();
     expect(screen.getByText('Report an Issue')).toBeOnTheScreen();
-    expect(screen.getByText('#eng-voice-blocks')).toBeOnTheScreen();
+    expect(screen.getByText('#test-channel')).toBeOnTheScreen();
+    expect(screen.getByText('Version')).toBeOnTheScreen();
   });
 
-  it('should allow user to click #eng-voice-blocks to be redirected to the slack channel', () => {
+  it('should allow user to click #test-channel to be redirected to the slack channel', () => {
     const store = createStore();
     const openURL = jest
       .spyOn(Linking, 'openURL')
       .mockImplementation(() => Promise.resolve(true));
     wrapper = ({ children }) => <Provider store={store}>{children}</Provider>;
     render(<About />, { wrapper });
-    fireEvent.press(screen.getByText('#eng-voice-blocks'));
+    fireEvent.press(screen.getByText('#test-channel'));
     expect(openURL).toBeCalledTimes(1);
   });
 });

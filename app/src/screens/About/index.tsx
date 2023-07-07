@@ -6,12 +6,14 @@ import {
   Linking,
   TouchableHighlight,
 } from 'react-native';
+import { getEnvVariable } from '../../util/env';
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#F4F4F6',
     height: '100%',
     display: 'flex',
+    flex: 1,
     alignContent: 'center',
     marginTop: 100,
     marginHorizontal: 40,
@@ -22,6 +24,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 10,
   },
+  body: { flex: 1 },
   section: {
     marginBottom: 50,
   },
@@ -36,31 +39,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
+  label: {
+    fontWeight: '700',
+  },
+  footer: {
+    height: 50,
+  },
 });
 
 const About: React.FC = () => {
-  const VOICE_BLOCKS_URL = 'https://twilio.slack.com/archives/C020DUH6R1B';
-  const VOICE_BLOCKS_CHANNEL = '#eng-voice-blocks';
+  const slackURL = getEnvVariable('SLACK_URL');
+  const slackChannelName = `#${getEnvVariable('SLACK_CHANNEL_NAME')}`;
 
   const handlePress = async () => {
-    await Linking.openURL(VOICE_BLOCKS_URL);
+    await Linking.openURL(slackURL);
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.header}>About</Text>
-        <Text>This app is maintained by the Twilio Voice Access group</Text>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.header}>Report an Issue</Text>
-        <View style={styles.issueDescription}>
-          <Text>For issues or bugs please reach out in the </Text>
-          <TouchableHighlight onPress={handlePress}>
-            <Text style={styles.channel}>{VOICE_BLOCKS_CHANNEL}</Text>
-          </TouchableHighlight>
-          <Text> slack channel</Text>
+      <View style={styles.body}>
+        <View style={styles.section}>
+          <Text style={styles.header}>About</Text>
+          <Text>This app is maintained by the Twilio Voice Access group</Text>
         </View>
+        <View style={styles.section}>
+          <View style={styles.issueDescription}>
+            <Text style={styles.header}>Report an Issue</Text>
+            <Text>For issues or bugs please reach out in the </Text>
+            <TouchableHighlight onPress={handlePress}>
+              <Text style={styles.channel}>{slackChannelName}</Text>
+            </TouchableHighlight>
+            <Text> slack channel</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.footer}>
+        <Text>
+          <Text style={styles.label}>Version </Text>
+          <Text>0.0.1</Text>
+        </Text>
       </View>
     </View>
   );
