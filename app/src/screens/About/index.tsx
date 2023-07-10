@@ -7,6 +7,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import { getEnvVariable } from '../../util/env';
+import packageJson from '../../../package.json';
 
 const styles = StyleSheet.create({
   container: {
@@ -76,7 +77,7 @@ const About: React.FC = () => {
       <View style={styles.footer}>
         <Text>
           <Text style={styles.label}>Version </Text>
-          <Text>0.0.1</Text>
+          <Text>{packageJson.version}</Text>
         </Text>
       </View>
     </View>
