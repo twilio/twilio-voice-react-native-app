@@ -79,7 +79,7 @@ const aboutTabOptions: BottomTabNavigationOptions = {
 const TabNavigator: React.FC = () => {
   const bannerProps = useConnectedActiveCallBanner();
   const isAboutPageEnabled = React.useMemo(() => {
-    return Boolean(getEnvVariable('ENABLE_ABOUT_PAGE'));
+    return getEnvVariable('ENABLE_ABOUT_PAGE') === 'true';
   }, []);
 
   const screen = React.useMemo(
