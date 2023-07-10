@@ -60,7 +60,7 @@ const dialerTabOptions: BottomTabNavigationOptions = {
 const aboutTabOptions: BottomTabNavigationOptions = {
   tabBarIcon: ({ focused, size }) => {
     return focused ? (
-      // Note: Will talk to Design team on getting a "Selected Image"
+      // TODO(kchoy): Will talk to Design team on getting a "Selected Image"
       <Image
         source={AboutSelectedSource}
         resizeMode="contain"
@@ -78,7 +78,9 @@ const aboutTabOptions: BottomTabNavigationOptions = {
 
 const TabNavigator: React.FC = () => {
   const bannerProps = useConnectedActiveCallBanner();
-  const isAboutPageEnabled = Boolean(getEnvVariable('ENABLE_ABOUT_PAGE'));
+  const isAboutPageEnabled = React.useMemo(() => {
+    return Boolean(getEnvVariable('ENABLE_ABOUT_PAGE'));
+  }, []);
 
   const screen = React.useMemo(
     () => (

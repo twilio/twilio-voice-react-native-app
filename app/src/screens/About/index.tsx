@@ -49,8 +49,12 @@ const styles = StyleSheet.create({
 });
 
 const About: React.FC = () => {
-  const slackURL = getEnvVariable('SLACK_URL');
-  const slackChannelName = `#${getEnvVariable('SLACK_CHANNEL_NAME')}`;
+  const slackURL = React.useMemo(() => {
+    return getEnvVariable('SLACK_URL');
+  }, []);
+  const slackChannelName = React.useMemo(() => {
+    return `#${getEnvVariable('SLACK_CHANNEL_NAME')}`;
+  }, []);
 
   const handlePress = async () => {
     await Linking.openURL(slackURL);
