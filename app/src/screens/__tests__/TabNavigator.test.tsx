@@ -7,10 +7,10 @@ import configureStore from 'redux-mock-store';
 import { NavigationContainer } from '@react-navigation/native';
 import Config from '../../../__mocks__/react-native-config';
 
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+
 describe('<TabNavigator />', () => {
   let wrapper: React.ComponentType<any>;
-
-  jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
   beforeEach(() => {
     jest.clearAllMocks();
