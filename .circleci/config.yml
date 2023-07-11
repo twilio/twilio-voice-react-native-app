@@ -51,6 +51,7 @@ commands:
             echo "AUTH0_PASSWORD=$AUTH0_PASSWORD" >> .env
             echo "AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID" >> .env
             echo "AUTH0_CLIENT_SECRET=$AUTH0_CLIENT_SECRET" >> .env
+            echo "ENABLE_ABOUT_PAGE=$ENABLE_ABOUT_PAGE" >> .env
             cd ..
 
   app-install-dependencies:

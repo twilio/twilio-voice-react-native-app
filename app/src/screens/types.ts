@@ -21,6 +21,7 @@ export type StackScreenProps<T extends keyof StackParamList> =
 export type TabParamList = {
   Home: undefined;
   Dialer: undefined;
+  About: undefined;
 };
 
 export type TabNavScreenProps<T extends keyof TabParamList> =
