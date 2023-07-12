@@ -14,6 +14,7 @@ export enum EnvVars {
   PushCredentialSid = 'PUSH_CREDENTIAL_SID',
   Auth0Audience = 'AUTH0_AUDIENCE',
   Auth0IssuerBaseUrl = 'AUTH0_ISSUER_BASE_URL',
+  EnableAboutPage = 'ENABLE_ABOUT_PAGE',
 }
 
 function validateNumber(envVar: string): number | undefined {
@@ -43,6 +44,7 @@ export function getServerCredentials(): ServerCredentials | undefined {
     EnvVars.PushCredentialSid,
     EnvVars.Auth0Audience,
     EnvVars.Auth0IssuerBaseUrl,
+    EnvVars.EnableAboutPage,
   ].map((envVarKey) => [envVarKey, getEnvVar(envVarKey)]);
 
   if (

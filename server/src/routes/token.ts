@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { jwt } from 'twilio';
 import { ServerCredentials } from '../common/types';
-import { getUserInfo } from '../utils/auth';
+import { getUserInfo, verifyTwilioEmail } from '../utils/auth';
 import { log } from '../utils/log';
 
 export function createTokenRoute(serverCredentials: ServerCredentials) {
@@ -32,6 +32,19 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
     }
 
     const { userInfo } = userInfoResult;
+
+    /**
+     * Note: For internal use
+     */
+    if (
+      serverCredentials.ENABLE_ABOUT_PAGE === 'true' &&
+      !verifyTwilioEmail(userInfo.email)
+    ) {
+      const msg = 'Must be a valid @twilio.com email';
+      logMsg(msg);
+      return res.header('Content-Type', 'text/plain').status(401).send(msg);
+    }
+
     const accessToken = new AccessToken(
       serverCredentials.ACCOUNT_SID,
       serverCredentials.API_KEY_SID,

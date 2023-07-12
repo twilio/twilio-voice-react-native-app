@@ -16,6 +16,7 @@ const mockServerConfig = {
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
+  ENABLE_ABOUT_PAGE: 'false',
 };
 
 beforeEach(() => {

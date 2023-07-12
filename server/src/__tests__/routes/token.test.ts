@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createTokenRoute } from '../../routes/token';
 import { jwt } from 'twilio';
-
-jest.mock('../../utils/auth');
+import * as auth from '../../utils/auth';
 
 const mockedAccessToken = jest.mocked(jwt.AccessToken);
 const mockedVoiceGrant = jest.mocked(jwt.AccessToken.VoiceGrant);
@@ -17,10 +16,25 @@ const mockServerConfig = {
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
+  ENABLE_ABOUT_PAGE: 'false',
 };
 
 beforeEach(() => {
   jest.clearAllMocks();
+  jest.spyOn(auth, 'getUserInfo').mockImplementation(
+    jest.fn().mockResolvedValue({
+      success: true,
+      userInfo: {
+        email: 'mock-email@test.com',
+        email_verified: 'mock-email-verified',
+        name: 'mock-name',
+        nickname: 'mock-nickname',
+        picture: 'mock-picture',
+        sub: 'mock-sub',
+        updated_at: 'mock-updated-at',
+      },
+    }),
+  );
 });
 
 describe('createTokenRoute()', () => {
@@ -67,7 +81,7 @@ describe('createTokenRoute()', () => {
           mockServerConfig.API_KEY_SID,
           mockServerConfig.API_KEY_SECRET,
           {
-            identity: 'mock-email',
+            identity: 'mock-email@test.com',
           },
         ],
       ]);
@@ -112,6 +126,44 @@ describe('createTokenRoute()', () => {
       expect(mockRes.send.mock.calls).toEqual([
         ['mock-accesstoken-tojwt-foobar'],
       ]);
+    });
+
+    describe('Verify Twilio Email', () => {
+      it('returns 401 when About Page is enabled, and email is NOT @twilio.com', async () => {
+        tokenRoute = createTokenRoute({
+          ...mockServerConfig,
+          ENABLE_ABOUT_PAGE: 'true',
+        });
+
+        await tokenRoute(mockReq as any, mockRes as any);
+
+        expect(mockRes.status.mock.calls).toEqual([[401]]);
+      });
+
+      it('returns 200 when About Page is enabled, and email is @twilio.com', async () => {
+        jest.spyOn(auth, 'getUserInfo').mockImplementation(
+          jest.fn().mockResolvedValue({
+            success: true,
+            userInfo: {
+              email: 'mock-email@twilio.com',
+              email_verified: 'mock-email-verified',
+              name: 'mock-name',
+              nickname: 'mock-nickname',
+              picture: 'mock-picture',
+              sub: 'mock-sub',
+              updated_at: 'mock-updated-at',
+            },
+          }),
+        );
+        tokenRoute = createTokenRoute({
+          ...mockServerConfig,
+          ENABLE_ABOUT_PAGE: 'true',
+        });
+
+        await tokenRoute(mockReq as any, mockRes as any);
+
+        expect(mockRes.status.mock.calls).toEqual([[200]]);
+      });
     });
   });
 });
