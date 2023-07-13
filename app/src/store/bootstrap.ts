@@ -10,10 +10,9 @@ import { getAccessToken } from './voice/accessToken';
 import { handleCall } from './voice/call/activeCall';
 import { receiveCallInvite, removeCallInvite } from './voice/call/callInvite';
 import { register } from './voice/registration';
-import { navigate } from '../util/navigation';
+import { getNavigate } from '../util/navigation';
 import { settlePromise } from '../util/settlePromise';
 import { voice } from '../util/voice';
-import { StackParamList } from '../screens/types';
 
 /**
  * Bootstrap user action. Gets the login-state of the user, and if logged in
@@ -71,13 +70,67 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
   { rejectValue: BootstrapCallInvitesRejectValue }
 >(
   bootstrapCallInvitesActionTypes.prefix,
-  async (_, { dispatch, rejectWithValue }) => {
-    const handleCallInvite = async (callInvite: TwilioCallInvite) => {
+  async (_, { dispatch, getState, rejectWithValue }) => {
+    /**
+     * Handle an incoming, pending, call invite.
+     */
+    const handlePendingCallInvite = async (callInvite: TwilioCallInvite) => {
       await dispatch(receiveCallInvite(callInvite));
     };
+    voice.on(Voice.Event.CallInvite, handlePendingCallInvite);
 
-    voice.on(Voice.Event.CallInvite, handleCallInvite);
+    /**
+     * Handle the settling of a pending call invite.
+     */
+    const handleSettledCallInvite = (callInvite: TwilioCallInvite) => {
+      const callSid = callInvite.getCallSid();
 
+      const callInviteEntities = getState().voice.call.callInvite.entities;
+      const callInviteEntity = Object.values(callInviteEntities).find(
+        (entity) => {
+          if (typeof entity === 'undefined') {
+            return false;
+          }
+          return entity.info.callSid === callSid;
+        },
+      );
+      if (typeof callInviteEntity === 'undefined') {
+        return;
+      }
+
+      dispatch(removeCallInvite(callInviteEntity.id));
+    };
+
+    voice.on(
+      Voice.Event.CallInviteAccepted,
+      (callInvite: TwilioCallInvite, call: TwilioCall) => {
+        // dispatch the new call
+        dispatch(handleCall({ call }));
+        handleSettledCallInvite(callInvite);
+
+        const navigate = getNavigate();
+        if (!navigate) {
+          return;
+        }
+        const callSid = callInvite.getCallSid();
+        navigate('Call', { callSid });
+      },
+    );
+
+    voice.on(Voice.Event.CallInviteRejected, (callInvite: TwilioCallInvite) => {
+      handleSettledCallInvite(callInvite);
+    });
+
+    voice.on(
+      Voice.Event.CancelledCallInvite,
+      (callInvite: TwilioCallInvite) => {
+        handleSettledCallInvite(callInvite);
+      },
+    );
+
+    /**
+     * Handle existing pending call invites.
+     */
     const callInvitesResult = await settlePromise(voice.getCallInvites());
     if (callInvitesResult.status === 'rejected') {
       return rejectWithValue({
@@ -88,7 +141,7 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 
     const callInvites = callInvitesResult.value;
     for (const callInvite of callInvites.values()) {
-      handleCallInvite(callInvite);
+      handlePendingCallInvite(callInvite);
     }
   },
 );
@@ -113,68 +166,7 @@ export const bootstrapCalls = createTypedAsyncThunk<
   { rejectValue: BootstrapCallsRejectValue }
 >(
   bootstrapCallsActionTypes.prefix,
-  async (_, { dispatch, getState, rejectWithValue }) => {
-    // TODO(mhuynh): consider placing this logic somewhere else
-    voice.on(
-      Voice.Event.CallInviteAccepted,
-      (callInvite: TwilioCallInvite, call: TwilioCall) => {
-        // dispatch the new call
-        dispatch(handleCall({ call }));
-
-        // invalidate the existing call invite if it exists
-        const callInvites = getState().voice.call.callInvite.entities;
-        const callInviteEntity = Object.entries(callInvites).find(([__, e]) => {
-          if (typeof e === 'undefined') {
-            return false;
-          }
-          return e.info.callSid === callInvite.getCallSid();
-        });
-        if (typeof callInviteEntity === 'undefined') {
-          return;
-        }
-        const [id] = callInviteEntity;
-        dispatch(removeCallInvite(id));
-        navigate('Call');
-      },
-    );
-
-    voice.on(Voice.Event.CallInviteRejected, (callInvite: TwilioCallInvite) => {
-      // invalidate the existing call invite if it exists
-      const callInvites = getState().voice.call.callInvite.entities;
-      const callInviteEntity = Object.entries(callInvites).find(([__, e]) => {
-        if (typeof e === 'undefined') {
-          return false;
-        }
-        return e.info.callSid === callInvite.getCallSid();
-      });
-      if (typeof callInviteEntity === 'undefined') {
-        return;
-      }
-      const [id] = callInviteEntity;
-      dispatch(removeCallInvite(id));
-      navigate('App');
-    });
-
-    voice.on(
-      Voice.Event.CancelledCallInvite,
-      (callInvite: TwilioCallInvite) => {
-        // invalidate the existing call invite if it exists
-        const callInvites = getState().voice.call.callInvite.entities;
-        const callInviteEntity = Object.entries(callInvites).find(([__, e]) => {
-          if (typeof e === 'undefined') {
-            return false;
-          }
-          return e.info.callSid === callInvite.getCallSid();
-        });
-        if (typeof callInviteEntity === 'undefined') {
-          return;
-        }
-        const [id] = callInviteEntity;
-        dispatch(removeCallInvite(id));
-        navigate('App');
-      },
-    );
-
+  async (_, { dispatch, rejectWithValue }) => {
     const callsResult = await settlePromise(voice.getCalls());
     if (callsResult.status === 'rejected') {
       return rejectWithValue({
@@ -185,7 +177,6 @@ export const bootstrapCalls = createTypedAsyncThunk<
 
     const calls = callsResult.value;
     for (const call of calls.values()) {
-      console.log(call);
       await dispatch(handleCall({ call }));
     }
   },
@@ -200,22 +191,19 @@ export const bootstrapCalls = createTypedAsyncThunk<
 export const bootstrapNavigationActionTypes = generateThunkActionTypes(
   'bootstrap/navigation',
 );
-export const bootstrapNavigation = createTypedAsyncThunk<keyof StackParamList>(
+export const bootstrapNavigation = createTypedAsyncThunk(
   bootstrapNavigationActionTypes.prefix,
   (_, { getState }) => {
     const state = getState();
 
-    if (state.voice.call.callInvite.ids.length) {
-      navigate('Incoming Call');
-      return 'Incoming Call';
+    const navigate = getNavigate();
+    if (typeof navigate === 'undefined') {
+      return;
     }
 
     if (state.voice.call.activeCall.ids.length) {
-      navigate('Call');
+      navigate('Call', {});
       return 'Call';
     }
-
-    navigate('App');
-    return 'App';
   },
 );

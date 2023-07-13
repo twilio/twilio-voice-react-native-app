@@ -12,7 +12,7 @@ export const useConnectedActiveCallBanner = () => {
   const navigation = useNavigation<StackNavigationProp<'App'>>();
 
   const onPress = React.useCallback(() => {
-    navigation.navigate('Call');
+    navigation.navigate('Call', {});
   }, [navigation]);
 
   const activeCall = useActiveCall();

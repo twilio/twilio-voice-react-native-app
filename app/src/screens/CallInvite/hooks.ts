@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { type State } from '../../store/app';
@@ -16,6 +17,7 @@ type HookReturnValue = {
 
 export const useCallInvite = (): HookReturnValue => {
   const dispatch = useTypedDispatch();
+  const navigation = useNavigation();
 
   // Get the first incoming call invite.
   const callInviteEntity: CallInviteEntity | undefined = useSelector(
@@ -39,6 +41,14 @@ export const useCallInvite = (): HookReturnValue => {
       await dispatch(rejectCallInvite({ id: callInviteEntity.id }));
     }
   }, [callInviteEntity, dispatch]);
+
+  React.useEffect(() => {
+    if (typeof callInviteEntity !== 'undefined') {
+      return;
+    }
+
+    navigation.goBack();
+  }, [callInviteEntity, navigation]);
 
   return {
     callInviteEntity,

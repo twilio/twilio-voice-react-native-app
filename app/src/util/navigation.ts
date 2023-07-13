@@ -3,10 +3,10 @@ import { type StackParamList } from '../screens/types';
 
 export const navigationRef = createNavigationContainerRef<StackParamList>();
 
-export function navigate(name: keyof StackParamList) {
+export function getNavigate() {
   if (!navigationRef.isReady()) {
     return;
   }
 
-  navigationRef.navigate(name);
+  return navigationRef.navigate;
 }

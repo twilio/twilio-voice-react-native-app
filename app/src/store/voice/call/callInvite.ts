@@ -19,7 +19,6 @@ import {
 import { connectEvent, setActiveCallInfo } from './activeCall';
 import { type AsyncStoreSlice } from '../../app';
 import { createTypedAsyncThunk, generateThunkActionTypes } from '../../common';
-import { navigate } from '../../../util/navigation';
 import { callMap, callInviteMap } from '../../../util/voice';
 import { settlePromise } from '../../../util/settlePromise';
 
@@ -44,8 +43,6 @@ export const receiveCallInvite = createTypedAsyncThunk<
       status: 'idle',
     }),
   );
-
-  navigate('Incoming Call');
 
   return requestId;
 });
@@ -137,8 +134,6 @@ export const acceptCallInvite = createTypedAsyncThunk<
       dispatch(connectEvent({ id, timestamp: Date.now() }));
     });
 
-    navigate('Call');
-
     return callInfo;
   },
 );
@@ -202,8 +197,6 @@ export const rejectCallInvite = createTypedAsyncThunk<
     }
 
     dispatch(removeCallInvite(id));
-
-    navigate('App');
   },
 );
 
