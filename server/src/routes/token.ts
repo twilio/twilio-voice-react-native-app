@@ -37,8 +37,11 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
      * Note: For internal use
      */
     if (
-      serverCredentials.ENABLE_ABOUT_PAGE === 'true' &&
-      !verifyTwilioEmail(userInfo.email)
+      typeof serverCredentials.EMAIL_VERIFICATION_REGEX !== 'undefined' &&
+      !verifyTwilioEmail(
+        userInfo.email,
+        new RegExp(serverCredentials.EMAIL_VERIFICATION_REGEX),
+      )
     ) {
       const msg = 'Must be a valid @twilio.com email';
       logMsg(msg);

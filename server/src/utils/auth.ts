@@ -61,5 +61,5 @@ export async function getUserInfo(
   };
 }
 
-export const verifyTwilioEmail = (email: string): boolean =>
-  email.indexOf('@twilio.com') > -1;
+export const verifyTwilioEmail = (email: string, regex: RegExp): boolean =>
+  regex.test(email);

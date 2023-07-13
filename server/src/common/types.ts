@@ -16,7 +16,7 @@ export interface Auth0Credentials {
 }
 
 export interface Flags {
-  readonly [EnvVars.EnableAboutPage]: string;
+  readonly [EnvVars.EmailVerificationRegex]?: string;
 }
 
 export interface ServerCredentials

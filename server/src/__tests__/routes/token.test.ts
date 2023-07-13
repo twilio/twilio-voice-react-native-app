@@ -16,7 +16,6 @@ const mockServerConfig = {
   PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
-  ENABLE_ABOUT_PAGE: 'false',
 };
 
 beforeEach(() => {
@@ -129,10 +128,11 @@ describe('createTokenRoute()', () => {
     });
 
     describe('Verify Twilio Email', () => {
-      it('returns 401 when About Page is enabled, and email is NOT @twilio.com', async () => {
+      it('returns 401 when EMAIL_VERIFICATION_REGEX is provided, and email is NOT @twilio.com', async () => {
         tokenRoute = createTokenRoute({
           ...mockServerConfig,
-          ENABLE_ABOUT_PAGE: 'true',
+          // eslint-disable-next-line no-useless-escape
+          EMAIL_VERIFICATION_REGEX: '@twilio.com',
         });
 
         await tokenRoute(mockReq as any, mockRes as any);
@@ -140,7 +140,7 @@ describe('createTokenRoute()', () => {
         expect(mockRes.status.mock.calls).toEqual([[401]]);
       });
 
-      it('returns 200 when About Page is enabled, and email is @twilio.com', async () => {
+      it('returns 200 when EMAIL_VERIFICATION_REGEX is provided, and email is @twilio.com', async () => {
         jest.spyOn(auth, 'getUserInfo').mockImplementation(
           jest.fn().mockResolvedValue({
             success: true,
@@ -157,7 +157,8 @@ describe('createTokenRoute()', () => {
         );
         tokenRoute = createTokenRoute({
           ...mockServerConfig,
-          ENABLE_ABOUT_PAGE: 'true',
+          // eslint-disable-next-line no-useless-escape
+          EMAIL_VERIFICATION_REGEX: '@twilio.com',
         });
 
         await tokenRoute(mockReq as any, mockRes as any);
