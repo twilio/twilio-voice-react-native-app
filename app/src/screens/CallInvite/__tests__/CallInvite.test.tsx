@@ -1,3 +1,4 @@
+import { NavigationContainer } from '@react-navigation/native';
 import '@testing-library/jest-native/extend-expect';
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';
@@ -12,7 +13,11 @@ describe('<CallInvite />', () => {
 
   beforeEach(async () => {
     store = createStore();
-    wrapper = ({ children }) => <Provider store={store}>{children}</Provider>;
+    wrapper = ({ children }) => (
+      <NavigationContainer>
+        <Provider store={store}>{children}</Provider>
+      </NavigationContainer>
+    );
     store.dispatch(
       setCallInvite({
         id: 'foobar-id',
