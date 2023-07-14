@@ -11,4 +11,4 @@ export const getUserInfo = jest.fn().mockResolvedValue({
   },
 });
 
-export const verifyTwilioEmail = jest.fn().mockReturnValue(true);
+export const verifyEmail = jest.fn().mockReturnValue(true);

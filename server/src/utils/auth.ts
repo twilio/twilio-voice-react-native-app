@@ -61,5 +61,5 @@ export async function getUserInfo(
   };
 }
 
-export const verifyTwilioEmail = (email: string, regex: RegExp): boolean =>
+export const verifyEmail = (email: string, regex: RegExp): boolean =>
   regex.test(email);

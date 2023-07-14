@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { jwt } from 'twilio';
 import { ServerCredentials } from '../common/types';
-import { getUserInfo, verifyTwilioEmail } from '../utils/auth';
+import { getUserInfo, verifyEmail } from '../utils/auth';
 import { log } from '../utils/log';
 
 export function createTokenRoute(serverCredentials: ServerCredentials) {
@@ -38,12 +38,12 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
      */
     if (
       typeof serverCredentials.EMAIL_VERIFICATION_REGEX !== 'undefined' &&
-      !verifyTwilioEmail(
+      !verifyEmail(
         userInfo.email,
         new RegExp(serverCredentials.EMAIL_VERIFICATION_REGEX),
       )
     ) {
-      const msg = 'Must be a valid @twilio.com email';
+      const msg = `Must be a valid ${serverCredentials.EMAIL_VERIFICATION_REGEX} email`;
       logMsg(msg);
       return res.header('Content-Type', 'text/plain').status(401).send(msg);
     }
