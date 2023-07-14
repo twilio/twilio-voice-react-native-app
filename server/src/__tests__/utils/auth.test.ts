@@ -1,27 +1,29 @@
 import { getUserInfo } from '../../utils/auth';
+
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 
-jest.mock('axios', () => {
-  return {
-    ...(jest.requireActual('axios') as object),
-    create: jest.fn().mockReturnValue(jest.requireActual('axios')),
-  };
-});
-
-const mockAdapter = new MockAdapter(axios);
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('auth utils', () => {
   describe('getUserInfo', () => {
     it('should return success', async () => {
-      const userInfo = { name: 'foo' };
-      mockAdapter.onGet().reply(200, userInfo);
+      const mockedResponse = {
+        data: { name: 'foo' },
+        status: 200,
+        statusText: 'OK',
+      };
+      mockedAxios.get.mockResolvedValueOnce(mockedResponse);
       const response = await getUserInfo('auth0Url', 'auth0Token');
-      expect(response).toEqual({ success: true, userInfo });
+      expect(response).toEqual({ success: true, userInfo: { name: 'foo' } });
     });
 
     it('should handle error', async () => {
-      mockAdapter.onGet().reply(400);
+      const mockedResponse = {
+        status: 500,
+        statusText: 'ERROR',
+      };
+      mockedAxios.get.mockRejectedValueOnce(mockedResponse);
       const response = await getUserInfo('auth0Url', 'auth0Token');
       expect(response.success).toEqual(false);
     });
