@@ -24,14 +24,14 @@ const App = () => {
    * longer dispatch actions.
    */
   React.useEffect(() => {
-    const effect = async () => {
+    const bootstrap = async () => {
       await defaultStore.dispatch(bootstrapUser());
       await defaultStore.dispatch(bootstrapCalls());
       await defaultStore.dispatch(bootstrapCallInvites());
       await defaultStore.dispatch(bootstrapNavigation());
     };
 
-    effect();
+    bootstrap();
   }, []);
 
   return (
