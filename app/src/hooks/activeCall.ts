@@ -29,11 +29,11 @@ export const useActiveCall = (callSid?: string): ActiveCall | undefined => {
     }
 
     const foundCallEntity = Object.values(callEntities).find((callEntity) => {
-      return match<typeof callEntity, boolean>(callEntity)
-        .with({ info: { sid: P.not(undefined) } }, (_callEntity) => {
-          return _callEntity.info.sid === callSid;
-        })
-        .otherwise(() => false);
+      if (callEntity?.status !== 'fulfilled') {
+        return false;
+      }
+
+      return callEntity.info.sid === callSid;
     });
 
     return foundCallEntity;
