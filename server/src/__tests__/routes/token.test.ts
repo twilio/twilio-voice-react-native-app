@@ -131,7 +131,6 @@ describe('createTokenRoute()', () => {
       it('returns 401 when EMAIL_VERIFICATION_REGEX is provided, and email is NOT @twilio.com', async () => {
         tokenRoute = createTokenRoute({
           ...mockServerConfig,
-          // eslint-disable-next-line no-useless-escape
           EMAIL_VERIFICATION_REGEX: '@twilio.com',
         });
 
@@ -157,7 +156,6 @@ describe('createTokenRoute()', () => {
         );
         tokenRoute = createTokenRoute({
           ...mockServerConfig,
-          // eslint-disable-next-line no-useless-escape
           EMAIL_VERIFICATION_REGEX: '@twilio.com',
         });
 

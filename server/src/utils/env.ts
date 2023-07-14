@@ -53,7 +53,7 @@ export function getServerCredentials(): ServerCredentials | undefined {
     return;
   }
 
-  //Optional Credentials
+  //Optional
   const optionalEnvVars = [EnvVars.EmailVerificationRegex];
   optionalEnvVars.forEach((_optionalEnvVarKey) =>
     envVars.push([_optionalEnvVarKey, process.env[_optionalEnvVarKey]]),
