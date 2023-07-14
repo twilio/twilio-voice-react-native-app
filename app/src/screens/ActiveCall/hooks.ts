@@ -220,7 +220,7 @@ const useActiveCallScreen = (callSid?: string) => {
       activeCall.info.state === 'disconnected'
     ) {
       timeoutId = setTimeout(() => {
-        navigation.goBack();
+        navigation.navigate('App');
       }, 1000);
     }
     return () => {

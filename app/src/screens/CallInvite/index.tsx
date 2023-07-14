@@ -20,7 +20,7 @@ const CallInvite: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="call_invite">
       <Image style={styles.logo} source={TwilioLogo} resizeMode="contain" />
       <RemoteParticipant
         title={callInviteEntity.info.from}

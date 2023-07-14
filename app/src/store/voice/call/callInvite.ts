@@ -19,8 +19,10 @@ import {
 import { connectEvent, setActiveCallInfo } from './activeCall';
 import { type AsyncStoreSlice } from '../../app';
 import { createTypedAsyncThunk, generateThunkActionTypes } from '../../common';
+import { navigateToCallInviteScreen } from '../../../util/behavior';
 import { callMap, callInviteMap } from '../../../util/voice';
 import { settlePromise } from '../../../util/settlePromise';
+import { getNavigate } from '../../../util/navigation';
 
 const sliceName = 'callInvite' as const;
 
@@ -43,6 +45,13 @@ export const receiveCallInvite = createTypedAsyncThunk<
       status: 'idle',
     }),
   );
+
+  /**
+   * Hard-code navigation to the Incoming Call screen for tests.
+   */
+  if (navigateToCallInviteScreen) {
+    getNavigate()?.('Incoming Call');
+  }
 
   return requestId;
 });

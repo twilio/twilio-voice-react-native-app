@@ -8,6 +8,7 @@ import {
   type CallInviteEntity,
   rejectCallInvite,
 } from '../../store/voice/call/callInvite';
+import { StackNavigationProp } from '../types';
 
 type HookReturnValue = {
   callInviteEntity?: CallInviteEntity;
@@ -17,7 +18,7 @@ type HookReturnValue = {
 
 export const useCallInvite = (): HookReturnValue => {
   const dispatch = useTypedDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<'Incoming Call'>>();
 
   // Get the first incoming call invite.
   const callInviteEntity: CallInviteEntity | undefined = useSelector(
@@ -33,8 +34,9 @@ export const useCallInvite = (): HookReturnValue => {
   const handleAccept = React.useCallback(async () => {
     if (callInviteEntity?.id) {
       await dispatch(acceptCallInvite({ id: callInviteEntity.id }));
+      navigation.navigate('Call', {});
     }
-  }, [callInviteEntity, dispatch]);
+  }, [callInviteEntity, dispatch, navigation]);
 
   const handleReject = React.useCallback(async () => {
     if (callInviteEntity?.id) {
