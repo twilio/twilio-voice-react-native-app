@@ -15,6 +15,11 @@ export interface Auth0Credentials {
   readonly [EnvVars.Auth0IssuerBaseUrl]: string;
 }
 
+export interface Flags {
+  readonly [EnvVars.EmailVerificationRegex]?: string;
+}
+
 export interface ServerCredentials
   extends TwilioCredentials,
-    Auth0Credentials {}
+    Auth0Credentials,
+    Flags {}
