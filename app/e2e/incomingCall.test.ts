@@ -21,6 +21,24 @@ describe('Incoming Call', () => {
   let twilioClient: ReturnType<typeof twilio>;
   let clientId: string;
 
+  const setup = async () => {
+    await element(by.id('login_button')).tap();
+
+    await expect(element(by.text('Ahoy!'))).toBeVisible();
+    await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
+
+    await twilioClient.calls.create({
+      twiml: '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
+      to: `client:${clientId}`,
+      from: 'detox',
+    });
+
+    /**
+     * Wait for 10 seconds to let the registration settle.
+     */
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+  };
+
   beforeAll(async () => {
     ({ twilioClient, clientId } = bootstrap());
 
@@ -35,17 +53,7 @@ describe('Incoming Call', () => {
 
   describe(':android:', () => {
     it('should answer the call', async () => {
-      await element(by.id('login_button')).tap();
-
-      await expect(element(by.text('Ahoy!'))).toBeVisible();
-      await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
-
-      await twilioClient.calls.create({
-        twiml:
-          '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
-        to: `client:${clientId}`,
-        from: 'detox',
-      });
+      await setup();
 
       /**
        * Wait up to two minutes for the incoming call.
@@ -68,17 +76,7 @@ describe('Incoming Call', () => {
     });
 
     it('should decline the call', async () => {
-      await element(by.id('login_button')).tap();
-
-      await expect(element(by.text('Ahoy!'))).toBeVisible();
-      await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
-
-      await twilioClient.calls.create({
-        twiml:
-          '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
-        to: `client:${clientId}`,
-        from: 'detox',
-      });
+      await setup();
 
       /**
        * Wait up to two minutes for the incoming call.
@@ -95,17 +93,7 @@ describe('Incoming Call', () => {
     });
 
     it('should let the call time out', async () => {
-      await element(by.id('login_button')).tap();
-
-      await expect(element(by.text('Ahoy!'))).toBeVisible();
-      await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
-
-      await twilioClient.calls.create({
-        twiml:
-          '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
-        to: `client:${clientId}`,
-        from: 'detox',
-      });
+      await setup();
 
       /**
        * Wait up to 2 minutes for the incoming call.
