@@ -1,18 +1,28 @@
 import { by, element, expect, waitFor, device } from 'detox';
 import twilio from 'twilio';
 
-const createTwilioClient = () => {
+const bootstrap = () => {
   const accountSid = process.env.ACCOUNT_SID;
   const authToken = process.env.AUTH_TOKEN;
+  const mockClientId = process.env.MOCK_CLIENT_ID;
 
-  return twilio(accountSid, authToken);
+  if (
+    [accountSid, authToken, mockClientId].some((v) => typeof v !== 'string')
+  ) {
+    throw new Error('Missing env var.');
+  }
+
+  const twilioClient = twilio(accountSid, authToken);
+
+  return { twilioClient, clientId: mockClientId as string };
 };
 
 describe('Incoming Call', () => {
-  let client: ReturnType<typeof twilio>;
+  let twilioClient: ReturnType<typeof twilio>;
+  let clientId: string;
 
   beforeAll(async () => {
-    client = createTwilioClient();
+    ({ twilioClient, clientId } = bootstrap());
 
     await device.launchApp({
       newInstance: true,
@@ -30,10 +40,10 @@ describe('Incoming Call', () => {
       await expect(element(by.text('Ahoy!'))).toBeVisible();
       await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
 
-      await client.calls.create({
+      await twilioClient.calls.create({
         twiml:
           '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
-        to: 'client:detoxtestidmhuynh',
+        to: `client:${clientId}`,
         from: 'detox',
       });
 
@@ -63,10 +73,10 @@ describe('Incoming Call', () => {
       await expect(element(by.text('Ahoy!'))).toBeVisible();
       await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
 
-      await client.calls.create({
+      await twilioClient.calls.create({
         twiml:
           '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
-        to: 'client:detoxtestidmhuynh',
+        to: `client:${clientId}`,
         from: 'detox',
       });
 
@@ -90,10 +100,10 @@ describe('Incoming Call', () => {
       await expect(element(by.text('Ahoy!'))).toBeVisible();
       await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
 
-      await client.calls.create({
+      await twilioClient.calls.create({
         twiml:
           '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
-        to: 'client:detoxtestidmhuynh',
+        to: `client:${clientId}`,
         from: 'detox',
       });
 
