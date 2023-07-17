@@ -3,6 +3,7 @@ import {
   miniSerializeError,
   type SerializedError,
 } from '@reduxjs/toolkit';
+import { Platform } from 'react-native';
 import { fetch, defaultUrl } from '../../util/fetch';
 import { settlePromise } from '../../util/settlePromise';
 import { type AsyncStoreSlice } from '../app';
@@ -44,6 +45,9 @@ export const getAccessToken = createTypedAsyncThunk<
         'Content-Type': 'application/json',
         Authorization: `Bearer ${user.accessToken}`,
       },
+      body: JSON.stringify({
+        platform: Platform.OS,
+      }),
     }),
   );
   if (fetchResult.status === 'rejected') {
