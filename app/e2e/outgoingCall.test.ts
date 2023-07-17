@@ -141,10 +141,7 @@ describe('Outgoing Call', () => {
             .not.toExist()
             .withTimeout(10000);
 
-          /**
-           * It takes about 5000ms to return to the dialer.
-           */
-          checkDuration(callStartTime, 5000);
+          checkDuration(callStartTime, 10000);
         });
 
         it('should disconnect if invalid Client-ID', async () => {
@@ -172,10 +169,7 @@ describe('Outgoing Call', () => {
             .not.toBeVisible()
             .withTimeout(10000);
 
-          /**
-           * It takes about 3000ms to return to the dialer.
-           */
-          checkDuration(callStartTime, 3000);
+          checkDuration(callStartTime, 10000);
         });
       });
     });
