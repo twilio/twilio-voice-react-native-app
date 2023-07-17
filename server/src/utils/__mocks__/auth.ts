@@ -10,3 +10,5 @@ export const getUserInfo = jest.fn().mockResolvedValue({
     updated_at: 'mock-updated-at',
   },
 });
+
+export const verifyEmail = jest.fn().mockReturnValue(true);

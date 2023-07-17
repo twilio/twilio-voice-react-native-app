@@ -6,7 +6,7 @@ export type AuthError = {
   message: string;
   name: string;
   status?: number;
-}
+};
 
 export type UserInfo = {
   email: string;
@@ -31,15 +31,16 @@ export type UserInfoResponse =
 
 export async function getUserInfo(
   auth0Url: string,
-  auth0Token: string
+  auth0Token: string,
 ): Promise<UserInfoResponse> {
   const userInfoUrl = `${auth0Url}/userinfo`;
-  const headers = { 'Authorization': `Bearer ${auth0Token}` };
-  const response = await axios.get(userInfoUrl, { headers })
+  const headers = { Authorization: `Bearer ${auth0Token}` };
+  const response = await axios
+    .get(userInfoUrl, { headers })
     .then((value) => ({ success: true as const, value }))
     .catch((error) => ({ success: false as const, error }));
 
-    if (!response.success) {
+  if (!response.success) {
     const error: AxiosError = response.error;
     return {
       success: false,
@@ -59,3 +60,6 @@ export async function getUserInfo(
     userInfo: response.value.data,
   };
 }
+
+export const verifyEmail = (email: string, regex: RegExp): boolean =>
+  regex.test(email);

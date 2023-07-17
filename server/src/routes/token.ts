@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { jwt } from 'twilio';
 import { ServerCredentials } from '../common/types';
-import { getUserInfo } from '../utils/auth';
+import { getUserInfo, verifyEmail } from '../utils/auth';
 import { log } from '../utils/log';
 
 export function createTokenRoute(serverCredentials: ServerCredentials) {
@@ -32,6 +32,22 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
     }
 
     const { userInfo } = userInfoResult;
+
+    /**
+     * Note: For internal use
+     */
+    if (
+      typeof serverCredentials.EMAIL_VERIFICATION_REGEX !== 'undefined' &&
+      !verifyEmail(
+        userInfo.email,
+        new RegExp(serverCredentials.EMAIL_VERIFICATION_REGEX),
+      )
+    ) {
+      const msg = `Must be a valid ${serverCredentials.EMAIL_VERIFICATION_REGEX} email`;
+      logMsg(msg);
+      return res.header('Content-Type', 'text/plain').status(401).send(msg);
+    }
+
     const accessToken = new AccessToken(
       serverCredentials.ACCOUNT_SID,
       serverCredentials.API_KEY_SID,

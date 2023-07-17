@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createTokenRoute } from '../../routes/token';
 import { jwt } from 'twilio';
-
-jest.mock('../../utils/auth');
+import * as auth from '../../utils/auth';
 
 const mockedAccessToken = jest.mocked(jwt.AccessToken);
 const mockedVoiceGrant = jest.mocked(jwt.AccessToken.VoiceGrant);
@@ -21,6 +20,20 @@ const mockServerConfig = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  jest.spyOn(auth, 'getUserInfo').mockImplementation(
+    jest.fn().mockResolvedValue({
+      success: true,
+      userInfo: {
+        email: 'mock-email@test.com',
+        email_verified: 'mock-email-verified',
+        name: 'mock-name',
+        nickname: 'mock-nickname',
+        picture: 'mock-picture',
+        sub: 'mock-sub',
+        updated_at: 'mock-updated-at',
+      },
+    }),
+  );
 });
 
 describe('createTokenRoute()', () => {
@@ -67,7 +80,7 @@ describe('createTokenRoute()', () => {
           mockServerConfig.API_KEY_SID,
           mockServerConfig.API_KEY_SECRET,
           {
-            identity: 'mock-email',
+            identity: 'mock-email@test.com',
           },
         ],
       ]);
@@ -112,6 +125,44 @@ describe('createTokenRoute()', () => {
       expect(mockRes.send.mock.calls).toEqual([
         ['mock-accesstoken-tojwt-foobar'],
       ]);
+    });
+
+    describe('Verify Twilio Email', () => {
+      it('returns 401 when EMAIL_VERIFICATION_REGEX is provided, and email is NOT @twilio.com', async () => {
+        tokenRoute = createTokenRoute({
+          ...mockServerConfig,
+          EMAIL_VERIFICATION_REGEX: '@twilio.com',
+        });
+
+        await tokenRoute(mockReq as any, mockRes as any);
+
+        expect(mockRes.status.mock.calls).toEqual([[401]]);
+      });
+
+      it('returns 200 when EMAIL_VERIFICATION_REGEX is provided, and email is @twilio.com', async () => {
+        jest.spyOn(auth, 'getUserInfo').mockImplementation(
+          jest.fn().mockResolvedValue({
+            success: true,
+            userInfo: {
+              email: 'mock-email@twilio.com',
+              email_verified: 'mock-email-verified',
+              name: 'mock-name',
+              nickname: 'mock-nickname',
+              picture: 'mock-picture',
+              sub: 'mock-sub',
+              updated_at: 'mock-updated-at',
+            },
+          }),
+        );
+        tokenRoute = createTokenRoute({
+          ...mockServerConfig,
+          EMAIL_VERIFICATION_REGEX: '@twilio.com',
+        });
+
+        await tokenRoute(mockReq as any, mockRes as any);
+
+        expect(mockRes.status.mock.calls).toEqual([[200]]);
+      });
     });
   });
 });
