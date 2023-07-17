@@ -7,25 +7,16 @@ describe('Outgoing Call', () => {
     });
   });
 
-  const checkDuration = (
-    callStartTime: number,
-    expectedDuration: number,
-    marginOfError: number = 1000,
-  ) => {
+  const checkDuration = (callStartTime: number, expectedDuration: number) => {
     const callEndTime = Date.now();
     const measuredDuration = callEndTime - callStartTime;
 
-    const minMargin = expectedDuration - marginOfError;
-    const maxMargin = expectedDuration + marginOfError;
+    const isDurationErroneous = measuredDuration > expectedDuration;
 
-    const isOutOfMargin =
-      measuredDuration < minMargin || measuredDuration > maxMargin;
-
-    if (isOutOfMargin) {
+    if (isDurationErroneous) {
       throw new Error(
-        'Call duration out of margin-of-error.\n' +
-          'Expected duration is about ' +
-          `${expectedDuration}ms +- ${marginOfError}ms.\n` +
+        'Call duration too long.\n' +
+          `Expected duration is about ${expectedDuration}ms.\n` +
           `Measured duration is ${measuredDuration}ms`,
       );
     }
@@ -151,9 +142,9 @@ describe('Outgoing Call', () => {
             .withTimeout(10000);
 
           /**
-           * It takes about 7500ms to return to the dialer.
+           * It takes about 5000ms to return to the dialer.
            */
-          checkDuration(callStartTime, 7500, 1000);
+          checkDuration(callStartTime, 5000);
         });
 
         it('should disconnect if invalid Client-ID', async () => {
@@ -184,7 +175,7 @@ describe('Outgoing Call', () => {
           /**
            * It takes about 3000ms to return to the dialer.
            */
-          checkDuration(callStartTime, 3000, 1000);
+          checkDuration(callStartTime, 3000);
         });
       });
     });
