@@ -1,17 +1,18 @@
+import { miniSerializeError, type SerializedError } from '@reduxjs/toolkit';
 import {
-  miniSerializeError,
-  nanoid,
-  type SerializedError,
-} from '@reduxjs/toolkit';
-import { Voice, CallInvite } from '@twilio/voice-react-native-sdk';
+  Voice,
+  Call as TwilioCall,
+  CallInvite as TwilioCallInvite,
+} from '@twilio/voice-react-native-sdk';
 import { createTypedAsyncThunk, generateThunkActionTypes } from './common';
 import { checkLoginStatus } from './user';
 import { getAccessToken } from './voice/accessToken';
-import { getCallInviteInfo } from './voice/call';
-import { setCallInvite } from './voice/call/callInvite';
+import { handleCall } from './voice/call/activeCall';
+import { receiveCallInvite, removeCallInvite } from './voice/call/callInvite';
 import { register } from './voice/registration';
+import { getNavigate } from '../util/navigation';
 import { settlePromise } from '../util/settlePromise';
-import { callInviteMap, voice } from '../util/voice';
+import { voice } from '../util/voice';
 
 /**
  * Bootstrap user action. Gets the login-state of the user, and if logged in
@@ -69,22 +70,67 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
   { rejectValue: BootstrapCallInvitesRejectValue }
 >(
   bootstrapCallInvitesActionTypes.prefix,
-  async (_, { dispatch, rejectWithValue }) => {
-    const handleCallInvite = (callInvite: CallInvite) => {
-      const callInviteInfo = getCallInviteInfo(callInvite);
-      const id = nanoid();
-      callInviteMap.set(id, callInvite);
-      dispatch(
-        setCallInvite({
-          id,
-          info: callInviteInfo,
-          status: 'idle',
-        }),
+  async (_, { dispatch, getState, rejectWithValue }) => {
+    /**
+     * Handle an incoming, pending, call invite.
+     */
+    const handlePendingCallInvite = async (callInvite: TwilioCallInvite) => {
+      await dispatch(receiveCallInvite(callInvite));
+    };
+    voice.on(Voice.Event.CallInvite, handlePendingCallInvite);
+
+    /**
+     * Handle the settling of a pending call invite.
+     */
+    const handleSettledCallInvite = (callInvite: TwilioCallInvite) => {
+      const callSid = callInvite.getCallSid();
+
+      const callInviteEntities = getState().voice.call.callInvite.entities;
+      const callInviteEntity = Object.values(callInviteEntities).find(
+        (entity) => {
+          if (typeof entity === 'undefined') {
+            return false;
+          }
+          return entity.info.callSid === callSid;
+        },
       );
+      if (typeof callInviteEntity === 'undefined') {
+        return;
+      }
+
+      dispatch(removeCallInvite(callInviteEntity.id));
     };
 
-    voice.on(Voice.Event.CallInvite, handleCallInvite);
+    voice.on(
+      Voice.Event.CallInviteAccepted,
+      (callInvite: TwilioCallInvite, call: TwilioCall) => {
+        // dispatch the new call
+        dispatch(handleCall({ call }));
+        handleSettledCallInvite(callInvite);
 
+        const navigate = getNavigate();
+        if (!navigate) {
+          return;
+        }
+        const callSid = callInvite.getCallSid();
+        navigate('Call', { callSid });
+      },
+    );
+
+    voice.on(Voice.Event.CallInviteRejected, (callInvite: TwilioCallInvite) => {
+      handleSettledCallInvite(callInvite);
+    });
+
+    voice.on(
+      Voice.Event.CancelledCallInvite,
+      (callInvite: TwilioCallInvite) => {
+        handleSettledCallInvite(callInvite);
+      },
+    );
+
+    /**
+     * Handle existing pending call invites.
+     */
     const callInvitesResult = await settlePromise(voice.getCallInvites());
     if (callInvitesResult.status === 'rejected') {
       return rejectWithValue({
@@ -95,7 +141,7 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 
     const callInvites = callInvitesResult.value;
     for (const callInvite of callInvites.values()) {
-      handleCallInvite(callInvite);
+      handlePendingCallInvite(callInvite);
     }
   },
 );
@@ -118,15 +164,46 @@ export const bootstrapCalls = createTypedAsyncThunk<
   void,
   void,
   { rejectValue: BootstrapCallsRejectValue }
->(bootstrapCallsActionTypes.prefix, async (_, { rejectWithValue }) => {
-  const callsResult = await settlePromise(voice.getCalls());
+>(
+  bootstrapCallsActionTypes.prefix,
+  async (_, { dispatch, rejectWithValue }) => {
+    const callsResult = await settlePromise(voice.getCalls());
+    if (callsResult.status === 'rejected') {
+      return rejectWithValue({
+        reason: 'NATIVE_MODULE_REJECTED',
+        error: miniSerializeError(callsResult.reason),
+      });
+    }
 
-  if (callsResult.status === 'rejected') {
-    return rejectWithValue({
-      reason: 'NATIVE_MODULE_REJECTED',
-      error: miniSerializeError(callsResult.reason),
-    });
-  }
+    const calls = callsResult.value;
+    for (const call of calls.values()) {
+      await dispatch(handleCall({ call }));
+    }
+  },
+);
 
-  // TODO(mhuynh): [VBLOCKS-1676] Dispatch the existing calls to the application state.
-});
+/**
+ * Bootstrap proper screen. Navigate to the proper screen depending on
+ * application state.
+ *
+ * For example, navigate to the call invite screen when there are call invites.
+ */
+export const bootstrapNavigationActionTypes = generateThunkActionTypes(
+  'bootstrap/navigation',
+);
+export const bootstrapNavigation = createTypedAsyncThunk(
+  bootstrapNavigationActionTypes.prefix,
+  (_, { getState }) => {
+    const state = getState();
+
+    const navigate = getNavigate();
+    if (typeof navigate === 'undefined') {
+      return;
+    }
+
+    if (state.voice.call.activeCall.ids.length) {
+      navigate('Call', {});
+      return 'Call';
+    }
+  },
+);

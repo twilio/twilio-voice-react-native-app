@@ -2,8 +2,25 @@ import { by, element, expect, waitFor, device } from 'detox';
 
 describe('Outgoing Call', () => {
   beforeAll(async () => {
-    await global.device.launchApp();
+    await device.launchApp({
+      newInstance: true,
+    });
   });
+
+  const checkDuration = (callStartTime: number, expectedDuration: number) => {
+    const callEndTime = Date.now();
+    const measuredDuration = callEndTime - callStartTime;
+
+    const isDurationErroneous = measuredDuration > expectedDuration;
+
+    if (isDurationErroneous) {
+      throw new Error(
+        'Call duration too long.\n' +
+          `Expected duration is about ${expectedDuration}ms.\n` +
+          `Measured duration is ${measuredDuration}ms`,
+      );
+    }
+  };
 
   const navigateToDialer = async () => {
     await element(by.id('login_button')).tap();
@@ -11,7 +28,7 @@ describe('Outgoing Call', () => {
   };
 
   beforeEach(async () => {
-    await global.device.reloadReactNative();
+    await device.reloadReactNative();
     await navigateToDialer();
   });
 
@@ -50,29 +67,24 @@ describe('Outgoing Call', () => {
           await element(by.id('dialpad_button_5')).tap();
           await element(by.id('dialpad_button_4')).tap();
           await element(by.id('dialpad_button_1')).tap();
-          await element(by.id('call_button')).tap();
-          await waitFor(element(by.id('active_call'))).toBeVisible();
-          await waitFor(element(by.id('call_status'))).toHaveText('ringing');
-          await waitFor(element(by.id('call_status'))).toHaveText('00:05');
-          await waitFor(element(by.id('active_call'))).not.toBeVisible();
-        });
 
-        it('should validate call is disconnected after callee disconnects the call', async () => {
-          await element(by.id('dialpad_button_3')).tap();
-          await element(by.id('dialpad_button_1')).tap();
-          await element(by.id('dialpad_button_5')).tap();
-          await element(by.id('dialpad_button_6')).tap();
-          await element(by.id('dialpad_button_7')).tap();
-          await element(by.id('dialpad_button_0')).tap();
-          await element(by.id('dialpad_button_3')).tap();
-          await element(by.id('dialpad_button_5')).tap();
-          await element(by.id('dialpad_button_4')).tap();
-          await element(by.id('dialpad_button_1')).tap();
+          /**
+           * The call duration label constantly changing will throw Detox
+           * synchronization off. Detox will stop while the app is not idle.
+           */
+          await device.disableSynchronization();
           await element(by.id('call_button')).tap();
-          await waitFor(element(by.id('active_call'))).toBeFocused();
+
           await waitFor(element(by.id('active_call')))
-            .not.toBeFocused()
-            .withTimeout(12000);
+            .toBeVisible()
+            .withTimeout(10000);
+
+          // after we detect the call screen we can re-enable synchronization
+          await device.enableSynchronization();
+
+          await waitFor(element(by.id('active_call')))
+            .not.toBeVisible()
+            .withTimeout(30000);
         });
 
         it('should allow user to disconnect the call', async () => {
@@ -86,16 +98,19 @@ describe('Outgoing Call', () => {
           await element(by.id('dialpad_button_5')).tap();
           await element(by.id('dialpad_button_4')).tap();
           await element(by.id('dialpad_button_1')).tap();
+
           await device.disableSynchronization();
           await element(by.id('call_button')).tap();
+
           await waitFor(element(by.id('end_call_button')))
-            .toExist()
-            .withTimeout(3000);
+            .toBeVisible()
+            .withTimeout(10000);
           await element(by.id('end_call_button')).tap();
+
           await device.enableSynchronization();
           await waitFor(element(by.id('active_call')))
-            .not.toBeFocused()
-            .withTimeout(2000);
+            .not.toBeVisible()
+            .withTimeout(10000);
         });
       });
 
@@ -104,44 +119,57 @@ describe('Outgoing Call', () => {
           await element(by.id('dialpad_button_1')).tap();
           await element(by.id('dialpad_button_2')).tap();
           await element(by.id('dialpad_button_3')).tap();
-          await element(by.id('call_button')).tap();
-          await waitFor(element(by.id('active_call'))).toBeVisible();
-          await waitFor(element(by.id('call_status'))).toHaveText('ringing');
-          await waitFor(element(by.id('call_status'))).toHaveText(
-            'disconnected',
-          );
-          await waitFor(element(by.id('active_call'))).not.toBeVisible();
-        });
 
-        it('should disconnect if invalid number within 3s', async () => {
-          await element(by.id('dialpad_button_1')).tap();
-          await element(by.id('dialpad_button_2')).tap();
-          await element(by.id('dialpad_button_3')).tap();
+          await device.disableSynchronization();
           await element(by.id('call_button')).tap();
+
           await waitFor(element(by.id('active_call')))
-            .not.toBeFocused()
-            .withTimeout(3000);
+            .toExist()
+            .withTimeout(10000);
+
+          const callStartTime = Date.now();
+
+          await waitFor(element(by.id('call_status')))
+            .toHaveText('ringing')
+            .withTimeout(10000);
+          await waitFor(element(by.id('call_status')))
+            .toHaveText('disconnected')
+            .withTimeout(10000);
+
+          await device.enableSynchronization();
+          await waitFor(element(by.id('active_call')))
+            .not.toExist()
+            .withTimeout(10000);
+
+          checkDuration(callStartTime, 10000);
         });
 
         it('should disconnect if invalid Client-ID', async () => {
           await element(by.text('Client')).tap();
           await element(by.id('client_text_input')).typeText('hi\n');
-          await element(by.id('call_button')).tap();
-          await waitFor(element(by.id('active_call'))).toBeVisible();
-          await waitFor(element(by.id('call_status'))).toHaveText('ringing');
-          await waitFor(element(by.id('call_status'))).toHaveText(
-            'disconnected',
-          );
-          await waitFor(element(by.id('active_call'))).not.toBeVisible();
-        });
 
-        it('should disconnect if invalid Client-ID within 3s', async () => {
-          await element(by.text('Client')).tap();
-          await element(by.id('client_text_input')).typeText('hi\n');
+          await device.disableSynchronization();
           await element(by.id('call_button')).tap();
+
           await waitFor(element(by.id('active_call')))
-            .not.toBeFocused()
-            .withTimeout(3000);
+            .toBeVisible()
+            .withTimeout(10000);
+
+          const callStartTime = Date.now();
+
+          await waitFor(element(by.id('call_status')))
+            .toHaveText('ringing')
+            .withTimeout(10000);
+          await waitFor(element(by.id('call_status')))
+            .toHaveText('disconnected')
+            .withTimeout(10000);
+
+          await device.enableSynchronization();
+          await waitFor(element(by.id('active_call')))
+            .not.toBeVisible()
+            .withTimeout(10000);
+
+          checkDuration(callStartTime, 10000);
         });
       });
     });

@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import { AudioDevice as TwilioAudioDevice } from '@twilio/voice-react-native-sdk';
 import React from 'react';
 import { match, P } from 'ts-pattern';
@@ -15,6 +16,7 @@ import {
   getAudioDevices,
   selectAudioDevice,
 } from '../../store/voice/audioDevices';
+import { StackNavigationProp } from '../types';
 import {
   useActiveCall,
   useActiveCallRemoteParticipant,
@@ -183,12 +185,13 @@ const useSelectAudioOutputDevice = (
  * call screen.
  * @returns - Handlers and state for the active call screen.
  */
-const useActiveCallScreen = () => {
+const useActiveCallScreen = (callSid?: string) => {
   const dispatch = useTypedDispatch();
+  const navigation = useNavigation<StackNavigationProp<'App'>>();
 
   const audioDevices = useAudioDevices();
 
-  const activeCall = useActiveCall();
+  const activeCall = useActiveCall(callSid);
   const remoteParticipant = useActiveCallRemoteParticipant(activeCall);
   const callStatus = useActiveCallDuration(activeCall);
 
@@ -206,6 +209,26 @@ const useActiveCallScreen = () => {
     };
     getAudioDevicesEffect();
   }, [dispatch]);
+
+  /**
+   * Return to the prior screen when the call is disconnected.
+   */
+  React.useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    if (
+      activeCall?.status === 'fulfilled' &&
+      activeCall.info.state === 'disconnected'
+    ) {
+      timeoutId = setTimeout(() => {
+        navigation.navigate('App');
+      }, 1000);
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [activeCall, navigation]);
 
   return {
     button: {

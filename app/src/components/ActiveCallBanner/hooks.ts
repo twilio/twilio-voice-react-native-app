@@ -12,15 +12,15 @@ export const useConnectedActiveCallBanner = () => {
   const navigation = useNavigation<StackNavigationProp<'App'>>();
 
   const onPress = React.useCallback(() => {
-    navigation.navigate('Call');
+    navigation.navigate('Call', {});
   }, [navigation]);
 
   const activeCall = useActiveCall();
   const participant = useActiveCallRemoteParticipant(activeCall);
   const callDuration = useActiveCallDuration(activeCall);
   const hidden = match(activeCall)
-    .with({ info: { state: 'connected' } }, () => false)
-    .otherwise(() => true);
+    .with(undefined, { info: { state: 'disconnected' } }, () => true)
+    .otherwise(() => false);
 
   return { hidden, onPress, participant, callDuration };
 };

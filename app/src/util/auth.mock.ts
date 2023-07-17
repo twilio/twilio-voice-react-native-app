@@ -25,7 +25,7 @@ export function initializeAuth() {
   }
 
   const checkLoginStatus = async () => {
-    return { accessToken: '', email: '' };
+    throw new Error('Not logged in.');
   };
 
   const login = async () => {

@@ -5,7 +5,10 @@ import {
   type PayloadAction,
   type SerializedError,
 } from '@reduxjs/toolkit';
-import { type CallInvite as TwilioCallInvite } from '@twilio/voice-react-native-sdk';
+import {
+  Call as TwilioCall,
+  type CallInvite as TwilioCallInvite,
+} from '@twilio/voice-react-native-sdk';
 import { match } from 'ts-pattern';
 import {
   getCallInfo,
@@ -13,10 +16,13 @@ import {
   type CallInfo,
   type CallInviteInfo,
 } from './';
+import { connectEvent, setActiveCallInfo } from './activeCall';
 import { type AsyncStoreSlice } from '../../app';
 import { createTypedAsyncThunk, generateThunkActionTypes } from '../../common';
-import { callInviteMap } from '../../../util/voice';
+import { navigateToCallInviteScreen } from '../../../util/behavior';
+import { callMap, callInviteMap } from '../../../util/voice';
 import { settlePromise } from '../../../util/settlePromise';
+import { getNavigate } from '../../../util/navigation';
 
 const sliceName = 'callInvite' as const;
 
@@ -39,6 +45,13 @@ export const receiveCallInvite = createTypedAsyncThunk<
       status: 'idle',
     }),
   );
+
+  /**
+   * Hard-code navigation to the Incoming Call screen for tests.
+   */
+  if (navigateToCallInviteScreen) {
+    getNavigate()?.('Incoming Call');
+  }
 
   return requestId;
 });
@@ -105,6 +118,31 @@ export const acceptCallInvite = createTypedAsyncThunk<
 
     const call = acceptResult.value;
     const callInfo = getCallInfo(call);
+    callMap.set(id, call);
+
+    call.on(TwilioCall.Event.ConnectFailure, (error) =>
+      console.error('ConnectFailure:', error),
+    );
+    call.on(TwilioCall.Event.Reconnecting, (error) =>
+      console.error('Reconnecting:', error),
+    );
+    call.on(TwilioCall.Event.Disconnected, (error) => {
+      // The type of error here is "TwilioError | undefined".
+      if (error) {
+        console.error('Disconnected:', error);
+      }
+    });
+
+    Object.values(TwilioCall.Event).forEach((callEvent) => {
+      call.on(callEvent, () => {
+        dispatch(setActiveCallInfo({ id, info: getCallInfo(call) }));
+      });
+    });
+
+    call.once(TwilioCall.Event.Connected, () => {
+      dispatch(connectEvent({ id, timestamp: Date.now() }));
+    });
+
     return callInfo;
   },
 );

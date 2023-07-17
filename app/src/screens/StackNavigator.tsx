@@ -23,26 +23,22 @@ const StackNavigator = () => {
     return <Busy />;
   }
 
-  const screens =
-    user?.status === 'fulfilled' && user.accessToken ? (
-      <>
-        <Stack.Screen
-          name="App"
-          options={{ headerShown: false }}
-          component={TabNavigator}
-        />
-        <Stack.Screen name="Call" component={ActiveCall} />
-        <Stack.Screen name="Incoming Call" component={CallInvite} />
-      </>
-    ) : (
-      <Stack.Screen
-        name="Sign In"
-        options={{ headerShown: false }}
-        component={SignIn}
-      />
-    );
+  const isLoggedIn = user?.status === 'fulfilled' && user.accessToken;
+  if (!isLoggedIn) {
+    return <SignIn />;
+  }
 
-  return <Stack.Navigator>{screens}</Stack.Navigator>;
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="App"
+        options={{ headerShown: false }}
+        component={TabNavigator}
+      />
+      <Stack.Screen name="Call" component={ActiveCall} />
+      <Stack.Screen name="Incoming Call" component={CallInvite} />
+    </Stack.Navigator>
+  );
 };
 
 export default StackNavigator;

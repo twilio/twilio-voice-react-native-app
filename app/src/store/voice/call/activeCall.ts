@@ -5,6 +5,7 @@ import {
   type PayloadAction,
   type SerializedError,
 } from '@reduxjs/toolkit';
+import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 import { match } from 'ts-pattern';
 import {
   type CallInfo,
@@ -19,6 +20,46 @@ import { makeOutgoingCall } from './outgoingCall';
 import { acceptCallInvite } from './callInvite';
 
 const sliceName = 'activeCall' as const;
+
+/**
+ * Handle existing call action. Used when bootstrapping the app or receiving a
+ * call that was accepted through the native layer.
+ */
+export const handleCallActionType = generateThunkActionTypes(
+  `${sliceName}/handleCall`,
+);
+export const handleCall = createTypedAsyncThunk<CallInfo, { call: TwilioCall }>(
+  handleCallActionType.prefix,
+  async ({ call }, { dispatch, requestId }) => {
+    const callInfo = getCallInfo(call);
+    callMap.set(requestId, call);
+
+    call.on(TwilioCall.Event.ConnectFailure, (error) =>
+      console.error('ConnectFailure:', error),
+    );
+    call.on(TwilioCall.Event.Reconnecting, (error) =>
+      console.error('Reconnecting:', error),
+    );
+    call.on(TwilioCall.Event.Disconnected, (error) => {
+      // The type of error here is "TwilioError | undefined".
+      if (error) {
+        console.error('Disconnected:', error);
+      }
+    });
+
+    Object.values(TwilioCall.Event).forEach((callEvent) => {
+      call.on(callEvent, () => {
+        dispatch(setActiveCallInfo({ id: requestId, info: getCallInfo(call) }));
+      });
+    });
+
+    call.once(TwilioCall.Event.Connected, () => {
+      dispatch(connectEvent({ id: requestId, timestamp: Date.now() }));
+    });
+
+    return callInfo;
+  },
+);
 
 /**
  * Disconnect active call action.
@@ -202,6 +243,31 @@ export const activeCallSlice = createSlice({
     },
   },
   extraReducers(builder) {
+    /**
+     * Handle the "handleCall" actions.
+     */
+    builder.addCase(handleCall.fulfilled, (state, action) => {
+      const { requestId } = action.meta;
+
+      match(state.entities[requestId])
+        .with(undefined, () => {
+          activeCallAdapter.setOne(state, {
+            direction: 'incoming',
+            id: requestId,
+            status: 'fulfilled',
+            action: {
+              disconnect: { status: 'idle' },
+              hold: { status: 'idle' },
+              mute: { status: 'idle' },
+              sendDigits: { status: 'idle' },
+            },
+            info: action.payload,
+            initialConnectTimestamp: undefined,
+          });
+        })
+        .otherwise(() => {});
+    });
+
     /**
      * Handle the "makeOutgoingCall" actions.
      */

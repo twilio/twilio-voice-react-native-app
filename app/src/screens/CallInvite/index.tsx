@@ -3,21 +3,33 @@ import { Image, StyleSheet, View } from 'react-native';
 import RemoteParticipant from '../../components/Call/RemoteParticipant';
 import MakeCallButton from '../../components/Call/MakeCallButton';
 import EndCallButton from '../../components/Call/EndCallButton';
-import { useIncomingCall } from './hooks';
+import { useCallInvite } from './hooks';
 
 const TwilioLogo = require('../../../assets/icons/twilio-logo.png');
 
 const CallInvite: React.FC = () => {
-  const { remoteParticipant } = useIncomingCall();
+  const { callInviteEntity, handleAccept, handleReject } = useCallInvite();
+
+  /**
+   * Display nothing if there is no call invite and we're somehow on this
+   * screen. This should not happen because we only render this screen in the
+   * navigator when there is a call invite in the app state.
+   */
+  if (!callInviteEntity) {
+    return null;
+  }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="call_invite">
       <Image style={styles.logo} source={TwilioLogo} resizeMode="contain" />
-      <RemoteParticipant {...remoteParticipant} />
+      <RemoteParticipant
+        title={callInviteEntity.info.from}
+        subtitle="Incoming Call"
+      />
       <View />
       <View style={styles.buttonContainer}>
-        <MakeCallButton />
-        <EndCallButton />
+        <MakeCallButton onPress={handleAccept} />
+        <EndCallButton onPress={handleReject} />
       </View>
     </View>
   );

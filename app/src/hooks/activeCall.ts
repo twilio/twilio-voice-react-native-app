@@ -19,10 +19,24 @@ const DEFAULT_TIME_INTERVAL_UPDATE_MS = 250;
  *
  * @returns - The active call.
  */
-export const useActiveCall = () => {
+export const useActiveCall = (callSid?: string): ActiveCall | undefined => {
   const activeCall = useSelector<State, ActiveCall | undefined>((store) => {
-    const { entities, ids } = store.voice.call.activeCall;
-    return entities[ids[ids.length - 1]];
+    const { entities: callEntities, ids: callIds } =
+      store.voice.call.activeCall;
+
+    if (typeof callSid === 'undefined') {
+      return callEntities[callIds[callIds.length - 1]];
+    }
+
+    const foundCallEntity = Object.values(callEntities).find((callEntity) => {
+      if (callEntity?.status !== 'fulfilled') {
+        return false;
+      }
+
+      return callEntity.info.sid === callSid;
+    });
+
+    return foundCallEntity;
   });
 
   return activeCall;

@@ -1,12 +1,14 @@
-import { by, element, expect } from 'detox';
+import { by, device, element, expect } from 'detox';
 
 describe('Login', () => {
   beforeAll(async () => {
-    await global.device.launchApp();
+    await device.launchApp({
+      newInstance: true,
+    });
   });
 
   beforeEach(async () => {
-    await global.device.reloadReactNative();
+    await device.reloadReactNative();
   });
 
   it('should land on the login screen', async () => {

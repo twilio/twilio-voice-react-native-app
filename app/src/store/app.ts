@@ -5,7 +5,11 @@ import { userSlice } from './user';
 export const logActionType: Middleware = () => (next) => (action) => {
   console.log(
     action.type.match(/\/rejected$/g)
-      ? `${action.type} ${JSON.stringify(action.payload, null, 2)}`
+      ? `${action.type} ${JSON.stringify(
+          action.error || action.payload,
+          null,
+          2,
+        )}`
       : action.type,
   );
 

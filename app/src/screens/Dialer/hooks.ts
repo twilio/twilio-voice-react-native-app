@@ -119,7 +119,7 @@ const useMakeOutgoingCall = (
       return;
     }
 
-    navigation.navigate('Call');
+    navigation.navigate('Call', {});
   }, [dispatch, navigation, recipientType, to]);
 
   const isDisabled = React.useMemo(() => {
