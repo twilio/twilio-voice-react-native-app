@@ -7,7 +7,8 @@ export interface TwilioCredentials {
   readonly [EnvVars.ApiKeySecret]: string;
   readonly [EnvVars.OutgoingApplicationSid]: string;
   readonly [EnvVars.CallerId]: string;
-  readonly [EnvVars.PushCredentialSid]: string;
+  readonly [EnvVars.ApnPushCredentialSid]: string;
+  readonly [EnvVars.FcmPushCredentialSid]: string;
 }
 
 export interface Auth0Credentials {
@@ -23,3 +24,8 @@ export interface ServerCredentials
   extends TwilioCredentials,
     Auth0Credentials,
     Flags {}
+
+export enum Platform {
+  Android = 'android',
+  Ios = 'ios',
+}

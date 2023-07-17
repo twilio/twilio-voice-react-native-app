@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as auth0JwtCheck from 'express-oauth2-jwt-bearer';
 import request from 'supertest';
-import { validateExpressRequest } from 'twilio';
+import { validateExpressRequest, jwt } from 'twilio';
 import { createExpressApp } from '../server';
 import * as authUtil from '../utils/auth';
 
@@ -17,7 +17,8 @@ const mockServerConfig = {
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   TWIML_APP_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
-  PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
+  APN_PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-apnpushcredentialsid',
+  FCM_PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-fcmpushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
@@ -32,10 +33,49 @@ describe('/token', () => {
     jest.clearAllMocks();
   });
 
-  it('responds with 200 for a valid request', async () => {
+  it('responds with 200 for a request without a platform', async () => {
     const auth = jest.spyOn(auth0JwtCheck, 'auth');
     const response = await tokenRouteTest().send();
     expect(auth).toBeCalledTimes(1);
+    expect(response.status).toBe(200);
+    expect(response.headers['content-type']).toMatch(/text/);
+    expect(response.text).toBe('mock-accesstoken-tojwt-foobar');
+  });
+
+  describe('responds with 200 for a request with a known platform', () => {
+    const knownPlatforms = [
+      ['android', mockServerConfig.FCM_PUSH_CREDENTIAL_SID],
+      ['ios', mockServerConfig.APN_PUSH_CREDENTIAL_SID],
+    ] as const;
+
+    knownPlatforms.forEach(([platform, pushCredentialSid]) => {
+      it(platform, async () => {
+        const spy = jest.spyOn(jwt.AccessToken, 'VoiceGrant');
+        const response = await tokenRouteTest().send({ platform });
+
+        expect(spy.mock.calls).toEqual([[{
+          incomingAllow: true,
+          outgoingApplicationSid: mockServerConfig.TWIML_APP_SID,
+          pushCredentialSid,
+        }]]);
+
+        expect(response.status).toBe(200);
+        expect(response.headers['content-type']).toMatch(/text/);
+        expect(response.text).toBe('mock-accesstoken-tojwt-foobar');
+      });
+    });
+  });
+
+  it('responds with 200 for a request with an unknown platform', async () => {
+    const spy = jest.spyOn(jwt.AccessToken, 'VoiceGrant');
+    const response = await tokenRouteTest().send({ platform: 'windows' });
+
+    expect(spy.mock.calls).toEqual([[{
+      incomingAllow: false,
+      outgoingApplicationSid: mockServerConfig.TWIML_APP_SID,
+      pushCredentialSid: undefined,
+    }]]);
+
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toMatch(/text/);
     expect(response.text).toBe('mock-accesstoken-tojwt-foobar');

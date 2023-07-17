@@ -3,6 +3,8 @@ import { createTokenRoute } from '../../routes/token';
 import { jwt } from 'twilio';
 import * as auth from '../../utils/auth';
 
+jest.mock('../../utils/log');
+
 const mockedAccessToken = jest.mocked(jwt.AccessToken);
 const mockedVoiceGrant = jest.mocked(jwt.AccessToken.VoiceGrant);
 
@@ -13,7 +15,8 @@ const mockServerConfig = {
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   TWIML_APP_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
-  PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
+  APN_PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-apnpushcredentialsid',
+  FCM_PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-fcmpushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
@@ -48,6 +51,9 @@ describe('createTokenRoute()', () => {
       auth: {
         token: string;
       };
+      body: {
+        platform?: string;
+      };
     };
     let mockRes: {
       header: jest.Mock;
@@ -61,6 +67,9 @@ describe('createTokenRoute()', () => {
       mockReq = {
         auth: {
           token: 'mock-token',
+        },
+        body: {
+          platform: 'android',
         },
       };
       mockRes = {
@@ -94,7 +103,7 @@ describe('createTokenRoute()', () => {
           {
             incomingAllow: true,
             outgoingApplicationSid: mockServerConfig.TWIML_APP_SID,
-            pushCredentialSid: mockServerConfig.PUSH_CREDENTIAL_SID,
+            pushCredentialSid: mockServerConfig.FCM_PUSH_CREDENTIAL_SID,
           },
         ],
       ]);

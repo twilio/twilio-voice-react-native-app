@@ -11,7 +11,8 @@ export enum EnvVars {
   CallerId = 'CALLER_ID',
   OutgoingApplicationSid = 'TWIML_APP_SID',
   Port = 'PORT',
-  PushCredentialSid = 'PUSH_CREDENTIAL_SID',
+  ApnPushCredentialSid = 'APN_PUSH_CREDENTIAL_SID',
+  FcmPushCredentialSid = 'FCM_PUSH_CREDENTIAL_SID',
   Auth0Audience = 'AUTH0_AUDIENCE',
   Auth0IssuerBaseUrl = 'AUTH0_ISSUER_BASE_URL',
   EmailVerificationRegex = 'EMAIL_VERIFICATION_REGEX',
@@ -41,7 +42,6 @@ export function getServerCredentials(): ServerCredentials | undefined {
     EnvVars.ApiKeySid,
     EnvVars.CallerId,
     EnvVars.OutgoingApplicationSid,
-    EnvVars.PushCredentialSid,
     EnvVars.Auth0Audience,
     EnvVars.Auth0IssuerBaseUrl,
   ].map((envVarKey) => [envVarKey, getEnvVar(envVarKey)]);
@@ -53,8 +53,12 @@ export function getServerCredentials(): ServerCredentials | undefined {
     return;
   }
 
-  //Optional
-  const optionalEnvVars = [EnvVars.EmailVerificationRegex];
+  // Optional variables
+  const optionalEnvVars = [
+    EnvVars.ApnPushCredentialSid,
+    EnvVars.EmailVerificationRegex,
+    EnvVars.FcmPushCredentialSid,
+  ];
   optionalEnvVars.forEach((_optionalEnvVarKey) =>
     envVars.push([_optionalEnvVarKey, process.env[_optionalEnvVarKey]]),
   );
