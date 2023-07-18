@@ -32,11 +32,13 @@ describe('Incoming Call', () => {
      */
     await new Promise((resolve) => setTimeout(resolve, 10000));
 
-    await twilioClient.calls.create({
+    const testCall = await twilioClient.calls.create({
       twiml: '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
       to: `client:${clientId}`,
       from: 'detox',
     });
+
+    console.log(`Call created with SID: "${testCall.sid}".`);
   };
 
   beforeAll(async () => {
