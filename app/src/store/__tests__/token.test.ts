@@ -33,10 +33,17 @@ jest.mock('@twilio/voice-react-native-sdk', () => {
   return { Call: MockCall };
 });
 
+jest.mock('react-native', () => {
+  return {
+    Platform: { OS: 'foobar' },
+  };
+});
+
 describe('token store', () => {
   let store: app.Store;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     store = app.createStore();
   });
 
@@ -51,6 +58,26 @@ describe('token store', () => {
     expect(store.getState().voice.accessToken).toEqual({
       status: 'fulfilled',
       value: 'foo',
+    });
+  });
+
+  it('passes the platform to the request body', async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      text: jest.fn().mockResolvedValueOnce('foo'),
+    });
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
+    expect(fetchMock).toBeCalledTimes(1);
+    expect(fetchMock.mock.calls[0]).toHaveLength(2);
+    const params = fetchMock.mock.calls[0][1];
+    expect(params).toEqual({
+      body: JSON.stringify({ platform: 'foobar' }),
+      headers: {
+        Authorization: 'Bearer test token',
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
     });
   });
 

@@ -1,8 +1,47 @@
 import { Request, Response } from 'express';
 import { jwt } from 'twilio';
-import { ServerCredentials } from '../common/types';
+import { Platform, ServerCredentials } from '../common/types';
 import { getUserInfo, verifyEmail } from '../utils/auth';
 import { log } from '../utils/log';
+
+type ParsePlatformReturnType = {
+  incomingAllow: true;
+  platform: Platform.Android;
+  pushCredentialSid: string;
+} | {
+  incomingAllow: true;
+  platform: Platform.Ios;
+  pushCredentialSid: string;
+} | {
+  incomingAllow: false;
+  platform: undefined;
+  pushCredentialSid: undefined;
+};
+export function parsePlatform(
+  serverCredentials: ServerCredentials,
+  platform: string,
+): ParsePlatformReturnType {
+  switch (platform) {
+    case Platform.Android:
+      return {
+        incomingAllow: true,
+        platform: Platform.Android,
+        pushCredentialSid: serverCredentials.FCM_PUSH_CREDENTIAL_SID,
+      };
+    case Platform.Ios:
+      return {
+        incomingAllow: true,
+        platform: Platform.Ios,
+        pushCredentialSid: serverCredentials.APN_PUSH_CREDENTIAL_SID,
+      };
+    default:
+      return {
+        incomingAllow: false,
+        platform: undefined,
+        pushCredentialSid: undefined,
+      };
+  }
+}
 
 export function createTokenRoute(serverCredentials: ServerCredentials) {
   const {
@@ -48,6 +87,18 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
       return res.header('Content-Type', 'text/plain').status(401).send(msg);
     }
 
+    const { incomingAllow, platform, pushCredentialSid } = parsePlatform(
+      serverCredentials,
+      req.body.platform,
+    );
+
+    if (typeof platform === 'undefined') {
+      logMsg(
+        `Unknown platform detected: "${req.body.platform}". ' +
+        'Supported platforms are "['android', 'ios']".`,
+      );
+    }
+
     const accessToken = new AccessToken(
       serverCredentials.ACCOUNT_SID,
       serverCredentials.API_KEY_SID,
@@ -58,9 +109,9 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
     );
 
     const voiceGrant = new VoiceGrant({
-      incomingAllow: true,
+      incomingAllow,
       outgoingApplicationSid: serverCredentials.TWIML_APP_SID,
-      pushCredentialSid: serverCredentials.PUSH_CREDENTIAL_SID,
+      pushCredentialSid,
     });
 
     accessToken.addGrant(voiceGrant);
