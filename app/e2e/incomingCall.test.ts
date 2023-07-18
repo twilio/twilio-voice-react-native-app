@@ -53,6 +53,10 @@ describe('Incoming Call', () => {
     await device.reloadReactNative();
   });
 
+  afterEach(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+  });
+
   describe(':android:', () => {
     it('should answer the call', async () => {
       await setup();
