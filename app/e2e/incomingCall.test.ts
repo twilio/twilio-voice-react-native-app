@@ -29,6 +29,9 @@ describe('Incoming Call', () => {
 
     /**
      * Wait for 10 seconds to let the registration settle.
+     *
+     * Duration chosen through local testing as the minimum value that seems to
+     * stabilize tests.
      */
     await new Promise((resolve) => setTimeout(resolve, 10000));
 
@@ -54,6 +57,12 @@ describe('Incoming Call', () => {
   });
 
   afterEach(async () => {
+    /**
+     * Wait for 10 seconds to let the call settle.
+     *
+     * Duration chosen through local testing as the minimum value that seems to
+     * stabilize tests.
+     */
     await new Promise((resolve) => setTimeout(resolve, 10000));
   });
 
