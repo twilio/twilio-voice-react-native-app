@@ -27,16 +27,16 @@ describe('Incoming Call', () => {
     await expect(element(by.text('Ahoy!'))).toBeVisible();
     await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
 
+    /**
+     * Wait for 10 seconds to let the registration settle.
+     */
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
     await twilioClient.calls.create({
       twiml: '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
       to: `client:${clientId}`,
       from: 'detox',
     });
-
-    /**
-     * Wait for 10 seconds to let the registration settle.
-     */
-    await new Promise((resolve) => setTimeout(resolve, 10000));
   };
 
   beforeAll(async () => {
