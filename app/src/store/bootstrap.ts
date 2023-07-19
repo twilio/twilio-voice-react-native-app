@@ -43,7 +43,6 @@ export const bootstrapUser = createTypedAsyncThunk<
 
   const getAccessTokenResult = await dispatch(getAccessToken());
   if (getAccessToken.rejected.match(getAccessTokenResult)) {
-    // await dispatch logout with error
     return rejectWithValue({ reason: 'GET_ACCESS_TOKEN_REJECTED' });
   }
 

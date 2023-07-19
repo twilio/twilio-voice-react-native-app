@@ -4,6 +4,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import SignIn from '..';
 import { createStore } from '../../../store/app';
+import configureStore from 'redux-mock-store';
 
 describe('<SignIn />', () => {
   let store: ReturnType<typeof createStore>;
@@ -26,5 +27,23 @@ describe('<SignIn />', () => {
         "Welcome to Twilio's Voice SDK Reference App. Log in to get started!",
       ),
     ).toBeOnTheScreen();
+  });
+
+  it('should show the accessToken error message', () => {
+    const errorMessage = 'wrong email';
+    const initialState = {
+      voice: {
+        accessToken: {
+          status: 'rejected',
+          error: { message: errorMessage },
+        },
+      },
+    };
+    const mockStore = configureStore();
+    wrapper = ({ children }) => (
+      <Provider store={mockStore(initialState)}>{children}</Provider>
+    );
+    render(<SignIn />, { wrapper });
+    expect(screen.getByText(errorMessage)).toBeOnTheScreen();
   });
 });

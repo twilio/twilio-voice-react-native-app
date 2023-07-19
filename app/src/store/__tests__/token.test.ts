@@ -61,6 +61,7 @@ describe('token store', () => {
     expect(store.getState().voice.accessToken).toEqual({
       status: 'rejected',
       reason: 'USER_NOT_FULFILLED',
+      error: miniSerializeError(null),
     });
   });
 
@@ -87,12 +88,35 @@ describe('token store', () => {
     });
     fetchMock.mockResolvedValueOnce({
       ok: false,
+      text: jest.fn().mockRejectedValueOnce({}),
     });
     await store.dispatch(user.login());
     await store.dispatch(token.getAccessToken());
     expect(store.getState().voice.accessToken).toEqual({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       status: 'rejected',
+      error: miniSerializeError(null),
+    });
+  });
+
+  it('rejects if "TOKEN_RESPONSE_NOT_OK" and status is fulfilled', async () => {
+    jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
+      accessToken: 'test token',
+      idToken: 'test id token',
+    });
+    const errorMessage = 'foobar';
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      text: jest.fn().mockResolvedValueOnce(errorMessage),
+      status: 400,
+    });
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
+    expect(store.getState().voice.accessToken).toEqual({
+      reason: 'TOKEN_RESPONSE_NOT_OK',
+      status: 'rejected',
+      error: miniSerializeError(errorMessage),
+      statusCode: 400,
     });
   });
 

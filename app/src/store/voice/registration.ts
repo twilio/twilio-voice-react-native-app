@@ -7,7 +7,7 @@ import { match } from 'ts-pattern';
 import { getAccessToken } from './accessToken';
 import { type AsyncStoreSlice } from '../app';
 import { createTypedAsyncThunk } from '../common';
-import { login } from '../user';
+import { login, logout } from '../user';
 import { settlePromise } from '../../util/settlePromise';
 import { voice } from '../../util/voice';
 
@@ -76,7 +76,10 @@ export const loginAndRegister = createTypedAsyncThunk<
 
   const getAccessTokenResult = await dispatch(getAccessToken());
   if (getAccessToken.rejected.match(getAccessTokenResult)) {
-    return rejectWithValue({ reason: 'GET_ACCESS_TOKEN_REJECTED' });
+    await dispatch(logout());
+    return rejectWithValue({
+      reason: 'GET_ACCESS_TOKEN_REJECTED',
+    });
   }
 
   const registerActionResult = await dispatch(register());

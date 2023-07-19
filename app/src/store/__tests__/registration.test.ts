@@ -108,6 +108,8 @@ describe('registration', () => {
           user.login.fulfilled,
           accessTokenStoreModule.getAccessToken.pending,
           accessTokenStoreModule.getAccessToken.rejected,
+          user.logout.pending,
+          user.logout.fulfilled,
           registrationStoreModule.loginAndRegister.rejected,
         ]);
       });

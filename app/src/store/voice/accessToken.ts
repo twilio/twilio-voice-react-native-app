@@ -11,6 +11,7 @@ import { createTypedAsyncThunk } from '../common';
 export type GetAccessTokenRejectValue =
   | {
       reason: 'USER_NOT_FULFILLED';
+      error: SerializedError;
     }
   | {
       reason: 'FETCH_ERROR';
@@ -19,6 +20,7 @@ export type GetAccessTokenRejectValue =
   | {
       reason: 'TOKEN_RESPONSE_NOT_OK';
       statusCode: number;
+      error: SerializedError;
     }
   | {
       reason: 'FETCH_TEXT_ERROR';
@@ -34,7 +36,10 @@ export const getAccessToken = createTypedAsyncThunk<
 >('voice/getAccessToken', async (_, { getState, rejectWithValue }) => {
   const user = getState().user;
   if (user?.status !== 'fulfilled') {
-    return rejectWithValue({ reason: 'USER_NOT_FULFILLED' });
+    return rejectWithValue({
+      reason: 'USER_NOT_FULFILLED',
+      error: miniSerializeError(null),
+    });
   }
 
   const fetchResult = await settlePromise(
@@ -54,14 +59,25 @@ export const getAccessToken = createTypedAsyncThunk<
   }
 
   const tokenResponse = fetchResult.value;
+
+  const tokenTextResult = await settlePromise(tokenResponse.text());
+
+  if (!tokenResponse.ok && tokenTextResult.status === 'fulfilled') {
+    return rejectWithValue({
+      reason: 'TOKEN_RESPONSE_NOT_OK',
+      statusCode: tokenResponse.status,
+      error: miniSerializeError(tokenTextResult.value),
+    });
+  }
+
   if (!tokenResponse.ok) {
     return rejectWithValue({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       statusCode: tokenResponse.status,
+      error: miniSerializeError(null),
     });
   }
 
-  const tokenTextResult = await settlePromise(tokenResponse.text());
   if (tokenTextResult.status === 'rejected') {
     return rejectWithValue({
       reason: 'FETCH_TEXT_ERROR',
@@ -91,18 +107,27 @@ export const accessTokenSlice = createSlice({
       return { status: 'fulfilled', value: action.payload };
     });
 
-    builder.addCase(getAccessToken.rejected, (_, action) => {
+    builder.addCase(getAccessToken.rejected, (state, action) => {
       switch (action.payload?.reason) {
         case 'USER_NOT_FULFILLED':
           return {
             status: 'rejected',
             reason: action.payload.reason,
+            error: action.payload.error,
           };
         case 'TOKEN_RESPONSE_NOT_OK':
+          state = {
+            ...state,
+            status: 'rejected',
+            reason: action.payload.reason,
+            statusCode: action.payload.statusCode,
+            error: action.payload.error,
+          };
           return {
             status: 'rejected',
             reason: action.payload.reason,
             statusCode: action.payload.statusCode,
+            error: action.payload.error,
           };
         case 'FETCH_ERROR':
         case 'FETCH_TEXT_ERROR':

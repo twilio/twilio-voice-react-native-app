@@ -13,20 +13,17 @@ import Busy from '../components/Busy';
 const Stack = createNativeStackNavigator<StackParamList>();
 
 const StackNavigator = () => {
-  // const twilioAccessToken = useSelector(
-  //   (state: State) => state.voice.accessToken,
-  // );
+  const twilioAccessToken = useSelector(
+    (state: State) => state.voice.accessToken,
+  );
   const user = useSelector((state: State) => state.user);
   if (user === null) {
     return <Text>Application not bootstrapped.</Text>;
   }
 
-  if (user?.status === 'pending') {
+  if (user?.status === 'pending' || twilioAccessToken?.status === 'pending') {
     return <Busy />;
   }
-  //Maybe move this to make user logout
-  // twilioAccessToken.status === 'fulfilled' &&
-  // twilioAccessToken.value
 
   const isLoggedIn = user?.status === 'fulfilled' && user.accessToken;
   if (!isLoggedIn) {
