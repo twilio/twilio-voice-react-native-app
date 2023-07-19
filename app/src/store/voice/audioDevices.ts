@@ -10,41 +10,57 @@ import { type AsyncStoreSlice } from '../app';
 import { createTypedAsyncThunk } from '../common';
 import { settlePromise } from '../../util/settlePromise';
 
-export type AudioDeviceRejectValue =
-  | { reason: 'AUDIO_DEVICES_NOT_FOUND' }
-  | { reason: 'MISSING_AUDIO_DEVICE_UUID' }
-  | { reason: 'GET_AUDIO_DEVICES_ERROR'; error: SerializedError };
-
+export type SelectAudioDeviceRejectValue =
+  | { reason: 'AUDIO_DEVICE_UUID_NOT_FOUND' }
+  | { reason: 'NATIVE_MODULE_REJECTED' };
 export const selectAudioDevice = createTypedAsyncThunk<
   void,
-  { audioDeviceUuid: string }
->('voice/selectAudioDevice', async () => {
-  // TODO(mhuynh): VBLOCKS-1830; Implement this feature.
-});
+  { audioDeviceUuid: string },
+  { rejectValue: SelectAudioDeviceRejectValue }
+>(
+  'voice/selectAudioDevice',
+  async ({ audioDeviceUuid }, { rejectWithValue }) => {
+    const audioDevice = audioDeviceMap.get(audioDeviceUuid);
+    if (typeof audioDevice === 'undefined') {
+      return rejectWithValue({
+        reason: 'AUDIO_DEVICE_UUID_NOT_FOUND',
+      });
+    }
 
+    const selectResult = await settlePromise(audioDevice.select());
+    if (selectResult.status === 'rejected') {
+      return rejectWithValue({
+        reason: 'NATIVE_MODULE_REJECTED',
+      });
+    }
+  },
+);
+
+export type GetAudioDeviceRejectValue =
+  | { reason: 'AUDIO_DEVICES_UNDEFINED' }
+  | { reason: 'AUDIO_DEVICE_UUID_UNDEFINED' }
+  | { reason: 'NATIVE_MODULE_REJECTED'; error: SerializedError };
 export const getAudioDevices = createTypedAsyncThunk<
   { audioDevices: AudioDeviceInfo[]; selectedDevice: AudioDeviceInfo | null },
   void,
-  {
-    rejectValue: AudioDeviceRejectValue;
-  }
+  { rejectValue: GetAudioDeviceRejectValue }
 >('voice/getAudioDevices', async (_, { rejectWithValue }) => {
   const fetchAudioDevices = await settlePromise(voice.getAudioDevices());
   if (fetchAudioDevices?.status === 'rejected') {
     return rejectWithValue({
-      reason: 'GET_AUDIO_DEVICES_ERROR',
+      reason: 'NATIVE_MODULE_REJECTED',
       error: miniSerializeError(fetchAudioDevices.reason),
     });
   }
 
   const { audioDevices, selectedDevice } = fetchAudioDevices.value;
   if (typeof audioDevices === 'undefined') {
-    return rejectWithValue({ reason: 'AUDIO_DEVICES_NOT_FOUND' });
+    return rejectWithValue({ reason: 'AUDIO_DEVICES_UNDEFINED' });
   }
 
   for (const audioDevice of audioDevices) {
     if (typeof audioDevice.uuid === 'undefined') {
-      return rejectWithValue({ reason: 'MISSING_AUDIO_DEVICE_UUID' });
+      return rejectWithValue({ reason: 'AUDIO_DEVICE_UUID_UNDEFINED' });
     }
     audioDeviceMap.set(audioDevice.uuid, audioDevice);
   }
@@ -78,7 +94,7 @@ export type AudioDevicesState = AsyncStoreSlice<
     audioDevices: AudioDeviceInfo[];
     selectedDevice: AudioDeviceInfo | null;
   },
-  | AudioDeviceRejectValue
+  | GetAudioDeviceRejectValue
   | {
       error: SerializedError;
     }
@@ -100,14 +116,14 @@ export const audioDevicesSlice = createSlice({
     builder.addCase(getAudioDevices.rejected, (_, action) => {
       const { requestStatus } = action.meta;
       return match(action.payload)
-        .with({ reason: 'GET_AUDIO_DEVICES_ERROR' }, ({ reason, error }) => ({
+        .with({ reason: 'NATIVE_MODULE_REJECTED' }, ({ reason, error }) => ({
           status: requestStatus,
           reason,
           error,
         }))
         .with(
-          { reason: 'AUDIO_DEVICES_NOT_FOUND' },
-          { reason: 'MISSING_AUDIO_DEVICE_UUID' },
+          { reason: 'AUDIO_DEVICES_UNDEFINED' },
+          { reason: 'AUDIO_DEVICE_UUID_UNDEFINED' },
           ({ reason }) => ({
             status: requestStatus,
             reason,
