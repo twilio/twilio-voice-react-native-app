@@ -104,10 +104,10 @@ describe('token store', () => {
       accessToken: 'test token',
       idToken: 'test id token',
     });
-    const errorMessage = 'foobar';
+    const error = new Error('foobar');
     fetchMock.mockResolvedValueOnce({
       ok: false,
-      text: jest.fn().mockResolvedValueOnce(errorMessage),
+      text: jest.fn().mockResolvedValueOnce(error),
       status: 400,
     });
     await store.dispatch(user.login());
@@ -115,7 +115,7 @@ describe('token store', () => {
     expect(store.getState().voice.accessToken).toEqual({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       status: 'rejected',
-      error: miniSerializeError(errorMessage),
+      error: miniSerializeError(error),
       statusCode: 400,
     });
   });
