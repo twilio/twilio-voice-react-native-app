@@ -83,17 +83,13 @@ const styles = StyleSheet.create({
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
-  const accessTokenState = useSelector(
-    (state: State) => state.voice.accessToken,
-  );
   const [errorMessage, setErrorMessage] = React.useState<string>('');
 
-  React.useEffect(() => {
-    if (accessTokenState.status === 'rejected') {
-      setErrorMessage(accessTokenState.error.message);
+  useSelector((state: State) => {
+    if (state.voice.accessToken.status === 'rejected') {
+      setErrorMessage(state.voice.accessToken.error.message);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessTokenState.status]);
+  });
 
   const handleLogin = async () => {
     const loginAction = await dispatch(loginAndRegister());
