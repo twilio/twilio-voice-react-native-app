@@ -34,8 +34,10 @@ describe('<SignIn />', () => {
     const initialState = {
       voice: {
         accessToken: {
-          status: 'rejected',
           error: { message: errorMessage },
+          reason: 'TOKEN_RESPONSE_NOT_OK',
+          status: 'rejected',
+          statusCode: 401,
         },
       },
     };
