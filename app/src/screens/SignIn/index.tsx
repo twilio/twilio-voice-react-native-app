@@ -83,11 +83,12 @@ const styles = StyleSheet.create({
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
-  const [errorMessage, setErrorMessage] = React.useState<string>('');
-
-  useSelector((state: State) => {
+  const errorMessage = useSelector((state: State) => {
     if (state.voice.accessToken.status === 'rejected') {
-      setErrorMessage(state.voice.accessToken.error.message);
+      switch (state.voice.accessToken.reason) {
+        case 'TOKEN_RESPONSE_NOT_OK':
+          return state.voice.accessToken.error.message || '';
+      }
     }
   });
 

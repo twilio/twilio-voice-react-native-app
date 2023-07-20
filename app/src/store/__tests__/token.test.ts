@@ -61,7 +61,6 @@ describe('token store', () => {
     expect(store.getState().voice.accessToken).toEqual({
       status: 'rejected',
       reason: 'USER_NOT_FULFILLED',
-      error: miniSerializeError(null),
     });
   });
 

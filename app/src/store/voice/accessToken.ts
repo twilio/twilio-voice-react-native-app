@@ -11,7 +11,6 @@ import { createTypedAsyncThunk } from '../common';
 export type GetAccessTokenRejectValue =
   | {
       reason: 'USER_NOT_FULFILLED';
-      error: SerializedError;
     }
   | {
       reason: 'FETCH_ERROR';
@@ -38,7 +37,6 @@ export const getAccessToken = createTypedAsyncThunk<
   if (user?.status !== 'fulfilled') {
     return rejectWithValue({
       reason: 'USER_NOT_FULFILLED',
-      error: miniSerializeError(null),
     });
   }
 
@@ -91,7 +89,7 @@ export const getAccessToken = createTypedAsyncThunk<
 
 export type AccessTokenState = AsyncStoreSlice<
   { value: string },
-  GetAccessTokenRejectValue | { error: any }
+  GetAccessTokenRejectValue | { error: any; reason: 'unknown' }
 >;
 
 export const accessTokenSlice = createSlice({
@@ -113,7 +111,6 @@ export const accessTokenSlice = createSlice({
           return {
             status: 'rejected',
             reason: action.payload.reason,
-            error: action.payload.error,
           };
         case 'TOKEN_RESPONSE_NOT_OK':
           state = {
@@ -139,6 +136,7 @@ export const accessTokenSlice = createSlice({
           return {
             status: 'rejected',
             error: action.error,
+            reason: 'unknown',
           };
       }
     });
