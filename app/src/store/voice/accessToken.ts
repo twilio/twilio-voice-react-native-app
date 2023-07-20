@@ -117,7 +117,6 @@ export const accessTokenSlice = createSlice({
           };
         case 'TOKEN_RESPONSE_NOT_OK':
           state = {
-            ...state,
             status: 'rejected',
             reason: action.payload.reason,
             statusCode: action.payload.statusCode,

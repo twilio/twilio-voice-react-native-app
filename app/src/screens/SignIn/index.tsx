@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginAndRegister } from '../../store/voice/registration';
@@ -88,7 +88,7 @@ const SignIn: React.FC = () => {
   );
   const [errorMessage, setErrorMessage] = React.useState<string>('');
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (accessTokenState.status === 'rejected') {
       setErrorMessage(accessTokenState.error.message);
     }
