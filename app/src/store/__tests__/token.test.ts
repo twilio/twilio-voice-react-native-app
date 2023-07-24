@@ -81,20 +81,21 @@ describe('token store', () => {
   });
 
   it('rejects if "TOKEN_RESPONSE_NOT_OK"', async () => {
+    const error = new Error('foo');
     jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
       accessToken: 'test token',
       idToken: 'test id token',
     });
     fetchMock.mockResolvedValueOnce({
       ok: false,
-      text: jest.fn().mockRejectedValueOnce({}),
+      text: jest.fn().mockRejectedValueOnce(error),
     });
     await store.dispatch(user.login());
     await store.dispatch(token.getAccessToken());
     expect(store.getState().voice.accessToken).toEqual({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       status: 'rejected',
-      error: miniSerializeError('TOKEN_RESPONSE_NOT_OK'),
+      error: miniSerializeError(error),
     });
   });
 

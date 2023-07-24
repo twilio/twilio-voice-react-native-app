@@ -60,19 +60,15 @@ export const getAccessToken = createTypedAsyncThunk<
 
   const tokenTextResult = await settlePromise(tokenResponse.text());
 
-  if (!tokenResponse.ok && tokenTextResult.status === 'fulfilled') {
-    return rejectWithValue({
-      reason: 'TOKEN_RESPONSE_NOT_OK',
-      statusCode: tokenResponse.status,
-      error: miniSerializeError(tokenTextResult.value),
-    });
-  }
-
   if (!tokenResponse.ok) {
+    const error =
+      tokenTextResult.status === 'fulfilled'
+        ? tokenTextResult.value
+        : tokenTextResult.reason;
     return rejectWithValue({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       statusCode: tokenResponse.status,
-      error: miniSerializeError({ message: 'TOKEN_RESPONSE_NOT_OK' }),
+      error: miniSerializeError(error),
     });
   }
 
@@ -89,7 +85,7 @@ export const getAccessToken = createTypedAsyncThunk<
 
 export type AccessTokenState = AsyncStoreSlice<
   { value: string },
-  GetAccessTokenRejectValue | { error: any; reason: 'UNKNOWN_ERROR' }
+  GetAccessTokenRejectValue | { error: any; reason: 'UNEXPECTED_ERROR' }
 >;
 
 export const accessTokenSlice = createSlice({
@@ -136,7 +132,7 @@ export const accessTokenSlice = createSlice({
           return {
             status: 'rejected',
             error: action.error,
-            reason: 'UNKNOWN_ERROR',
+            reason: 'UNEXPECTED_ERROR',
           };
       }
     });
