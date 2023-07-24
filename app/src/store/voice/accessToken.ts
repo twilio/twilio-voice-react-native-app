@@ -63,7 +63,7 @@ export const getAccessToken = createTypedAsyncThunk<
   if (!tokenResponse.ok) {
     const error =
       tokenTextResult.status === 'fulfilled'
-        ? tokenTextResult.value
+        ? new Error(tokenTextResult.value)
         : tokenTextResult.reason;
     return rejectWithValue({
       reason: 'TOKEN_RESPONSE_NOT_OK',

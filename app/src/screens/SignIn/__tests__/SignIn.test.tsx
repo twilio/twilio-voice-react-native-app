@@ -43,10 +43,9 @@ describe('<SignIn />', () => {
       accessToken: 'test token',
       idToken: 'test id token',
     });
-    const error = new Error(errorMessage);
     fetchMock.mockResolvedValueOnce({
       ok: false,
-      text: jest.fn().mockResolvedValueOnce(error),
+      text: jest.fn().mockResolvedValueOnce(errorMessage),
       status: 401,
     });
     await store.dispatch(user.login());
