@@ -14,11 +14,9 @@ import useActiveCallScreen from './hooks';
 
 export type Props = StackScreenProps<'Call'>;
 
-const ActiveCall: React.FC<Props> = ({
-  route: {
-    params: { callSid },
-  },
-}) => {
+const ActiveCall: React.FC<Props> = (props) => {
+  const callSid = props.route.params?.callSid;
+
   const {
     button: { dialpad, hangup, mute, audio },
     callStatus,
