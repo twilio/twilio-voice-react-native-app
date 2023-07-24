@@ -10,7 +10,7 @@ export type Props = {
 } & Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const MuteButton: React.FC<Props> = ({ active, disabled, onPress }) => (
-  <Button size={96} disabled={disabled} onPress={onPress}>
+  <Button size={96} disabled={disabled} onPress={onPress} testID="mute_button">
     {active ? (
       <Image
         source={MuteActiveSource}
