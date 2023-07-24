@@ -72,7 +72,7 @@ export const getAccessToken = createTypedAsyncThunk<
     return rejectWithValue({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       statusCode: tokenResponse.status,
-      error: miniSerializeError(null),
+      error: miniSerializeError({ message: 'TOKEN_RESPONSE_NOT_OK' }),
     });
   }
 
@@ -89,7 +89,7 @@ export const getAccessToken = createTypedAsyncThunk<
 
 export type AccessTokenState = AsyncStoreSlice<
   { value: string },
-  GetAccessTokenRejectValue | { error: any; reason: 'unknown' }
+  GetAccessTokenRejectValue | { error: any; reason: 'UNKNOWN_ERROR' }
 >;
 
 export const accessTokenSlice = createSlice({
@@ -136,7 +136,7 @@ export const accessTokenSlice = createSlice({
           return {
             status: 'rejected',
             error: action.error,
-            reason: 'unknown',
+            reason: 'UNKNOWN_ERROR',
           };
       }
     });

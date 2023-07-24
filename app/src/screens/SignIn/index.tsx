@@ -88,6 +88,8 @@ const SignIn: React.FC = () => {
       switch (state.voice.accessToken.reason) {
         case 'TOKEN_RESPONSE_NOT_OK':
           return state.voice.accessToken.error.message || '';
+        default:
+          return '';
       }
     }
   });

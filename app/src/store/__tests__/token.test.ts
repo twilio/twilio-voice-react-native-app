@@ -94,7 +94,7 @@ describe('token store', () => {
     expect(store.getState().voice.accessToken).toEqual({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       status: 'rejected',
-      error: miniSerializeError(null),
+      error: miniSerializeError('TOKEN_RESPONSE_NOT_OK'),
     });
   });
 
