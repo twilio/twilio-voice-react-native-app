@@ -101,7 +101,7 @@ export const accessTokenSlice = createSlice({
       return { status: 'fulfilled', value: action.payload };
     });
 
-    builder.addCase(getAccessToken.rejected, (state, action) => {
+    builder.addCase(getAccessToken.rejected, (_, action) => {
       switch (action.payload?.reason) {
         case 'USER_NOT_FULFILLED':
           return {
@@ -109,12 +109,6 @@ export const accessTokenSlice = createSlice({
             reason: action.payload.reason,
           };
         case 'TOKEN_RESPONSE_NOT_OK':
-          state = {
-            status: 'rejected',
-            reason: action.payload.reason,
-            statusCode: action.payload.statusCode,
-            error: action.payload.error,
-          };
           return {
             status: 'rejected',
             reason: action.payload.reason,
