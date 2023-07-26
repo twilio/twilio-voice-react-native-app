@@ -3,6 +3,7 @@ import * as token from '../voice/accessToken';
 import * as user from '../user';
 import * as app from '../app';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
+import { match } from 'ts-pattern';
 
 let MockCall: { Event: Record<string, string> };
 let fetchMock: jest.Mock;
@@ -108,19 +109,48 @@ describe('token store', () => {
   });
 
   it('rejects if "TOKEN_RESPONSE_NOT_OK"', async () => {
+    const error = new Error('foo');
     jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
       accessToken: 'test token',
       idToken: 'test id token',
     });
     fetchMock.mockResolvedValueOnce({
       ok: false,
+      text: jest.fn().mockRejectedValueOnce(error),
     });
     await store.dispatch(user.login());
     await store.dispatch(token.getAccessToken());
     expect(store.getState().voice.accessToken).toEqual({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       status: 'rejected',
+      error: miniSerializeError(error),
     });
+  });
+
+  it('rejects if "TOKEN_RESPONSE_NOT_OK" and status is fulfilled', async () => {
+    const errorMessage = 'foobar';
+    jest.spyOn(auth0, 'authorize').mockResolvedValueOnce({
+      accessToken: 'test token',
+      idToken: 'test id token',
+    });
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      text: jest.fn().mockResolvedValueOnce(errorMessage),
+      status: 400,
+    });
+    await store.dispatch(user.login());
+    await store.dispatch(token.getAccessToken());
+    match(store.getState().voice.accessToken)
+      .with(
+        {
+          status: 'rejected',
+          reason: 'TOKEN_RESPONSE_NOT_OK',
+          error: miniSerializeError({ message: errorMessage }),
+          statusCode: 400,
+        },
+        () => {},
+      )
+      .run();
   });
 
   it('rejects if "FETCH_TEXT_ERROR"', async () => {

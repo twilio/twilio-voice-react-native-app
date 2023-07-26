@@ -20,6 +20,7 @@ export type GetAccessTokenRejectValue =
   | {
       reason: 'TOKEN_RESPONSE_NOT_OK';
       statusCode: number;
+      error: SerializedError;
     }
   | {
       reason: 'FETCH_TEXT_ERROR';
@@ -35,7 +36,9 @@ export const getAccessToken = createTypedAsyncThunk<
 >('voice/getAccessToken', async (_, { getState, rejectWithValue }) => {
   const user = getState().user;
   if (user?.status !== 'fulfilled') {
-    return rejectWithValue({ reason: 'USER_NOT_FULFILLED' });
+    return rejectWithValue({
+      reason: 'USER_NOT_FULFILLED',
+    });
   }
 
   const fetchResult = await settlePromise(
@@ -58,14 +61,21 @@ export const getAccessToken = createTypedAsyncThunk<
   }
 
   const tokenResponse = fetchResult.value;
+
+  const tokenTextResult = await settlePromise(tokenResponse.text());
+
   if (!tokenResponse.ok) {
+    const error =
+      tokenTextResult.status === 'fulfilled'
+        ? new Error(tokenTextResult.value)
+        : tokenTextResult.reason;
     return rejectWithValue({
       reason: 'TOKEN_RESPONSE_NOT_OK',
       statusCode: tokenResponse.status,
+      error: miniSerializeError(error),
     });
   }
 
-  const tokenTextResult = await settlePromise(tokenResponse.text());
   if (tokenTextResult.status === 'rejected') {
     return rejectWithValue({
       reason: 'FETCH_TEXT_ERROR',
@@ -79,7 +89,7 @@ export const getAccessToken = createTypedAsyncThunk<
 
 export type AccessTokenState = AsyncStoreSlice<
   { value: string },
-  GetAccessTokenRejectValue | { error: any }
+  GetAccessTokenRejectValue | { error: any; reason: 'UNEXPECTED_ERROR' }
 >;
 
 export const accessTokenSlice = createSlice({
@@ -107,6 +117,7 @@ export const accessTokenSlice = createSlice({
             status: 'rejected',
             reason: action.payload.reason,
             statusCode: action.payload.statusCode,
+            error: action.payload.error,
           };
         case 'FETCH_ERROR':
         case 'FETCH_TEXT_ERROR':
@@ -119,6 +130,7 @@ export const accessTokenSlice = createSlice({
           return {
             status: 'rejected',
             error: action.error,
+            reason: 'UNEXPECTED_ERROR',
           };
       }
     });

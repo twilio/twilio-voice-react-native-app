@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { loginAndRegister } from '../../store/voice/registration';
-import { type Dispatch } from '../../store/app';
+import { type Dispatch, type State } from '../../store/app';
 
 const ArrowForward = require('../../../assets/icons/arrow-forward.png');
 const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
 const HelloFigure = require('../../../assets/icons/hello-figure.png');
+const ErrorWarning = require('../../../assets/icons/error.png');
 
 const styles = StyleSheet.create({
   container: {
@@ -31,14 +32,16 @@ const styles = StyleSheet.create({
     color: '#121C2D',
   },
   logoContainer: {
-    marginTop: '50%',
+    marginTop: '45%',
     marginLeft: 18,
   },
   text: {
     marginBottom: 20,
+    lineHeight: 20,
   },
   loginScreenButton: {
     marginTop: 10,
+    marginBottom: 10,
     paddingTop: 8,
     paddingBottom: 8,
     backgroundColor: '#0263E0',
@@ -61,10 +64,35 @@ const styles = StyleSheet.create({
     height: 20,
     marginLeft: 4,
   },
+  errorWarning: {
+    height: 20,
+    width: 20,
+  },
+  errorContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '90%',
+  },
+  errorText: {
+    paddingLeft: 4,
+    lineHeight: 20,
+    fontSize: 14,
+    color: '#D61F1F',
+  },
 });
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
+  const errorMessage = useSelector((state: State) => {
+    if (state.voice.accessToken.status === 'rejected') {
+      switch (state.voice.accessToken.reason) {
+        case 'TOKEN_RESPONSE_NOT_OK':
+          return state.voice.accessToken.error.message || '';
+        default:
+          return '';
+      }
+    }
+  });
 
   const handleLogin = async () => {
     const loginAction = await dispatch(loginAndRegister());
@@ -93,6 +121,16 @@ const SignIn: React.FC = () => {
             style={styles.arrowForward}
           />
         </TouchableOpacity>
+        {errorMessage && (
+          <View style={styles.errorContainer}>
+            <Image
+              source={ErrorWarning}
+              style={styles.errorWarning}
+              resizeMode="contain"
+            />
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        )}
       </View>
       <View style={styles.helloFigureContainer}>
         <Image source={HelloFigure} resizeMode="contain" />

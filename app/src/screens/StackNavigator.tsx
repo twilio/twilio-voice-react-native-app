@@ -14,7 +14,6 @@ const Stack = createNativeStackNavigator<StackParamList>();
 
 const StackNavigator = () => {
   const user = useSelector((state: State) => state.user);
-
   if (user === null) {
     return <Text>Application not bootstrapped.</Text>;
   }
