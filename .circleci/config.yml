@@ -121,7 +121,7 @@ commands:
           name: "App: Detox test"
           command: |
             cd app
-            yarn detox:test --configuration << parameters.configuration >> --headless
+            yarn detox:test --configuration << parameters.configuration >> --artifacts-location "./detox_artifacts" --headless --take-screenshots all
             cd ..
 
   app-expose-port:
@@ -294,6 +294,16 @@ jobs:
             sleep 300
       - app-detox-test:
           configuration: android.emu.release
+      - run:
+          name: "Save Android logs"
+          when: always
+          command: |
+            cd app
+            adb logcat -d > ./detox_artifacts/logcat.txt
+            cd ..
+      - store_artifacts:
+          when: always
+          path: app/detox_artifacts
 
   app-detox-ios:
     macos:

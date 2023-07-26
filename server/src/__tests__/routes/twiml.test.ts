@@ -13,7 +13,8 @@ const mockServerConfig = {
   API_KEY_SECRET: 'mock-twiliocredentials-apikeysecret',
   TWIML_APP_SID: 'mock-twiliocredentials-outgoingapplicationsid',
   CALLER_ID: 'mock-twiliocredentials-phonenumber',
-  PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-pushcredentialsid',
+  APN_PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-apnpushcredentialsid',
+  FCM_PUSH_CREDENTIAL_SID: 'mock-twiliocredentials-fcmpushcredentialsid',
   AUTH0_AUDIENCE: 'mock-auth0-audience',
   AUTH0_ISSUER_BASE_URL: 'mock-auth0-issuer-base-url',
 };
