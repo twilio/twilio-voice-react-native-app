@@ -107,14 +107,6 @@ const useHangup = (
 };
 
 /**
- * Return type of the audio device hook.
- */
-type AudioDevicesHookReturnType = {
-  selectedType?: TwilioAudioDevice.Type;
-  onPressSpeaker?: () => void;
-  onPressBluetooth?: () => void;
-};
-/**
  * Hook for audio device selection button handlers and state.
  * @param activeCall - The active call.
  * @param audioDevices - The available audio devices.
@@ -125,7 +117,11 @@ const useAudio = (
   activeCall: ActiveCall | undefined,
   audioDevices: AudioDevicesState,
   dispatch: ReturnType<typeof useTypedDispatch>,
-): AudioDevicesHookReturnType => {
+): {
+  selectedType?: TwilioAudioDevice.Type;
+  onPressSpeaker?: () => void;
+  onPressBluetooth?: () => void;
+} => {
   const selectedType = React.useMemo((): TwilioAudioDevice.Type | undefined => {
     if (audioDevices.status !== 'fulfilled') {
       return;
