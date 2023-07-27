@@ -89,9 +89,9 @@ const About: React.FC = () => {
               issues, bugs, or product feedback please reach out to us on Slack{' '}
             </Text>
             <Text onPress={handleSlackChannelPress} style={styles.link}>
-              {slackChannelName}.
+              {slackChannelName}
             </Text>
-            <Text> If you're technically inclined, please submit a </Text>
+            <Text>. If you're technically inclined, please submit a </Text>
             <Text onPress={handleGitProjectPress} style={styles.link}>
               pull request
             </Text>

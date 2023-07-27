@@ -20,7 +20,7 @@ describe('<About />', () => {
     expect(screen.getByText('About')).toBeOnTheScreen();
     expect(
       screen.getByText(
-        'This app is maintained by the Twilio Voice Access group',
+        'This app is maintained by the Twilio Voice Access group. For issues, bugs, or product feedback please reach out to us on Slack',
       ),
     ).toBeOnTheScreen();
     expect(screen.getByText('Report an Issue')).toBeOnTheScreen();
