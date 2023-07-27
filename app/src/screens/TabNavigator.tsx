@@ -16,7 +16,8 @@ const HomeSource = require('../../assets/icons/home.png');
 const HomeSelectedSource = require('../../assets/icons/home-selected.png');
 const DialpadSource = require('../../assets/icons/dialpad-dark.png');
 const DialpadSelectedSource = require('../../assets/icons/dialpad-selected.png');
-const AboutSelectedSource = require('../../assets/icons/information.png');
+const AboutSource = require('../../assets/icons/info.png');
+const AboutSelectedSource = require('../../assets/icons/info-selected.png');
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -60,7 +61,6 @@ const dialerTabOptions: BottomTabNavigationOptions = {
 const aboutTabOptions: BottomTabNavigationOptions = {
   tabBarIcon: ({ focused, size }) => {
     return focused ? (
-      // TODO(kchoy): Will talk to Design team on getting a "Selected Image"
       <Image
         source={AboutSelectedSource}
         resizeMode="contain"
@@ -68,7 +68,7 @@ const aboutTabOptions: BottomTabNavigationOptions = {
       />
     ) : (
       <Image
-        source={AboutSelectedSource}
+        source={AboutSource}
         resizeMode="contain"
         style={{ maxHeight: size }}
       />
