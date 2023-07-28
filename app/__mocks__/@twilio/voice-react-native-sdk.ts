@@ -72,3 +72,11 @@ export const Call = {
     QualityWarningsChanged: 'qualityWarningsChanged',
   },
 };
+
+export const AudioDevice = {
+  Type: {
+    Earpiece: 'earpiece',
+    Speaker: 'speaker',
+    Bluetooth: 'bluetooth',
+  },
+};

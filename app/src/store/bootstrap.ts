@@ -8,6 +8,7 @@ import { createTypedAsyncThunk, generateThunkActionTypes } from './common';
 import { checkLoginStatus } from './user';
 import { getAccessToken } from './voice/accessToken';
 import { handleCall } from './voice/call/activeCall';
+import { updateAudioDevices } from './voice/audioDevices';
 import { receiveCallInvite, removeCallInvite } from './voice/call/callInvite';
 import { register } from './voice/registration';
 import { getNavigate } from '../util/navigation';
@@ -205,5 +206,30 @@ export const bootstrapNavigation = createTypedAsyncThunk(
       navigate('Call', {});
       return 'Call';
     }
+  },
+);
+
+/**
+ * Bootstrap audio devices.
+ */
+export const bootstrapAudioDevicesActionTypes = generateThunkActionTypes(
+  'bootstrap/audioDevices',
+);
+export const bootstrapAudioDevices = createTypedAsyncThunk(
+  bootstrapAudioDevicesActionTypes.prefix,
+  (_, { dispatch }) => {
+    const handleAudioDevicesUpdated: Voice.Listener.AudioDevicesUpdated = (
+      audioDevices,
+      selectedDevice,
+    ) => {
+      dispatch(
+        updateAudioDevices({
+          audioDevices,
+          selectedDevice: selectedDevice === null ? undefined : selectedDevice,
+        }),
+      );
+    };
+
+    voice.on(Voice.Event.AudioDevicesUpdated, handleAudioDevicesUpdated);
   },
 );

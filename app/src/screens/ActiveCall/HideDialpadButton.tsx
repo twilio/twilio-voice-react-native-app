@@ -7,7 +7,11 @@ const HideDialpadSource = require('../../../assets/icons/hide-dialpad.png');
 export type Props = Pick<ButtonProps, 'disabled' | 'onPress'>;
 
 const HideDialpadButton: React.FC<Props> = ({ disabled, onPress }) => (
-  <Button size={96} disabled={disabled} onPress={onPress}>
+  <Button
+    size={96}
+    disabled={disabled}
+    onPress={onPress}
+    testID="hide_dialpad_button">
     <Image
       source={HideDialpadSource}
       resizeMode="contain"

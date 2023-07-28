@@ -2,7 +2,6 @@ import { useNavigation } from '@react-navigation/native';
 import { AudioDevice as TwilioAudioDevice } from '@twilio/voice-react-native-sdk';
 import React from 'react';
 import { match, P } from 'ts-pattern';
-import { type Dispatch } from '../../store/app';
 import { useTypedDispatch } from '../../store/common';
 import {
   type ActiveCall,
@@ -11,7 +10,6 @@ import {
   sendDigitsActiveCall,
 } from '../../store/voice/call/activeCall';
 import {
-  type AudioDeviceInfo,
   type AudioDevicesState,
   getAudioDevices,
   selectAudioDevice,
@@ -108,48 +106,6 @@ const useHangup = (
   return { handle, isDisabled };
 };
 
-const matchOnAudioDevices = (
-  audioDevices: AudioDeviceInfo[],
-  selectedDevice: AudioDeviceInfo | null,
-  dispatch: Dispatch,
-) => {
-  const earpieceDevice = audioDevices.find(
-    (dev) => dev.type === TwilioAudioDevice.Type.Earpiece,
-  );
-
-  const speakerDevice = audioDevices.find(
-    (dev) => dev.type === TwilioAudioDevice.Type.Speaker,
-  );
-
-  return match<
-    [typeof earpieceDevice, typeof speakerDevice, typeof selectedDevice],
-    [() => void, boolean, boolean]
-  >([earpieceDevice, speakerDevice, selectedDevice])
-    .with(
-      [P.not(undefined), P._, null],
-      [P.not(undefined), P._, { type: TwilioAudioDevice.Type.Speaker }],
-      ([{ uuid }]) => [
-        () => {
-          dispatch(selectAudioDevice({ audioDeviceUuid: uuid }));
-        },
-        false,
-        true,
-      ],
-    )
-    .with(
-      [P._, P.not(undefined), null],
-      [P._, P.not(undefined), { type: TwilioAudioDevice.Type.Earpiece }],
-      ([_, { uuid }]) => [
-        () => {
-          dispatch(selectAudioDevice({ audioDeviceUuid: uuid }));
-        },
-        false,
-        false,
-      ],
-    )
-    .otherwise(() => [() => {}, true, false]);
-};
-
 /**
  * Hook for audio device selection button handlers and state.
  * @param activeCall - The active call.
@@ -157,27 +113,75 @@ const matchOnAudioDevices = (
  * @param dispatch - The dispatch function for the Redux store.
  * @returns - Handlers and state for the audio device selection button.
  */
-const useSelectAudioOutputDevice = (
+const useAudio = (
   activeCall: ActiveCall | undefined,
   audioDevices: AudioDevicesState,
   dispatch: ReturnType<typeof useTypedDispatch>,
-) => {
-  const [handle, isDisabled, isActive] = React.useMemo(
-    () =>
-      match<
-        [typeof activeCall, typeof audioDevices],
-        [() => void, boolean, boolean]
-      >([activeCall, audioDevices])
-        .with(
-          [{ info: { state: 'connected' } }, { status: 'fulfilled' }],
-          ([_, au]) =>
-            matchOnAudioDevices(au.audioDevices, au.selectedDevice, dispatch),
-        )
-        .otherwise(() => [() => {}, false, false]),
-    [dispatch, audioDevices, activeCall],
+): {
+  selectedType?: TwilioAudioDevice.Type;
+  onPressSpeaker?: () => void;
+  onPressBluetooth?: () => void;
+} => {
+  const selectedType = React.useMemo((): TwilioAudioDevice.Type | undefined => {
+    if (audioDevices.status !== 'fulfilled') {
+      return;
+    }
+    return audioDevices.selectedDevice?.type;
+  }, [audioDevices]);
+
+  const bindDevice = React.useCallback(
+    (type: TwilioAudioDevice.Type): (() => void) | undefined => {
+      if (audioDevices.status !== 'fulfilled') {
+        return;
+      }
+
+      const device = audioDevices.audioDevices.find((d) => d.type === type);
+      if (typeof device === 'undefined') {
+        return;
+      }
+
+      return () =>
+        dispatch(selectAudioDevice({ audioDeviceUuid: device.uuid }));
+    },
+    [audioDevices, dispatch],
   );
 
-  return { handle, isActive, isDisabled };
+  const selectEarpiece = React.useMemo(() => {
+    return bindDevice(TwilioAudioDevice.Type.Earpiece);
+  }, [bindDevice]);
+
+  const selectSpeaker = React.useMemo(() => {
+    return bindDevice(TwilioAudioDevice.Type.Speaker);
+  }, [bindDevice]);
+
+  const selectBluetooth = React.useMemo(() => {
+    return bindDevice(TwilioAudioDevice.Type.Bluetooth);
+  }, [bindDevice]);
+
+  const onPressSpeaker = React.useMemo(() => {
+    return selectedType === TwilioAudioDevice.Type.Speaker
+      ? selectEarpiece
+      : selectSpeaker;
+  }, [selectEarpiece, selectSpeaker, selectedType]);
+
+  const onPressBluetooth = React.useMemo(() => {
+    return selectedType === TwilioAudioDevice.Type.Bluetooth
+      ? selectEarpiece
+      : selectBluetooth;
+  }, [selectEarpiece, selectBluetooth, selectedType]);
+
+  if (
+    typeof activeCall === 'undefined' ||
+    audioDevices.status !== 'fulfilled'
+  ) {
+    return {};
+  }
+
+  return {
+    selectedType: audioDevices.selectedDevice?.type,
+    onPressSpeaker,
+    onPressBluetooth,
+  };
 };
 
 /**
@@ -235,11 +239,7 @@ const useActiveCallScreen = (callSid?: string) => {
       dialpad: useDialpad(activeCall, dispatch),
       hangup: useHangup(activeCall, dispatch),
       mute: useMute(activeCall, dispatch),
-      selectAudioOutputDevice: useSelectAudioOutputDevice(
-        activeCall,
-        audioDevices,
-        dispatch,
-      ),
+      audio: useAudio(activeCall, audioDevices, dispatch),
     },
     callStatus,
     remoteParticipant,

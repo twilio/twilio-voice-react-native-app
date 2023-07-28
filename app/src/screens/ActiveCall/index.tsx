@@ -1,3 +1,4 @@
+import { AudioDevice as TwilioAudioDevice } from '@twilio/voice-react-native-sdk';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Dialpad from '../../components/Dialpad';
@@ -5,22 +6,19 @@ import RemoteParticipant from '../../components/Call/RemoteParticipant';
 import EndCallButton from '../../components/Call/EndCallButton';
 import { type StackScreenProps } from '../types';
 import MuteButton from './MuteButton';
-import SelectAudioOutputDeviceButton from './SelectAudioOutputDeviceButton';
+import SpeakerButton from './SpeakerButton';
+import BluetoothButton from './BluetoothButton';
 import ShowDialpadButton from './ShowDialpadButton';
 import HideDialpadButton from './HideDialpadButton';
 import useActiveCallScreen from './hooks';
 
-export type Props = StackScreenProps<'Call'> & {
-  callSid?: string;
-};
+export type Props = StackScreenProps<'Call'>;
 
-const ActiveCall: React.FC<Props> = ({
-  route: {
-    params: { callSid },
-  },
-}) => {
+const ActiveCall: React.FC<Props> = (props) => {
+  const callSid = props.route.params?.callSid;
+
   const {
-    button: { dialpad, hangup, mute, selectAudioOutputDevice },
+    button: { dialpad, hangup, mute, audio },
     callStatus,
     remoteParticipant,
   } = useActiveCallScreen(callSid);
@@ -52,16 +50,23 @@ const ActiveCall: React.FC<Props> = ({
             disabled={dialpad.isDisabled}
             onPress={() => dialpad.setIsVisible(true)}
           />
-          <SelectAudioOutputDeviceButton
-            active={selectAudioOutputDevice.isActive}
-            disabled={selectAudioOutputDevice.isDisabled}
-            onPress={selectAudioOutputDevice.handle}
+          <SpeakerButton
+            active={audio.selectedType === TwilioAudioDevice.Type.Speaker}
+            disabled={typeof audio.onPressSpeaker === 'undefined'}
+            onPress={audio.onPressSpeaker}
+          />
+        </View>
+        <View style={styles.buttonBox}>
+          <BluetoothButton
+            active={audio.selectedType === TwilioAudioDevice.Type.Bluetooth}
+            disabled={typeof audio.onPressBluetooth === 'undefined'}
+            onPress={audio.onPressBluetooth}
           />
         </View>
         <EndCallButton disabled={hangup.isDisabled} onPress={hangup.handle} />
       </>
     ),
-    [dialpad, hangup, mute, selectAudioOutputDevice],
+    [dialpad, hangup, mute, audio],
   );
 
   return (
