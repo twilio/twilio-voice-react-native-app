@@ -7,6 +7,9 @@
   * Users are now automatically registered based on their Auth0 emails, and can receive calls.
 * Outgoing call support
   * Users can make outgoing calls to clients and PSTN numbers.
+* Auth0 example Authentication
+  * Auth0 implemented as the example Authentication service 
+* Detox e2e testing
 
 ### Changes
 * Upgraded Twilio Voice SDK to `1.0.0-beta.2`.
