@@ -2,8 +2,8 @@ import React from 'react';
 import { Image, StyleSheet } from 'react-native';
 import Button, { type Props as ButtonProps } from '../../components/Button';
 
-const SelectAudioDeviceSource = require('../../../assets/icons/speaker.png');
-const ActiveSelectAudioDeviceSource = require('../../../assets/icons/speaker-active.png');
+const BluetoothSource = require('../../../assets/icons/bluetooth.png');
+const ActiveBluetoothSource = require('../../../assets/icons/bluetooth-active.png');
 
 export type Props = {
   active?: boolean;
@@ -14,16 +14,20 @@ const SelectAudioOutputDeviceButton: React.FC<Props> = ({
   disabled,
   onPress,
 }) => (
-  <Button size={96} disabled={disabled} onPress={onPress}>
+  <Button
+    size={96}
+    disabled={disabled}
+    onPress={onPress}
+    testID="bluetooth_button">
     {active ? (
       <Image
-        source={ActiveSelectAudioDeviceSource}
+        source={ActiveBluetoothSource}
         resizeMode="contain"
         style={styles.image}
       />
     ) : (
       <Image
-        source={SelectAudioDeviceSource}
+        source={BluetoothSource}
         resizeMode="contain"
         style={styles.image}
       />

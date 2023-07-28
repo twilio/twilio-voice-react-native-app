@@ -1,5 +1,9 @@
 # 1.0.0-beta.1 (Ongoing)
 
+## Known Issues
+* Audio device selection is not working as expected on iOS platforms for bluetooth devices.
+  * If a bluetooth audio device is connected to the iOS device, then selecting other audio devices has inconsistent behavior.
+
 ## App
 
 ### Features
@@ -10,6 +14,7 @@
 * Auth0 example Authentication
   * Auth0 implemented as the example Authentication service 
 * Detox e2e testing
+* Added the ability to select an audio device within the active call screen.
 
 ### Changes
 * Upgraded Twilio Voice SDK to `1.0.0-beta.2`.

@@ -1,33 +1,22 @@
 import { configureStore, type Middleware } from '@reduxjs/toolkit';
 import { voiceReducer } from './voice';
 import { userSlice } from './user';
+import { createLogMiddleware } from './middleware/log';
 
-export const logActionType: Middleware = () => (next) => (action) => {
-  console.log(
-    action.type.match(/\/rejected$/g)
-      ? `${action.type} ${JSON.stringify(
-          action.error || action.payload,
-          null,
-          2,
-        )}`
-      : action.type,
-  );
-
-  return next(action);
+export const defaultReducer = {
+  [userSlice.name]: userSlice.reducer,
+  voice: voiceReducer,
 };
 
 export const createStore = (...middlewares: Middleware[]) =>
   configureStore({
-    reducer: {
-      [userSlice.name]: userSlice.reducer,
-      voice: voiceReducer,
-    },
+    reducer: defaultReducer,
     middleware(getDefaultMiddleware) {
       return getDefaultMiddleware().concat(...middlewares);
     },
   });
 
-export const defaultStore = createStore(logActionType);
+export const defaultStore = createStore(createLogMiddleware());
 
 export type Store = ReturnType<typeof createStore>;
 
