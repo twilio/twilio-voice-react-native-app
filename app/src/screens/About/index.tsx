@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Linking,
-  TouchableHighlight,
-} from 'react-native';
+import { StyleSheet, Text, View, Linking } from 'react-native';
 import { getEnvVariable } from '../../util/env';
 import packageJson from '../../../package.json';
 
@@ -16,7 +10,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flex: 1,
     alignContent: 'center',
-    marginTop: 100,
+    marginTop: 50,
     marginHorizontal: 40,
   },
   header: {
@@ -32,13 +26,12 @@ const styles = StyleSheet.create({
   highlight: {
     color: '#0263E0',
   },
-  channel: {
+  link: {
     color: '#0263E0',
     textDecorationLine: 'underline',
   },
-  issueDescription: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  textSection: {
+    marginBottom: 10,
   },
   label: {
     fontWeight: '700',
@@ -55,9 +48,15 @@ const About: React.FC = () => {
   const slackChannelName = React.useMemo(() => {
     return `#${getEnvVariable('SLACK_CHANNEL_NAME')}`;
   }, []);
+  const GIT_PROJECT_URL =
+    'https://github.com/twilio/twilio-voice-react-native-app';
 
-  const handlePress = async () => {
+  const handleSlackChannelPress = async () => {
     await Linking.openURL(slackURL);
+  };
+
+  const handleGitProjectPress = async () => {
+    await Linking.openURL(GIT_PROJECT_URL);
   };
 
   return (
@@ -65,17 +64,39 @@ const About: React.FC = () => {
       <View style={styles.body}>
         <View style={styles.section}>
           <Text style={styles.header}>About</Text>
-          <Text>This app is maintained by the Twilio Voice Access group</Text>
+          <Text style={styles.textSection}>
+            To get started use the Dialer, and make either a PTSN or Client
+            outgoing call.
+          </Text>
+          <Text style={styles.textSection}>
+            This project consists of a backend server and a React Native app
+            that demonstrate best practices for developing a Twilio Programmable
+            Voice application.
+          </Text>
+          <Text>
+            Find us on{' '}
+            <Text onPress={handleGitProjectPress} style={styles.link}>
+              GitHub
+            </Text>
+            !
+          </Text>
         </View>
         <View style={styles.section}>
-          <View style={styles.issueDescription}>
-            <Text style={styles.header}>Report an Issue</Text>
-            <Text>For issues or bugs please reach out in the </Text>
-            <TouchableHighlight onPress={handlePress}>
-              <Text style={styles.channel}>{slackChannelName}</Text>
-            </TouchableHighlight>
-            <Text> slack channel</Text>
-          </View>
+          <Text style={styles.header}>Report an Issue</Text>
+          <Text>
+            <Text>
+              This app is maintained by the Twilio Voice Access group. For
+              issues, bugs, or product feedback please reach out to us on Slack{' '}
+            </Text>
+            <Text onPress={handleSlackChannelPress} style={styles.link}>
+              {slackChannelName}
+            </Text>
+            <Text>. If you're technically inclined, please submit a </Text>
+            <Text onPress={handleGitProjectPress} style={styles.link}>
+              pull request
+            </Text>
+            <Text> (this project is open source!)</Text>
+          </Text>
         </View>
       </View>
       <View style={styles.footer}>
