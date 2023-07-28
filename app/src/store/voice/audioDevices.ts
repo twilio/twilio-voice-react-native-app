@@ -112,26 +112,29 @@ export const getAudioDevices = createTypedAsyncThunk<
   void,
   void,
   { rejectValue: GetAudioDevicesRejectValue }
->('voice/getAudioDevices', async (_, { dispatch, rejectWithValue }) => {
-  const fetchAudioDevices = await settlePromise(voice.getAudioDevices());
-  if (fetchAudioDevices?.status === 'rejected') {
-    return rejectWithValue({
-      reason: 'NATIVE_MODULE_REJECTED',
-      error: miniSerializeError(fetchAudioDevices.reason),
-    });
-  }
+>(
+  getAudioDevicesActionTypes.prefix,
+  async (_, { dispatch, rejectWithValue }) => {
+    const fetchAudioDevices = await settlePromise(voice.getAudioDevices());
+    if (fetchAudioDevices?.status === 'rejected') {
+      return rejectWithValue({
+        reason: 'NATIVE_MODULE_REJECTED',
+        error: miniSerializeError(fetchAudioDevices.reason),
+      });
+    }
 
-  const updateResult = await dispatch(
-    updateAudioDevices(fetchAudioDevices.value),
-  );
-  if (updateAudioDevices.rejected.match(updateResult)) {
-    return rejectWithValue({
-      reason: 'UPDATE_AUDIO_DEVICES_REJECTED',
-      rejectValue: updateResult.payload,
-      error: updateResult.error,
-    });
-  }
-});
+    const updateResult = await dispatch(
+      updateAudioDevices(fetchAudioDevices.value),
+    );
+    if (updateAudioDevices.rejected.match(updateResult)) {
+      return rejectWithValue({
+        reason: 'UPDATE_AUDIO_DEVICES_REJECTED',
+        rejectValue: updateResult.payload,
+        error: updateResult.error,
+      });
+    }
+  },
+);
 
 /**
  * Helper functions and types.
