@@ -146,7 +146,12 @@ const getAudioDeviceInfo = (
   audioDevice: TwilioAudioDevice,
 ): AudioDeviceInfo => {
   const uuid = audioDevice.uuid;
-  const type = audioDevice.type;
+
+  /**
+   * TODO(mhuynh): we can remove this workaround after the next RN SDK release.
+   * See VBLOCKS-1787 - "iOS discrepancy with audio device types".
+   */
+  const type = audioDevice.type.toLowerCase() as TwilioAudioDevice.Type;
   const name = audioDevice.name;
 
   return {
