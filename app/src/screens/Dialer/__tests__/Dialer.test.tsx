@@ -3,22 +3,53 @@ import { render, screen, fireEvent } from '@testing-library/react-native';
 import React from 'react';
 import { Text } from 'react-native';
 import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
+import configureStore, { MockStore } from 'redux-mock-store';
+import waitForActions from 'redux-mock-store-await-actions';
+import thunkMiddleware from 'redux-thunk';
 import { NavigationContainer } from '@react-navigation/native';
 import Dialer from '..';
 
-describe('<Dialer />', () => {
-  let wrapper: React.ComponentType<any>;
+jest.mock('../../../util/fetch', () => ({
+  fetch: jest.fn().mockResolvedValue({
+    ok: true,
+    text: jest.fn().mockResolvedValue('foo'),
+  }),
+}));
 
+const mockNavigate = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useNavigation: () => ({ navigate: mockNavigate }),
+}));
+
+describe('<Dialer />', () => {
+  let store: MockStore;
+  let wrapper: React.ComponentType<any>;
   jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
   beforeEach(() => {
     jest.clearAllMocks();
-    const mockStore = configureStore();
-    const initialState = {
-      voice: { call: { activeCall: { entities: {}, ids: [] } } },
-    };
-    const store = mockStore(initialState);
+    mockNavigate.mockClear();
+
+    store = configureStore([thunkMiddleware])({
+      user: {
+        status: 'fulfilled',
+        email: 'bar@baz.com',
+      },
+      voice: {
+        accessToken: {
+          status: 'fulfilled',
+        },
+        call: {
+          activeCall: {
+            entities: {},
+            ids: [],
+          },
+        },
+      },
+    });
+
     wrapper = ({ children }) => (
       <Provider store={store}>
         <NavigationContainer>{children}</NavigationContainer>
@@ -131,14 +162,26 @@ describe('<Dialer />', () => {
           fireEvent.press(screen.getByText(digit));
         });
         fireEvent.press(screen.getByTestId('call_button'));
+
+        return waitForActions(store, [
+          'voice/getAccessToken/pending',
+          'voice/getAccessToken/fulfilled',
+          'call/makeOutgoing/pending',
+        ]);
       });
 
       it('should dispatch the "makeOutgoingCall" action', () => {
-        // TODO(mmalavalli)
+        const actionArgs = new Map(
+          store.getActions().map(({ meta: { arg }, type }) => [type, arg]),
+        );
+        expect(actionArgs.get('call/makeOutgoing/pending')).toStrictEqual({
+          recipientType: 'number',
+          to: '4156502890',
+        });
       });
 
       it('should transition to the "ActiveCallScreen" component', () => {
-        // TODO(mmalavalli)
+        expect(mockNavigate).toBeCalledWith('Call', {});
       });
     });
   });
@@ -204,16 +247,27 @@ describe('<Dialer />', () => {
 
     describe('press the call button', () => {
       beforeEach(() => {
-        fireEvent.changeText(screen.getByTestId('client_text_input'), 'foo');
+        fireEvent.changeText(screen.getByTestId('client_text_input'), 'zoo');
         fireEvent.press(screen.getByTestId('call_button'));
+        return waitForActions(store, [
+          'voice/getAccessToken/pending',
+          'voice/getAccessToken/fulfilled',
+          'call/makeOutgoing/pending',
+        ]);
       });
 
       it('should dispatch the "makeOutgoingCall" action', () => {
-        // TODO(mmalavalli)
+        const actionArgs = new Map(
+          store.getActions().map(({ meta: { arg }, type }) => [type, arg]),
+        );
+        expect(actionArgs.get('call/makeOutgoing/pending')).toStrictEqual({
+          recipientType: 'client',
+          to: 'zoo',
+        });
       });
 
       it('should transition to the "ActiveCallScreen" component', () => {
-        // TODO(mmalavalli)
+        expect(mockNavigate).toBeCalledWith('Call', {});
       });
     });
   });
