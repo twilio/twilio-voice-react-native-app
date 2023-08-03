@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginAndRegister } from '../../store/voice/registration';
+import { loginAndRegister } from '../../store/loginAndRegister';
 import { type Dispatch, type State } from '../../store/app';
 
 const ArrowForward = require('../../../assets/icons/arrow-forward.png');
