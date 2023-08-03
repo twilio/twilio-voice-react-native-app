@@ -13,10 +13,12 @@ const DialpadButton: React.FC<Props> = ({
   subtitle,
   onPress,
 }) => (
-  <Button disabled={disabled} size={96} onPress={onPress}>
-    <Text style={styles.title} testID={`dialpad_button_${title}`}>
-      {title}
-    </Text>
+  <Button
+    disabled={disabled}
+    size={96}
+    onPress={onPress}
+    testID={`dialpad_button_${title}`}>
+    <Text style={styles.title}>{title}</Text>
     <Text style={styles.subtitle}>{subtitle}</Text>
   </Button>
 );
