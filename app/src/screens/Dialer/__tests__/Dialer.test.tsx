@@ -4,10 +4,13 @@ import React from 'react';
 import { Text } from 'react-native';
 import { Provider } from 'react-redux';
 import configureStore, { MockStore } from 'redux-mock-store';
-import waitForActions from 'redux-mock-store-await-actions';
 import thunkMiddleware from 'redux-thunk';
 import { NavigationContainer } from '@react-navigation/native';
 import Dialer from '..';
+
+// waitForActions() is imported using "require" as it does not
+// contain type definitions for the public APIs.
+const waitForActions = require('redux-mock-store-await-actions');
 
 jest.mock('../../../util/fetch', () => ({
   fetch: jest.fn().mockResolvedValue({

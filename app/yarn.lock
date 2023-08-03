@@ -5126,7 +5126,7 @@ lodash.truncate@^4.4.2:
   resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
   integrity sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==
 
-lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.21:
+lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.21, lodash@^4.17.4:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -6446,6 +6446,13 @@ redent@^3.0.0:
   dependencies:
     indent-string "^4.0.0"
     strip-indent "^3.0.0"
+
+redux-mock-store-await-actions@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/redux-mock-store-await-actions/-/redux-mock-store-await-actions-2.1.0.tgz#d716fc96d059aa71b18691f4330f264dbaed12e9"
+  integrity sha512-XtOt4U8+gqMUjYqKl4gRkkOxlyPKTqi2NzDJuZikBgRY989s+21/QGNhMjYf7ry1C9fiPwpSyYo4t2Le5QTyNQ==
+  dependencies:
+    lodash "^4.17.4"
 
 redux-mock-store@^1.5.4:
   version "1.5.4"
