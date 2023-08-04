@@ -8,8 +8,22 @@ import thunkMiddleware from 'redux-thunk';
 import { NavigationContainer } from '@react-navigation/native';
 import Dialer from '..';
 
-// Wait for an action of a particular type to be
-// dispatched to the MockStore.
+jest.mock('../../../util/fetch', () => ({
+  fetch: jest.fn().mockResolvedValue({
+    ok: true,
+    text: jest.fn().mockResolvedValue('foo'),
+  }),
+}));
+
+const mockNavigate = jest.fn();
+
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useNavigation: () => ({ navigate: mockNavigate }),
+}));
+
+// Wait for an action of a particular type to be dispatched to the MockStore.
+// TODO(mmalavalli): Explore using thunk middleware to wait for actions to dispatch.
 const waitForActionType = (
   store: MockStore,
   actionType: string,
@@ -37,20 +51,6 @@ const waitForActionType = (
   });
 };
 
-jest.mock('../../../util/fetch', () => ({
-  fetch: jest.fn().mockResolvedValue({
-    ok: true,
-    text: jest.fn().mockResolvedValue('foo'),
-  }),
-}));
-
-const mockNavigate = jest.fn();
-
-jest.mock('@react-navigation/native', () => ({
-  ...jest.requireActual('@react-navigation/native'),
-  useNavigation: () => ({ navigate: mockNavigate }),
-}));
-
 describe('<Dialer />', () => {
   let store: MockStore;
   let wrapper: React.ComponentType<any>;
@@ -60,6 +60,7 @@ describe('<Dialer />', () => {
     jest.clearAllMocks();
     mockNavigate.mockClear();
 
+    // TODO(mmalavalli): Explore using the real store.
     store = configureStore([thunkMiddleware])({
       user: {
         status: 'fulfilled',
