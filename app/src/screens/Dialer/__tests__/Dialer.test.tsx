@@ -8,9 +8,34 @@ import thunkMiddleware from 'redux-thunk';
 import { NavigationContainer } from '@react-navigation/native';
 import Dialer from '..';
 
-// waitForActions() is imported using "require" as it does not
-// contain type definitions for the public APIs.
-const waitForActions = require('redux-mock-store-await-actions');
+// Wait for an action of a particular type to be
+// dispatched to the MockStore.
+const waitForActionType = (
+  store: MockStore,
+  actionType: string,
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const timeoutMS = 2000;
+    const pollIntervalMS = 100;
+
+    const timeout = setTimeout(() => {
+      reject(new Error(`Timed out waiting for action type: "${actionType}"`));
+    }, timeoutMS);
+
+    const poll = () => {
+      const actions = store.getActions();
+      const action = actions.find(({ type }) => type === actionType);
+      if (action) {
+        clearInterval(interval);
+        clearTimeout(timeout);
+        resolve(action);
+      }
+    };
+
+    const interval = setInterval(poll, pollIntervalMS);
+    poll();
+  });
+};
 
 jest.mock('../../../util/fetch', () => ({
   fetch: jest.fn().mockResolvedValue({
@@ -160,24 +185,18 @@ describe('<Dialer />', () => {
     });
 
     describe('press the call button', () => {
-      beforeEach(() => {
+      let action: any;
+
+      beforeEach(async () => {
         ['4', '1', '5', '6', '5', '0', '2', '8', '9', '0'].forEach((digit) => {
           fireEvent.press(screen.getByText(digit));
         });
         fireEvent.press(screen.getByTestId('call_button'));
-
-        return waitForActions(store, [
-          'voice/getAccessToken/pending',
-          'voice/getAccessToken/fulfilled',
-          'call/makeOutgoing/pending',
-        ]);
+        action = await waitForActionType(store, 'call/makeOutgoing/pending');
       });
 
       it('should dispatch the "makeOutgoingCall" action', () => {
-        const actionArgs = new Map(
-          store.getActions().map(({ meta: { arg }, type }) => [type, arg]),
-        );
-        expect(actionArgs.get('call/makeOutgoing/pending')).toStrictEqual({
+        expect(action.meta.arg).toStrictEqual({
           recipientType: 'number',
           to: '4156502890',
         });
@@ -249,21 +268,16 @@ describe('<Dialer />', () => {
     });
 
     describe('press the call button', () => {
-      beforeEach(() => {
+      let action: any;
+
+      beforeEach(async () => {
         fireEvent.changeText(screen.getByTestId('client_text_input'), 'zoo');
         fireEvent.press(screen.getByTestId('call_button'));
-        return waitForActions(store, [
-          'voice/getAccessToken/pending',
-          'voice/getAccessToken/fulfilled',
-          'call/makeOutgoing/pending',
-        ]);
+        action = await waitForActionType(store, 'call/makeOutgoing/pending');
       });
 
       it('should dispatch the "makeOutgoingCall" action', () => {
-        const actionArgs = new Map(
-          store.getActions().map(({ meta: { arg }, type }) => [type, arg]),
-        );
-        expect(actionArgs.get('call/makeOutgoing/pending')).toStrictEqual({
+        expect(action.meta.arg).toStrictEqual({
           recipientType: 'client',
           to: 'zoo',
         });
