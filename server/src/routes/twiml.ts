@@ -1,10 +1,10 @@
 import { Request, RequestHandler, Response } from 'express';
 import { twiml, validateExpressRequest } from 'twilio';
-import { ServerCredentials } from '../common/types';
+import { ServerConfig } from '../common/types';
 import { log } from '../utils/log';
 
 export function createTwimlRoute(
-  serverConfig: ServerCredentials,
+  serverConfig: ServerConfig,
 ): RequestHandler {
   const { VoiceResponse } = twiml;
 

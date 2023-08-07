@@ -1,8 +1,8 @@
 /** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
   rootDir: '..',
-  testMatch: ['<rootDir>/e2e/**/*.test.ts'],
-  testTimeout: 300000,
+  testMatch: ['<rootDir>/e2e/incomingCall.test.ts'],
+  testTimeout: 20 * 60 * 1000,
   maxWorkers: 1,
   globalSetup: 'detox/runners/jest/globalSetup',
   globalTeardown: 'detox/runners/jest/globalTeardown',

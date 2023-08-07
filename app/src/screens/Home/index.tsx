@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { type Dispatch, type State } from '../../store/app';
 import { logout } from '../../store/user';
+import { unregister } from '../../store/voice/registration';
 
 const TwilioLogo = require('../../../assets/icons/twilio-logo.png');
 
@@ -56,6 +57,11 @@ const Home: React.FC = () => {
     if (logout.rejected.match(logoutAction)) {
       console.error(logoutAction.payload || logoutAction.error);
     }
+
+    const unregisterAction = await dispatch(unregister());
+    if (unregister.rejected.match(unregisterAction)) {
+      console.error(unregisterAction.payload || unregisterAction.error);
+    }
   };
 
   return (
@@ -67,7 +73,7 @@ const Home: React.FC = () => {
         <Text>Ahoy!</Text>
         <View style={styles.client}>
           <Text>Client ID:</Text>
-          <TouchableHighlight onPress={handleLogout}>
+          <TouchableHighlight testID="logout_button" onPress={handleLogout}>
             <Text style={styles.logoutText}>Log out</Text>
           </TouchableHighlight>
         </View>

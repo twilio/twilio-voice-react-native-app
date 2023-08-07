@@ -1,21 +1,22 @@
 import * as dotenv from 'dotenv';
-import type { ServerCredentials } from '../common/types';
+import type { ServerConfig } from '../common/types';
 
 dotenv.config();
 
 export enum EnvVars {
   AccountSid = 'ACCOUNT_SID',
   ApiKeySecret = 'API_KEY_SECRET',
-  AuthToken = 'AUTH_TOKEN',
   ApiKeySid = 'API_KEY_SID',
-  CallerId = 'CALLER_ID',
-  OutgoingApplicationSid = 'TWIML_APP_SID',
-  Port = 'PORT',
   ApnPushCredentialSid = 'APN_PUSH_CREDENTIAL_SID',
-  FcmPushCredentialSid = 'FCM_PUSH_CREDENTIAL_SID',
   Auth0Audience = 'AUTH0_AUDIENCE',
   Auth0IssuerBaseUrl = 'AUTH0_ISSUER_BASE_URL',
+  AuthToken = 'AUTH_TOKEN',
+  CallerId = 'CALLER_ID',
+  ClientIdentity = 'CLIENT_IDENTITY',
   EmailVerificationRegex = 'EMAIL_VERIFICATION_REGEX',
+  FcmPushCredentialSid = 'FCM_PUSH_CREDENTIAL_SID',
+  OutgoingApplicationSid = 'TWIML_APP_SID',
+  Port = 'PORT',
 }
 
 function validateNumber(envVar: string): number | undefined {
@@ -34,16 +35,16 @@ export function getPort() {
   return validateNumber(portStr);
 }
 
-export function getServerCredentials(): ServerCredentials | undefined {
+export function getServerCredentials(): ServerConfig | undefined {
   const envVars = [
     EnvVars.AccountSid,
     EnvVars.ApiKeySecret,
-    EnvVars.AuthToken,
     EnvVars.ApiKeySid,
-    EnvVars.CallerId,
-    EnvVars.OutgoingApplicationSid,
     EnvVars.Auth0Audience,
     EnvVars.Auth0IssuerBaseUrl,
+    EnvVars.AuthToken,
+    EnvVars.CallerId,
+    EnvVars.OutgoingApplicationSid,
   ].map((envVarKey) => [envVarKey, getEnvVar(envVarKey)]);
 
   if (
@@ -56,11 +57,12 @@ export function getServerCredentials(): ServerCredentials | undefined {
   // Optional variables
   const optionalEnvVars = [
     EnvVars.ApnPushCredentialSid,
+    EnvVars.ClientIdentity,
     EnvVars.EmailVerificationRegex,
     EnvVars.FcmPushCredentialSid,
   ];
   optionalEnvVars.forEach((_optionalEnvVarKey) =>
-    envVars.push([_optionalEnvVarKey, process.env[_optionalEnvVarKey]]),
+    envVars.push([_optionalEnvVarKey, getEnvVar(_optionalEnvVarKey)]),
   );
 
   return Object.freeze(Object.fromEntries(envVars));
