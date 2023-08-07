@@ -8,6 +8,8 @@ import thunkMiddleware from 'redux-thunk';
 import { NavigationContainer } from '@react-navigation/native';
 import Dialer from '..';
 
+jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+
 jest.mock('../../../util/fetch', () => ({
   fetch: jest.fn().mockResolvedValue({
     ok: true,
@@ -54,7 +56,6 @@ const waitForActionType = (
 describe('<Dialer />', () => {
   let store: MockStore;
   let wrapper: React.ComponentType<any>;
-  jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
   beforeEach(() => {
     jest.clearAllMocks();
