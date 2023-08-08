@@ -68,6 +68,9 @@ describe('<ActiveCall />', () => {
         status: 'idle',
         action: 'login',
       },
+      loginAndRegister: {
+        status: 'idle',
+      },
     };
 
     const store = mockStore(initialState);

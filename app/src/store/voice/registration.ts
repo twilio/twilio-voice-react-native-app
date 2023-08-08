@@ -4,10 +4,8 @@ import {
   type SerializedError,
 } from '@reduxjs/toolkit';
 import { match } from 'ts-pattern';
-import { getAccessToken } from './accessToken';
 import { type AsyncStoreSlice } from '../app';
 import { createTypedAsyncThunk } from '../common';
-import { login, logout } from '../user';
 import { settlePromise } from '../../util/settlePromise';
 import { voice } from '../../util/voice';
 
@@ -48,43 +46,6 @@ export const register = createTypedAsyncThunk<
       reason: 'NATIVE_MODULE_REJECTED',
       error: miniSerializeError(voiceRegisterResult.reason),
     });
-  }
-});
-
-export type LoginAndRegisterRejectValue =
-  | {
-      reason: 'LOGIN_REJECTED';
-    }
-  | {
-      reason: 'GET_ACCESS_TOKEN_REJECTED';
-    }
-  | {
-      reason: 'REGISTER_REJECTED';
-    };
-
-export const loginAndRegister = createTypedAsyncThunk<
-  void,
-  void,
-  {
-    rejectValue: LoginAndRegisterRejectValue;
-  }
->('registration/loginAndRegister', async (_, { dispatch, rejectWithValue }) => {
-  const loginActionResult = await dispatch(login());
-  if (login.rejected.match(loginActionResult)) {
-    return rejectWithValue({ reason: 'LOGIN_REJECTED' });
-  }
-
-  const getAccessTokenResult = await dispatch(getAccessToken());
-  if (getAccessToken.rejected.match(getAccessTokenResult)) {
-    await dispatch(logout());
-    return rejectWithValue({
-      reason: 'GET_ACCESS_TOKEN_REJECTED',
-    });
-  }
-
-  const registerActionResult = await dispatch(register());
-  if (register.rejected.match(registerActionResult)) {
-    return rejectWithValue({ reason: 'REGISTER_REJECTED' });
   }
 });
 
