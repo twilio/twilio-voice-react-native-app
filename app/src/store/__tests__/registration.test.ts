@@ -51,9 +51,7 @@ describe('registration', () => {
       const loginAndRegisterResult = await store.dispatch(
         loginAndRegisterModule.loginAndRegister(),
       );
-      expect(loginAndRegisterResult.type).toEqual(
-        'registration/loginAndRegister/fulfilled',
-      );
+      expect(loginAndRegisterResult.type).toEqual('loginAndRegister/fulfilled');
       expect(loginAndRegisterResult.payload).toEqual(undefined);
 
       matchDispatchedActions(dispatchedActions, [
@@ -76,7 +74,7 @@ describe('registration', () => {
           loginAndRegisterModule.loginAndRegister(),
         );
         expect(loginAndRegisterResult.type).toEqual(
-          'registration/loginAndRegister/rejected',
+          'loginAndRegister/rejected',
         );
         expect(loginAndRegisterResult.payload).toEqual({
           reason: 'LOGIN_REJECTED',
@@ -97,7 +95,7 @@ describe('registration', () => {
           loginAndRegisterModule.loginAndRegister(),
         );
         expect(loginAndRegisterResult.type).toEqual(
-          'registration/loginAndRegister/rejected',
+          'loginAndRegister/rejected',
         );
         expect(loginAndRegisterResult.payload).toEqual({
           reason: 'GET_ACCESS_TOKEN_REJECTED',
@@ -122,7 +120,7 @@ describe('registration', () => {
           loginAndRegisterModule.loginAndRegister(),
         );
         expect(loginAndRegisterResult.type).toEqual(
-          'registration/loginAndRegister/rejected',
+          'loginAndRegister/rejected',
         );
         expect(loginAndRegisterResult.payload).toEqual({
           reason: 'REGISTER_REJECTED',

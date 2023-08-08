@@ -3,10 +3,12 @@ import { match } from 'ts-pattern';
 import { getAccessToken } from './voice/accessToken';
 import { register } from './voice/registration';
 import { type AsyncStoreSlice } from './app';
-import { createTypedAsyncThunk } from './common';
+import { createTypedAsyncThunk, generateThunkActionTypes } from './common';
 import { login, logout } from './user';
 
-export type LoginAndRegisterRejectValue =
+const sliceName = 'loginAndRegister' as const;
+
+type LoginAndRegisterRejectValue =
   | {
       reason: 'LOGIN_REJECTED';
     }
@@ -17,39 +19,45 @@ export type LoginAndRegisterRejectValue =
       reason: 'REGISTER_REJECTED';
     };
 
+const loginAndRegisterActionTypes = generateThunkActionTypes(`${sliceName}`);
+
 export const loginAndRegister = createTypedAsyncThunk<
   void,
   void,
   {
     rejectValue: LoginAndRegisterRejectValue;
   }
->('registration/loginAndRegister', async (_, { dispatch, rejectWithValue }) => {
-  const loginActionResult = await dispatch(login());
-  if (login.rejected.match(loginActionResult)) {
-    return rejectWithValue({ reason: 'LOGIN_REJECTED' });
-  }
+>(
+  loginAndRegisterActionTypes.prefix,
+  async (_, { dispatch, rejectWithValue }) => {
+    const loginActionResult = await dispatch(login());
+    if (login.rejected.match(loginActionResult)) {
+      return rejectWithValue({ reason: 'LOGIN_REJECTED' });
+    }
 
-  const getAccessTokenResult = await dispatch(getAccessToken());
-  if (getAccessToken.rejected.match(getAccessTokenResult)) {
-    await dispatch(logout());
-    return rejectWithValue({
-      reason: 'GET_ACCESS_TOKEN_REJECTED',
-    });
-  }
+    const getAccessTokenResult = await dispatch(getAccessToken());
+    if (getAccessToken.rejected.match(getAccessTokenResult)) {
+      await dispatch(logout());
+      return rejectWithValue({
+        reason: 'GET_ACCESS_TOKEN_REJECTED',
+      });
+    }
 
-  const registerActionResult = await dispatch(register());
-  if (register.rejected.match(registerActionResult)) {
-    return rejectWithValue({ reason: 'REGISTER_REJECTED' });
-  }
-});
+    const registerActionResult = await dispatch(register());
+    if (register.rejected.match(registerActionResult)) {
+      return rejectWithValue({ reason: 'REGISTER_REJECTED' });
+    }
+  },
+);
 
-export type LoginAndRegisterSlice = AsyncStoreSlice<
+type LoginAndRegisterSlice = AsyncStoreSlice<
   {},
-  LoginAndRegisterRejectValue | { error: SerializedError }
+  | LoginAndRegisterRejectValue
+  | { error: SerializedError; reason: 'UNEXPECTED_ERROR' }
 >;
 
 export const loginAndRegisterSlice = createSlice({
-  name: 'loginAndRegister',
+  name: sliceName,
   initialState: { status: 'idle' } as LoginAndRegisterSlice,
   reducers: {},
   extraReducers(builder) {
@@ -72,7 +80,7 @@ export const loginAndRegisterSlice = createSlice({
         .with(undefined, () => ({
           status: requestStatus,
           error: action.error,
-          reason: 'UNEXPECTED_ERROR',
+          reason: 'UNEXPECTED_ERROR' as const,
         }))
         .exhaustive();
     });
