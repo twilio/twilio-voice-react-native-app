@@ -212,7 +212,7 @@ describe('<ActiveCall />', () => {
       screen = renderActiveCall(store);
     });
 
-    it('should dispatch the "muteActiveCall" action with shouldMute = true', async () => {
+    it('should dispatch the "muteActiveCall" action with shouldMute = true', () => {
       const action = store
         .getActions()
         .find(({ type }) => type === 'activeCall/mute/pending');
@@ -238,7 +238,7 @@ describe('<ActiveCall />', () => {
         screen = renderActiveCall(store);
       });
 
-      it('should dispatch the "muteActiveCall" action with shouldMute = false', async () => {
+      it('should dispatch the "muteActiveCall" action with shouldMute = false', () => {
         const action = store
           .getActions()
           .find(({ type }) => type === 'activeCall/mute/pending');
@@ -340,7 +340,18 @@ describe('<ActiveCall />', () => {
   });
 
   describe('press end call button', () => {
-    //TODO(mmalavalli)
-    it.todo('todo');
+    beforeEach(() => {
+      fireEvent.press(screen.getByTestId('end_call_button'));
+    });
+
+    it('should dispatch "disconnectActiveCall" action', () => {
+      const action = store
+        .getActions()
+        .find(({ type }) => type === 'activeCall/disconnect/pending');
+      expect(action).not.toBeNull();
+      expect(action.meta.arg).toStrictEqual({
+        id: '1111',
+      });
+    });
   });
 });
