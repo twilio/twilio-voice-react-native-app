@@ -104,6 +104,12 @@ export function createTokenRoute(serverConfig: ServerConfig) {
       serverConfig.API_KEY_SID,
       serverConfig.API_KEY_SECRET,
       {
+        /**
+         * The `CLIENT_IDENTITY` environment variable used to override the
+         * identity here is used for e2e testing.
+         *
+         * See the file `e2e-testing.md` for more information.
+         */
         identity: serverConfig.CLIENT_IDENTITY ?? userInfo.email,
       },
     );
