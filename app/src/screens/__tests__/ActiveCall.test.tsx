@@ -1,41 +1,115 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import '@testing-library/jest-native/extend-expect';
-import { render, fireEvent } from '@testing-library/react-native';
+import { fireEvent, render, RenderResult } from '@testing-library/react-native';
 import React from 'react';
-import configureStore from 'redux-mock-store';
+import { Image } from 'react-native';
+import configureStore, { MockStore } from 'redux-mock-store';
+import thunkMiddleware from 'redux-thunk';
 import { Provider } from 'react-redux';
 import ActiveCall from '../ActiveCall';
 import { type StackParamList } from '../types';
-import { type State } from '../../store/app';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
+jest.mock('../../util/voice', () => ({
+  ...jest.requireActual('../../util/voice'),
+  callMap: new Map([
+    [
+      '1111',
+      {
+        getSid: jest.fn().mockReturnValue('1111'),
+        getState: jest.fn().mockReturnValue('connected'),
+        getFrom: jest.fn().mockReturnValue('foo-caller'),
+        getTo: jest.fn().mockReturnValue('foobar-outgoing-client-to'),
+        isOnHold: jest.fn().mockReturnValue(false),
+        ...(() => {
+          let muted = false;
+          const mute = (shouldMute: boolean) =>
+            Promise.resolve((muted = shouldMute));
+          return {
+            isMuted: () => muted,
+            mute,
+          };
+        })(),
+      },
+    ],
+  ]),
+  voice: {
+    getAudioDevices: jest.fn().mockResolvedValue({
+      audioDevices: [
+        { name: 'foo', type: 'earpiece' as any, uuid: '1111' },
+        { name: 'foo', type: 'speaker' as any, uuid: '2222' },
+        { name: 'foo', type: 'bluetooth' as any, uuid: '3333' },
+      ],
+      selectedDevice: {
+        name: 'foo',
+        type: 'earpiece' as any,
+        uuid: '1111',
+      },
+    }),
+  },
+}));
+
+const renderActiveCall = (store: MockStore): RenderResult => {
+  const Stack = createNativeStackNavigator<StackParamList>();
+  return render(
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Call" component={ActiveCall} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>,
+  );
+};
+
+// Wait for an action of a particular type to be dispatched to the MockStore.
+// TODO(mmalavalli): Explore using thunk middleware to wait for actions to dispatch.
+// TODO(mmalavalli): Refactor to a util function for re-use in other tests.
+const waitForActionType = (
+  store: MockStore,
+  actionType: string,
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const timeoutMS = 2000;
+    const pollIntervalMS = 100;
+
+    const timeout = setTimeout(() => {
+      reject(new Error(`Timed out waiting for action type: "${actionType}"`));
+    }, timeoutMS);
+
+    const poll = () => {
+      const actions = store.getActions();
+      const action = actions.find(({ type }) => type === actionType);
+      if (action) {
+        clearInterval(interval);
+        clearTimeout(timeout);
+        resolve(action);
+      }
+    };
+
+    const interval = setInterval(poll, pollIntervalMS);
+    poll();
+  });
+};
+
 describe('<ActiveCall />', () => {
+  let screen: RenderResult;
+  let state: any;
+  let store: MockStore;
+
   beforeEach(() => {
     jest.clearAllMocks();
-  });
 
-  const renderActiveCallScreen = () => {
-    const mockStore = configureStore();
-
-    const initialState: State = {
+    state = {
       voice: {
-        accessToken: {
-          status: 'idle',
-        },
         audioDevices: {
-          status: 'fulfilled',
           audioDevices: [
             { name: 'foo', type: 'earpiece' as any, uuid: '1111' },
             { name: 'foo', type: 'speaker' as any, uuid: '2222' },
             { name: 'foo', type: 'bluetooth' as any, uuid: '3333' },
           ],
-          selectedDevice: {
-            name: 'foo',
-            type: 'earpiece' as any,
-            uuid: '1111',
-          },
         },
         call: {
           activeCall: {
@@ -48,7 +122,7 @@ describe('<ActiveCall />', () => {
                   sendDigits: { status: 'idle' },
                 },
                 id: '1111',
-                info: { state: 'connected' },
+                info: { isMuted: false, state: 'connected' },
                 initialConnectTimestamp: undefined,
                 recipientType: 'client',
                 to: 'foobar-outgoing-client-to',
@@ -58,29 +132,28 @@ describe('<ActiveCall />', () => {
             },
             ids: ['1111'],
           },
-          callInvite: { entities: {}, ids: [] },
         },
-        registration: {
-          status: 'idle',
-        },
-      },
-      user: {
-        status: 'idle',
-        action: 'login',
       },
       loginAndRegister: {
         status: 'idle',
       },
     };
 
-    const store = mockStore(initialState);
-    const dispatch = jest
-      .spyOn(store, 'dispatch')
-      .mockImplementation((() => {}) as any);
+    store = configureStore([thunkMiddleware])((actions: any[]) => {
+      const setActiveCallInfoAction = actions.find(
+        ({ type }) => type === 'activeCall/setActiveCallInfo',
+      );
+      if (setActiveCallInfoAction) {
+        state.voice.call.activeCall.entities['1111'] = {
+          ...state.voice.call.activeCall.entities['1111'],
+          info: { ...setActiveCallInfoAction.payload.info },
+        };
+      }
+      return state;
+    });
 
     const Stack = createNativeStackNavigator<StackParamList>();
-
-    const screen = render(
+    screen = render(
       <Provider store={store}>
         <NavigationContainer>
           <Stack.Navigator>
@@ -89,61 +162,199 @@ describe('<ActiveCall />', () => {
         </NavigationContainer>
       </Provider>,
     );
+  });
 
-    return { screen, dispatch };
+  const activeCallLayoutTests = () => {
+    it('should show the name of the recipient', () => {
+      expect(screen.getByText('foobar-outgoing-client-to')).toBeOnTheScreen();
+    });
+
+    it('should show the status of the call', () => {
+      const {
+        voice: {
+          call: {
+            activeCall: { entities, ids },
+          },
+        },
+      } = store.getState();
+      expect(screen.getByText(entities[ids[0]].info.state)).toBeOnTheScreen();
+    });
+
+    [
+      ['bluetooth', 'bluetooth_button', true],
+      ['show dialpad', 'show_dialpad_button', false],
+      ['mute', 'mute_button', false],
+      ['speaker', 'speaker_button', true],
+      ['end call', 'end_call_button', false],
+    ].forEach(([name, testId, disabled]) => {
+      it(`should show an ${
+        disabled ? 'disabled' : 'enabled'
+      } ${name} button`, () => {
+        const button = screen.getByTestId(testId as string);
+        expect(button).toBeOnTheScreen();
+        expect(button.props.accessibilityState.disabled).toBe(disabled);
+        if (name === 'mute') {
+          expect(button.findByType(Image).props.accessibilityLabel).toBe(
+            'mute_passive',
+          );
+        }
+      });
+    });
+
+    it('should hide the hide dialpad button', () => {
+      expect(screen.queryByTestId('hide_dialpad_button')).not.toBeOnTheScreen();
+    });
   };
 
-  it('shows the active call screen', () => {
-    const { screen } = renderActiveCallScreen();
+  describe('UI layout', activeCallLayoutTests);
 
-    expect(screen.getByTestId('active_call')).toBeVisible();
-    expect(screen.getByTestId('call_status')).toBeVisible();
+  describe('press mute button', () => {
+    beforeEach(async () => {
+      fireEvent.press(screen.getByTestId('mute_button'));
+      await waitForActionType(store, 'activeCall/setActiveCallInfo');
+      screen = renderActiveCall(store);
+    });
 
-    expect(screen.getByTestId('mute_button')).toBeVisible();
-    expect(screen.getByTestId('show_dialpad_button')).toBeVisible();
-    expect(screen.getByTestId('speaker_button')).toBeVisible();
+    it('should dispatch the "muteActiveCall" action with shouldMute = true', () => {
+      const action = store
+        .getActions()
+        .find(({ type }) => type === 'activeCall/mute/pending');
+      expect(action).not.toBeNull();
+      expect(action.meta.arg).toStrictEqual({
+        id: '1111',
+        shouldMute: true,
+      });
+    });
 
-    expect(screen.getByTestId('end_call_button')).toBeVisible();
+    it('should activate the mute button', () => {
+      expect(
+        screen.getByTestId('mute_button').findByType(Image).props
+          .accessibilityLabel,
+      ).toBe('mute_active');
+    });
+
+    describe('press mute button again', () => {
+      beforeEach(async () => {
+        store.clearActions();
+        fireEvent.press(screen.getByTestId('mute_button'));
+        await waitForActionType(store, 'activeCall/setActiveCallInfo');
+        screen = renderActiveCall(store);
+      });
+
+      it('should dispatch the "muteActiveCall" action with shouldMute = false', () => {
+        const action = store
+          .getActions()
+          .find(({ type }) => type === 'activeCall/mute/pending');
+        expect(action).not.toBeNull();
+        expect(action.meta.arg).toStrictEqual({
+          id: '1111',
+          shouldMute: false,
+        });
+      });
+
+      it('should de-activate the mute button', () => {
+        expect(
+          screen.getByTestId('mute_button').findByType(Image).props
+            .accessibilityLabel,
+        ).toBe('mute_passive');
+      });
+    });
   });
 
-  describe('dialpad', () => {
-    it('shows the dialpad', async () => {
-      const { screen } = renderActiveCallScreen();
-
-      const showDialpadButton = screen.getByTestId('show_dialpad_button');
-      expect(showDialpadButton).toBeVisible();
-
-      fireEvent.press(showDialpadButton);
-
-      for (let i = 0; i < 10; i++) {
-        const label = String(i);
-        const button = screen.getByText(label);
-        expect(button).toBeVisible();
-      }
-
-      const hideDialpadButton = screen.getByTestId('hide_dialpad_button');
-      expect(hideDialpadButton).toBeVisible();
+  describe('press show dialpad button', () => {
+    beforeEach(() => {
+      fireEvent.press(screen.getByTestId('show_dialpad_button'));
     });
 
-    it('presses each dialpad button', async () => {
-      // TODO(mhuynh): increase test coverage.
+    it('should display the enabled dialpad buttons', () => {
+      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].forEach(
+        (digit) => {
+          const digitButton = screen.getByTestId(`dialpad_button_${digit}`);
+          expect(digitButton).toBeOnTheScreen();
+          expect(digitButton.props.accessibilityState.disabled).toBe(false);
+        },
+      );
     });
 
-    it('hides the dialpad', async () => {
-      // TODO(mhuynh): increase test coverage.
+    [
+      ['hide dialpad', 'hide_dialpad_button'],
+      ['end call', 'end_call_button'],
+    ].forEach(([name, testId]) => {
+      it(`should show the ${name} button`, () => {
+        const button = screen.getByTestId(testId);
+        expect(button).toBeOnTheScreen();
+        expect(button.props.accessibilityState?.disabled).toBeFalsy();
+      });
+    });
+
+    [
+      ['bluetooth', 'bluetooth_button'],
+      ['show dialpad', 'show_dialpad_button'],
+      ['mute', 'mute_button'],
+      ['speaker', 'speaker_button'],
+    ].forEach(([name, testId]) => {
+      it(`should hide the ${name} button`, () => {
+        expect(screen.queryByTestId(testId)).not.toBeOnTheScreen();
+      });
+    });
+
+    describe('press dialpad buttons', () => {
+      beforeEach(() => {
+        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].forEach(
+          (digit) => {
+            fireEvent.press(screen.getByTestId(`dialpad_button_${digit}`));
+          },
+        );
+      });
+
+      it('should dispatch "sendDigitsActiveCall" actions for each digit', () => {
+        const expectedActionArgs = [
+          '1',
+          '2',
+          '3',
+          '4',
+          '5',
+          '6',
+          '7',
+          '8',
+          '9',
+          '*',
+          '0',
+          '#',
+        ].map((digit) => ({
+          id: '1111',
+          digits: digit,
+        }));
+        const actionArgs = store
+          .getActions()
+          .filter(({ type }) => type === 'activeCall/sendDigits/pending')
+          .map(({ meta: { arg } }) => arg);
+        expect(actionArgs).toStrictEqual(expectedActionArgs);
+      });
+    });
+
+    describe('press hide dialpad button', () => {
+      beforeEach(() => {
+        fireEvent.press(screen.getByTestId('hide_dialpad_button'));
+      });
+
+      describe('re-render active call screen', activeCallLayoutTests);
     });
   });
 
-  describe('audio device buttons', () => {
-    it('should select the speaker', () => {
-      const { screen } = renderActiveCallScreen();
+  describe('press end call button', () => {
+    beforeEach(() => {
+      fireEvent.press(screen.getByTestId('end_call_button'));
+    });
 
-      const speakerButton = screen.getByTestId('speaker_button');
-      expect(speakerButton).toBeVisible();
-
-      fireEvent.press(speakerButton);
-
-      // TODO(mhuynh): hook up an actual store similarly to the store tests
+    it('should dispatch "disconnectActiveCall" action', () => {
+      const action = store
+        .getActions()
+        .find(({ type }) => type === 'activeCall/disconnect/pending');
+      expect(action).not.toBeNull();
+      expect(action.meta.arg).toStrictEqual({
+        id: '1111',
+      });
     });
   });
 });

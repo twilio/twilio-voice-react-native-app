@@ -13,12 +13,18 @@ const MuteButton: React.FC<Props> = ({ active, disabled, onPress }) => (
   <Button size={96} disabled={disabled} onPress={onPress} testID="mute_button">
     {active ? (
       <Image
+        accessibilityLabel="mute_active"
         source={MuteActiveSource}
         resizeMode="contain"
         style={styles.image}
       />
     ) : (
-      <Image source={MuteSource} resizeMode="contain" style={styles.image} />
+      <Image
+        accessibilityLabel="mute_passive"
+        source={MuteSource}
+        resizeMode="contain"
+        style={styles.image}
+      />
     )}
   </Button>
 );
