@@ -218,7 +218,6 @@ jobs:
       - restore_cache:
           keys:
             - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
-            - app-dependencies-
       - app-install-dependencies
       - save_cache:
           key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
@@ -277,7 +276,6 @@ jobs:
       - restore_cache:
           keys:
             - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
-            - app-dependencies-
       - app-install-dependencies
       - save_cache:
           key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
@@ -286,7 +284,6 @@ jobs:
       - restore_cache:
           keys:
             - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
-            - server-dependencies-
       - server-install-dependencies
       - save_cache:
           key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
@@ -345,7 +342,6 @@ jobs:
       - restore_cache:
           keys:
             - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
-            - app-dependencies-
       - app-install-dependencies
       - save_cache:
           key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
@@ -355,7 +351,6 @@ jobs:
       - restore_cache:
           keys:
             - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
-            - server-dependencies-
       - server-install-dependencies
       - save_cache:
           key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
@@ -364,7 +359,7 @@ jobs:
       - run:
           name: "Generate a client identity"
           command: |
-            echo 'export CLIENT_IDENTITY=$(uuidgen)' >> "$BASH_ENV"
+            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
       - run:
           name: "Read client identity"
           command: |
@@ -387,7 +382,6 @@ jobs:
       - restore_cache:
           keys:
             - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
-            - server-dependencies-
       - server-install-dependencies
       - save_cache:
           key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
