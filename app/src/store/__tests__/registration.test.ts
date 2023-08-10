@@ -3,6 +3,7 @@ import { createStore, Store } from '../app';
 import * as user from '../user';
 import * as accessTokenStoreModule from '../voice/accessToken';
 import * as registrationStoreModule from '../voice/registration';
+import * as loginAndRegisterModule from '../loginAndRegister';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
 import * as fetchUtil from '../../util/fetch';
@@ -48,22 +49,20 @@ describe('registration', () => {
   describe('loginAndRegister', () => {
     it('resolves when all sub-actions resolve', async () => {
       const loginAndRegisterResult = await store.dispatch(
-        registrationStoreModule.loginAndRegister(),
+        loginAndRegisterModule.loginAndRegister(),
       );
-      expect(loginAndRegisterResult.type).toEqual(
-        'registration/loginAndRegister/fulfilled',
-      );
+      expect(loginAndRegisterResult.type).toEqual('loginAndRegister/fulfilled');
       expect(loginAndRegisterResult.payload).toEqual(undefined);
 
       matchDispatchedActions(dispatchedActions, [
-        registrationStoreModule.loginAndRegister.pending,
+        loginAndRegisterModule.loginAndRegister.pending,
         user.login.pending,
         user.login.fulfilled,
         accessTokenStoreModule.getAccessToken.pending,
         accessTokenStoreModule.getAccessToken.fulfilled,
         registrationStoreModule.register.pending,
         registrationStoreModule.register.fulfilled,
-        registrationStoreModule.loginAndRegister.fulfilled,
+        loginAndRegisterModule.loginAndRegister.fulfilled,
       ]);
     });
 
@@ -72,20 +71,20 @@ describe('registration', () => {
         jest.spyOn(auth0, 'authorize').mockRejectedValueOnce(undefined);
 
         const loginAndRegisterResult = await store.dispatch(
-          registrationStoreModule.loginAndRegister(),
+          loginAndRegisterModule.loginAndRegister(),
         );
         expect(loginAndRegisterResult.type).toEqual(
-          'registration/loginAndRegister/rejected',
+          'loginAndRegister/rejected',
         );
         expect(loginAndRegisterResult.payload).toEqual({
           reason: 'LOGIN_REJECTED',
         });
 
         matchDispatchedActions(dispatchedActions, [
-          registrationStoreModule.loginAndRegister.pending,
+          loginAndRegisterModule.loginAndRegister.pending,
           user.login.pending,
           user.login.rejected,
-          registrationStoreModule.loginAndRegister.rejected,
+          loginAndRegisterModule.loginAndRegister.rejected,
         ]);
       });
 
@@ -93,24 +92,24 @@ describe('registration', () => {
         fetchMock.mockRejectedValueOnce(undefined);
 
         const loginAndRegisterResult = await store.dispatch(
-          registrationStoreModule.loginAndRegister(),
+          loginAndRegisterModule.loginAndRegister(),
         );
         expect(loginAndRegisterResult.type).toEqual(
-          'registration/loginAndRegister/rejected',
+          'loginAndRegister/rejected',
         );
         expect(loginAndRegisterResult.payload).toEqual({
           reason: 'GET_ACCESS_TOKEN_REJECTED',
         });
 
         matchDispatchedActions(dispatchedActions, [
-          registrationStoreModule.loginAndRegister.pending,
+          loginAndRegisterModule.loginAndRegister.pending,
           user.login.pending,
           user.login.fulfilled,
           accessTokenStoreModule.getAccessToken.pending,
           accessTokenStoreModule.getAccessToken.rejected,
           user.logout.pending,
           user.logout.fulfilled,
-          registrationStoreModule.loginAndRegister.rejected,
+          loginAndRegisterModule.loginAndRegister.rejected,
         ]);
       });
 
@@ -118,24 +117,24 @@ describe('registration', () => {
         voiceSdk.voiceRegister.mockRejectedValueOnce(undefined);
 
         const loginAndRegisterResult = await store.dispatch(
-          registrationStoreModule.loginAndRegister(),
+          loginAndRegisterModule.loginAndRegister(),
         );
         expect(loginAndRegisterResult.type).toEqual(
-          'registration/loginAndRegister/rejected',
+          'loginAndRegister/rejected',
         );
         expect(loginAndRegisterResult.payload).toEqual({
           reason: 'REGISTER_REJECTED',
         });
 
         matchDispatchedActions(dispatchedActions, [
-          registrationStoreModule.loginAndRegister.pending,
+          loginAndRegisterModule.loginAndRegister.pending,
           user.login.pending,
           user.login.fulfilled,
           accessTokenStoreModule.getAccessToken.pending,
           accessTokenStoreModule.getAccessToken.fulfilled,
           registrationStoreModule.register.pending,
           registrationStoreModule.register.rejected,
-          registrationStoreModule.loginAndRegister.rejected,
+          loginAndRegisterModule.loginAndRegister.rejected,
         ]);
       });
 
@@ -155,7 +154,7 @@ describe('registration', () => {
             text: jest.fn().mockResolvedValue(''),
           }),
         );
-        await store.dispatch(registrationStoreModule.loginAndRegister());
+        await store.dispatch(loginAndRegisterModule.loginAndRegister());
         const register = await store.dispatch(
           registrationStoreModule.register(),
         );

@@ -1,4 +1,5 @@
 # 1.0.0-beta.1 (Ongoing)
+* Android API >= 30 devices now don't have their microphones turn off upon inactivity. 
 
 ## Known Issues
 * Audio device selection is not working as expected on iOS platforms for bluetooth devices.

@@ -14,15 +14,23 @@ const Stack = createNativeStackNavigator<StackParamList>();
 
 const StackNavigator = () => {
   const user = useSelector((state: State) => state.user);
+  const loginAndRegister = useSelector(
+    (state: State) => state.loginAndRegister,
+  );
+
+  const isLoggedIn =
+    user?.status === 'fulfilled' &&
+    user.accessToken &&
+    loginAndRegister?.status === 'fulfilled';
+
   if (user === null) {
     return <Text>Application not bootstrapped.</Text>;
   }
 
-  if (user?.status === 'pending') {
+  if (loginAndRegister?.status === 'pending') {
     return <Busy />;
   }
 
-  const isLoggedIn = user?.status === 'fulfilled' && user.accessToken;
   if (!isLoggedIn) {
     return <SignIn />;
   }
