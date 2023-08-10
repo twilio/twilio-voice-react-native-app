@@ -5,6 +5,7 @@ version: 2.1
 ###
 orbs:
   android: circleci/android@2.2.0
+  gcp-cli: circleci/gcp-cli@2.4.1
 
 ###
 # Parameters
@@ -373,6 +374,17 @@ jobs:
       - store_artifacts:
           path: server/coverage
 
+  use-gcp:
+    executor: gcp-cli/default
+    steps:
+      - gcp-cli/setup:
+          version: 404.0.0
+          use_oidc: true
+      - run:
+          name: "GCloud Deploy"
+          no_output_timeout: 30m
+          command: gcloud app deploy --no-promote
+
 ###
 # Workflows
 ###
@@ -414,3 +426,11 @@ workflows:
             - app-detox-android
           context:
             - vblocks-js
+      - use-gcp:
+          context:
+            - vblocks-js
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
