@@ -383,7 +383,10 @@ jobs:
       - run:
           name: "GCloud Deploy"
           no_output_timeout: 30m
-          command: gcloud app deploy --no-promote
+          command: |
+            cd server 
+            gcloud app deploy --no-promote
+            cd ..
 
 ###
 # Workflows
