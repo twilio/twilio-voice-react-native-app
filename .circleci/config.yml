@@ -339,13 +339,14 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
-      - restore_cache:
-          keys:
-            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      # NOTE(mhuynh): this causes Detox issues only on iOS
+      # - restore_cache:
+      #     keys:
+      #       - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
       - app-install-dependencies
-      - save_cache:
-          key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
-          paths: app/node_modules
+      # - save_cache:
+      #     key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      #     paths: app/node_modules
       - app-install-applesimutils
       - app-install-pods
       - restore_cache:
