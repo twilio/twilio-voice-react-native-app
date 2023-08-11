@@ -375,7 +375,6 @@ jobs:
           path: server/coverage
 
   use-gcp:
-    executor: gcp-cli/default
     steps:
       - gcp-cli/setup:
           version: 404.0.0
@@ -417,6 +416,16 @@ workflows:
       - server-build:
           requires:
             - server-cache-install-dependencies
+      - use-gcp:
+          requires:
+            - server-build
+          context:
+            - vblocks-js
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
       # e2e jobs
       - app-detox-android:
           context:
@@ -426,11 +435,3 @@ workflows:
             - app-detox-android
           context:
             - vblocks-js
-      - use-gcp:
-          context:
-            - vblocks-js
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
