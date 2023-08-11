@@ -384,7 +384,7 @@ jobs:
           name: "GCloud Deploy"
           no_output_timeout: 30m
           command: |
-            cd server 
+            cd server
             gcloud app deploy --no-promote
             cd ..
 
