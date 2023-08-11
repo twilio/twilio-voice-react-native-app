@@ -375,7 +375,7 @@ jobs:
           path: server/coverage
 
   use-gcp:
-    executor: default
+    executor: gcp-cli/default
     steps:
       - gcp-cli/setup:
           version: 404.0.0
