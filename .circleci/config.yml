@@ -398,7 +398,7 @@ jobs:
       - app-install-dependencies
       - app-install-pods
       - configure-git-user
-      - configure-xcode-signing
+      - run:
           name: "Set up Xcode signing"
           command: |
             echo $FASTLANE_FILE_APPFILE_BASE64 | base64 -D -o app/ios/fastlane/Appfile
@@ -488,7 +488,7 @@ workflows:
   release-candidate:
     when: << pipeline.parameters.rc_workflow >>
     jobs:
-      - build-archive-ios-app:
+      - build-archive-ios-app
       - publish-ios-app-appcenter:
           requires:
             - build-archive-ios-app
