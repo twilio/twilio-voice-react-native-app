@@ -374,10 +374,11 @@ jobs:
       - store_artifacts:
           path: server/coverage
 
-  use-gcp:
+  deploy-server:
     executor: gcp-cli/default
     steps:
       - checkout
+      - server-build
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
@@ -427,9 +428,7 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - use-gcp:
-          requires:
-            - server-build
+      - deploy-server:
           context:
             - vblocks-js
           filters:
