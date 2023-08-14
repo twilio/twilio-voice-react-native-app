@@ -398,6 +398,13 @@ jobs:
       - app-install-dependencies
       - app-install-pods
       - configure-git-user
+      - configure-xcode-signing
+          name: "Set up Xcode signing"
+          command: |
+            echo $FASTLANE_FILE_APPFILE_BASE64 | base64 -D -o app/ios/fastlane/Appfile
+            echo $FASTLANE_FILE_MATCHFILE_BASE64 | base64 -D -o app/ios/fastlane/Matchfile
+            echo $FASTLANE_FILE_FASTFILE_BASE64 | base64 -D -o app/ios/fastlane/Fastfile
+            fastlane ci_match_install
       - attach_workspace:
           at: temp
       - run:
@@ -482,10 +489,6 @@ workflows:
     when: << pipeline.parameters.rc_workflow >>
     jobs:
       - build-archive-ios-app:
-          context:
-            - vblocks-js
       - publish-ios-app-appcenter:
           requires:
             - build-archive-ios-app
-          context:
-            - vblocks-js
