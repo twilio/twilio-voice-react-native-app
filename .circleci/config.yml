@@ -413,9 +413,6 @@ workflows:
             - app-cache-install-yarn-dependencies
       # server jobs
       - server-cache-install-dependencies:
-          filters:
-            tags:
-              only: /.*/
       - server-test:
           requires:
             - server-cache-install-dependencies
@@ -425,9 +422,6 @@ workflows:
       - server-build:
           requires:
             - server-cache-install-dependencies
-          filters:
-            tags:
-              only: /.*/
       - deploy-server:
           context:
             - vblocks-js
