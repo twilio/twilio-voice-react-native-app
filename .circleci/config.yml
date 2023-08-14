@@ -402,10 +402,12 @@ jobs:
           name: "Set up Xcode signing"
           command: |
             mkdir -p app/ios/fastlane
+            cd app/ios
             echo $FASTLANE_FILE_APPFILE_BASE64 | base64 -D -o app/ios/fastlane/Appfile
             echo $FASTLANE_FILE_MATCHFILE_BASE64 | base64 -D -o app/ios/fastlane/Matchfile
             echo $FASTLANE_FILE_FASTFILE_BASE64 | base64 -D -o app/ios/fastlane/Fastfile
             fastlane ci_match_install
+            cd ../..
       - attach_workspace:
           at: temp
       - run:
