@@ -375,7 +375,7 @@ jobs:
           path: server/coverage
 
   deploy-server:
-    executor: gcp-cli/default
+    executor: default
     steps:
       - checkout
       - server-build
