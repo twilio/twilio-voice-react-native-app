@@ -213,6 +213,15 @@ commands:
             sleep 30
             curl http://127.0.0.1:4040/api/tunnels
 
+  configure-git-user:
+    description: "Configures the git user for committing"
+    steps:
+      - run:
+         name: Git User Config
+         command: |
+           git config --global user.email "twilio-sdk-build@twilio.com"
+           git config --global user.name "twilio-sdk-build"
+
 jobs:
   ###
   # App jobs
@@ -388,15 +397,16 @@ jobs:
       - app-save-env-file
       - app-install-dependencies
       - app-install-pods
+      - configure-git-user
       - attach_workspace:
           at: temp
       - run:
           name: "App: build iOS dogfood app"
           command: |
             cd app/ios
-            APP_NAME=TwilioVoiceReactNativeReferenceApp \
-            ARCHIVE_PATH="temp/Archives/${APP_NAME}.xcarchive" \
-            xcodebuild -workspace ${APP_NAME}.xcworkspace -scheme ${APP_NAME} -configuration Release -sdk iphoneos -archivePath ${ARCHIVE_PATH} ONLY_ACTIVE_ARCH=NO archive
+            export APP_NAME=TwilioVoiceReactNativeReferenceApp
+            export ARCHIVE_PATH=temp/Archives/${APP_NAME}.xcarchive
+            xcodebuild -workspace ${APP_NAME}.xcworkspace -scheme ${APP_NAME} -configuration Release -sdk iphoneos -archivePath ${ARCHIVE_PATH} ONLY_ACTIVE_ARCH=NO DEVELOPMENT_TEAM=${XCODE_DEVELOPMENT_TEAM} PRODUCT_BUNDLE_IDENTIFIER=${XCODE_DEVELOPMENT_BUNDLE_ID} archive
             cd ../..
       - run:
           name: "App: archive iOS dogfood app"
