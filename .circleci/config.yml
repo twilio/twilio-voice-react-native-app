@@ -412,7 +412,7 @@ workflows:
           requires:
             - app-cache-install-yarn-dependencies
       # server jobs
-      - server-cache-install-dependencies:
+      - server-cache-install-dependencies
       - server-test:
           requires:
             - server-cache-install-dependencies
