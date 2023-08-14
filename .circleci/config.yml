@@ -378,6 +378,7 @@ jobs:
     executor: default
     steps:
       - checkout
+      - server-install-dependencies
       - server-build
       - gcp-cli/setup:
           version: 404.0.0
