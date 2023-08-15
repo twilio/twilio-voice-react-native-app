@@ -1,20 +1,29 @@
 # 1.0.0-beta.1 (In Progress)
 
 ## App
-* Android `API >= 30` devices now do not have their microphones turn off upon inactivity.
-* Upgrade Twilio Voice React Native SDK to `1.0.0-rc7`.
-* Upgrade React Native from `0.70.6` to `0.70.9`.
-  * Potentially fixes iOS builds for newer versions of Xcode.
-* Added tests.
-  * e2e tests for outgoing calls
-  * e2e test for incoming calls
-  * Unit tests for stores, screens, and components
 
 ### Features
+* Incoming call support
+  * Users are now automatically registered based on their Auth0 emails, and can receive calls.
+* Outgoing call support
+  * Users can make outgoing calls to clients and PSTN numbers.
+* Auth0 example Authentication
+  * Auth0 implemented as the example Authentication service
+* Detox e2e testing
 * Added the ability to select an audio device within the active call screen.
+
+### Changes
+* Upgraded Twilio Voice SDK to `1.0.0-beta.2`.
+* Upgraded React Native from `0.70.6` to `0.70.9`.
+  * Potentially fixes iOS builds for newer versions of Xcode.
+* Added tests
+  * Added e2e tests for outgoing calls
+  * Added unit tests for store and screens
 
 ## Server
 
 ### Features
-* Improve developer experience.
-  * Added linting to server.
+* Improved the developer experience
+  * Added linting to server
+* Platform based token vending
+  * The token vending logic will adjust for either iOS or Android platforms.
