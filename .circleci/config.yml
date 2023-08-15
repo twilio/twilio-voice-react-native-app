@@ -439,7 +439,7 @@ jobs:
             mkdir -p ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${IPA_DIR}/Apps/TwilioVoiceReactNativeReferenceApp.ipa ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${ARCHIVE_PATH} ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
-            cp -R ${ARCHIVE_PATH}/dSYMS/*.zip ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
+            cp -R ${ARCHIVE_PATH}/dSYMs/*.zip ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cd ../..
       - persist_to_workspace:
           root: app/ios/temp
