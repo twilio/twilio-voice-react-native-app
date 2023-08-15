@@ -436,6 +436,7 @@ jobs:
             export IPA_DIR=temp/IPAs
             export ARTIFACTS_DIR=temp/Artifacts
             cd app/ios
+            zip --quiet -r ${ARCHIVE_PATH}/dSYMs/${TwilioVoiceReactNativeReferenceApp}-dSYMs.zip" ${ARCHIVE_PATH}/dSYMs/*.dSYM
             mkdir -p ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${IPA_DIR}/Apps/TwilioVoiceReactNativeReferenceApp.ipa ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${ARCHIVE_PATH} ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
