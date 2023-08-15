@@ -1,17 +1,20 @@
-# 1.0.0-beta.1 (Ongoing)
-* Android API >= 30 devices now don't have their microphones turn off upon inactivity. 
-
-## Known Issues
-* Audio device selection is not working as expected on iOS platforms for bluetooth devices.
-  * If a bluetooth audio device is connected to the iOS device, then selecting other audio devices has inconsistent behavior.
+# 1.0.0-beta.1 (In Progress)
 
 ## App
-* Upgrade Twilio Voice SDK to `1.0.0-beta.2`.
+* Android `API >= 30` devices now do not have their microphones turn off upon inactivity.
+* Upgrade Twilio Voice React Native SDK to `1.0.0-rc7`.
 * Upgrade React Native from `0.70.6` to `0.70.9`.
   * Potentially fixes iOS builds for newer versions of Xcode.
-* Added e2e tests for outgoing calls
-* Added unit tests for store and screens
-* Add linting to server
+* Added tests.
+  * e2e tests for outgoing calls
+  * e2e test for incoming calls
+  * Unit tests for stores, screens, and components
 
 ### Features
 * Added the ability to select an audio device within the active call screen.
+
+## Server
+
+### Features
+* Improve developer experience.
+  * Added linting to server.
