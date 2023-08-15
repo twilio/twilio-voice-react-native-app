@@ -445,11 +445,11 @@ jobs:
       - persist_to_workspace:
           root: app/ios/temp
           paths:
-            - Artifacts/Release/TwilioVoiceReactNativeReferenceApp.app/*
+            - Artifacts/Release/TwilioVoiceReactNativeReferenceApp/*
       - store_artifacts:
-          path: app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp.app/TwilioVoiceReactNativeReferenceApp.ipa
+          path: app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp/TwilioVoiceReactNativeReferenceApp.ipa
       - store_artifacts:
-          path: app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp.app/TwilioVoiceReactNativeReferenceApp-dSYMs.zip
+          path: app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp/TwilioVoiceReactNativeReferenceApp-dSYMs.zip
 
   # Publish the iOS app
   publish-ios-app-appcenter:
