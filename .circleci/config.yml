@@ -416,7 +416,7 @@ jobs:
             cd app/ios
             export APP_NAME=TwilioVoiceReactNativeReferenceApp
             export ARCHIVE_PATH=temp/Archives/${APP_NAME}.xcarchive
-            xcodebuild -workspace ${APP_NAME}.xcworkspace -scheme ${APP_NAME} -configuration Release -sdk iphoneos -archivePath ${ARCHIVE_PATH} ONLY_ACTIVE_ARCH=NO DEVELOPMENT_TEAM=${XCODE_DEVELOPMENT_TEAM} PRODUCT_BUNDLE_IDENTIFIER=${XCODE_DEVELOPMENT_BUNDLE_ID} archive
+            xcodebuild -workspace ${APP_NAME}.xcworkspace -scheme ${APP_NAME} -configuration Release -sdk iphoneos -archivePath ${ARCHIVE_PATH} ONLY_ACTIVE_ARCH=NO DEVELOPMENT_TEAM=${XCODE_DEVELOPMENT_TEAM} PRODUCT_BUNDLE_IDENTIFIER=${XCODE_DEVELOPMENT_BUNDLE_ID} PROVISIONING_PROFILE_SPECIFIER="${XCODE_PROVISIONING_PROFILE}" CODE_SIGN_IDENTITY="${XCODE_CODE_SIGN_IDENTITY}" archive
             cd ../..
       - run:
           name: "App: archive iOS dogfood app"
