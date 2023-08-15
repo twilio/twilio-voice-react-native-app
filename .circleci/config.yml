@@ -381,7 +381,7 @@ jobs:
       - server-install-dependencies
       - server-build
       - gcp-cli/setup:
-          version: 404.0.0
+          version: 439.0.0
           use_oidc: true
       - run:
           name: "GCloud Deploy"
