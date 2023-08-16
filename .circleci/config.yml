@@ -13,9 +13,6 @@ parameters:
   pr_workflow:
     type: boolean
     default: true # by default pr workflow will get executed.
-  rc_workflow:
-    type: boolean
-    default: false
 
 ###
 # Executors
@@ -29,6 +26,27 @@ executors:
     macos:
       xcode: "14.3.1"
     resource_class: macos.m1.medium.gen1
+
+aliases:
+  # Filters
+  - &rc-filter
+    branches:
+      ignore:
+        - /.*/
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-rc\d+$/
+        - /^\d+\.\d+\.\d+-preview\d+-rc\d+$/
+        - /^\d+\.\d+\.\d+-beta\d+-rc\d+$/
+
+  - &release-filter
+    branches:
+      ignore: /.*/
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+$/
+        - /^\d+\.\d+\.\d+-preview\d+$/
+        - /^\d+\.\d+\.\d+-beta\d+$/
 
 ###
 # Commands
@@ -168,9 +186,9 @@ commands:
             yarn start
             cd ..
 
-  ##
+  ###
   # Ngrok Commands
-  ##
+  ###
   ngrok-install:
     steps:
       - run:
@@ -219,8 +237,8 @@ commands:
       - run:
          name: Git User Config
          command: |
-           git config --global user.email "twilio-sdk-build@twilio.com"
-           git config --global user.name "twilio-sdk-build"
+           git config --global user.email "${GITHUB_EMAIL_SDK_BUILD}"
+           git config --global user.name "${GITHUB_USERNAME_SDK_BUILD}"
 
 jobs:
   ###
@@ -436,7 +454,7 @@ jobs:
             export IPA_DIR=temp/IPAs
             export ARTIFACTS_DIR=temp/Artifacts
             cd app/ios
-            zip --quiet -r ${ARCHIVE_PATH}/dSYMs/${TwilioVoiceReactNativeReferenceApp}-dSYMs.zip ${ARCHIVE_PATH}/dSYMs/*.dSYM
+            zip --quiet -r ${ARCHIVE_PATH}/dSYMs/TwilioVoiceReactNativeReferenceApp-dSYMs.zip ${ARCHIVE_PATH}/dSYMs/*.dSYM
             mkdir -p ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${IPA_DIR}/Apps/TwilioVoiceReactNativeReferenceApp.ipa ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${ARCHIVE_PATH} ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
@@ -454,8 +472,15 @@ jobs:
   # Publish the iOS app
   publish-ios-app-appcenter:
     executor: ios-build
+    parameters:
+      release-candidate:
+        # Use this flag to control the app distrubution audience
+        type: boolean
+        default: true
     steps:
       - checkout
+      - attach_workspace:
+          at: app/ios/temp
 
 ###
 # Workflows
@@ -503,9 +528,24 @@ workflows:
   # RC workflow
   ###
   release-candidate:
-    when: << pipeline.parameters.rc_workflow >>
     jobs:
-      - build-archive-ios-app
+      - build-archive-ios-app:
+          filters: *rc-filter
       - publish-ios-app-appcenter:
+          release-candidate: true
+          filters: *rc-filter
+          requires:
+            - build-archive-ios-app
+
+  ###
+  # Release workflow
+  ###
+  release:
+    jobs:
+      - build-archive-ios-app:
+          filters: *release-filter
+      - publish-ios-app-appcenter:
+          release-candidate: false
+          filters: *release-filter
           requires:
             - build-archive-ios-app
