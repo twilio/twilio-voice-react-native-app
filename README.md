@@ -33,40 +33,35 @@ The Twilio Voice React Native Reference App implements Auth0 to demonstrate logi
 
 1. Create a new Auth0 `Native` app from the Auth0 user console, then enter your desired `Name`
 
-![auth0reactnative](https://user-images.githubusercontent.com/35968892/226486988-5dc0172d-0f46-4957-916b-385c2bdeaf8b.png)
-
 2. Navigate to the settings tab of your newly created Auth0 Application. You will now need to fill out the fields labeled `Allowed Callback Urls` and `Allowed Logout Urls`. Depending on your use case enter the iOS format, Android format, or both.
 
-
 > Allowed Callback Url format iOS
+
 ```
-org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp://{YourDomain}/ios/org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp/callback
+org.reactjs.native.example.twiliovoicereactnativereferenceapp.auth0://{YourDomain}/ios/org.reactjs.native.example.twiliovoicereactnativereferenceapp/callback
 ```
 
 > Allowed Callback Url format Android
+
 ```
-com.twiliovoicereactnativereferenceapp://{YourDomain}/android/com.twiliovoicereactnativereferenceapp/callback
+com.twiliovoicereactnativereferenceapp.auth0://{YourDomain}/android/com.twiliovoicereactnativereferenceapp/callback
 ```
 
 > Allowed Logout Url format iOS
+
 ```
-org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp://{YourDomain}/ios/org.reactjs.native.example.TwilioVoiceReactNativeReferenceApp/callback
+org.reactjs.native.example.twiliovoicereactnativereferenceapp.auth0://{YourDomain}/ios/org.reactjs.native.example.twiliovoicereactnativereferenceapp/callback
 ```
 
 > Allowed Logout Url format Android
-```
-com.twiliovoicereactnativereferenceapp://{YourDomain}/android/com.twiliovoicereactnativereferenceapp/callback
-```
 
-> Android Example for `Allowed Callback Urls` and `Allowed Logout Urls`
-
-![auth0AndroidUrls](https://user-images.githubusercontent.com/35968892/226817121-d9fb887b-6881-463a-bf27-485ecd3844c9.png)
+```
+com.twiliovoicereactnativereferenceapp.auth0://{YourDomain}/android/com.twiliovoicereactnativereferenceapp/callback
+```
 
 ### Auth0 for the server
 
 Create a new Auth0 `API` from the Auth0 user console, then enter your desired `Name` and `Identifier`.
-
-![auth0api](https://user-images.githubusercontent.com/35968892/226484829-1544e9db-a258-4986-adcf-923364e759ef.png)
 
 ## Structure
 
