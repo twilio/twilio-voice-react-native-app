@@ -84,7 +84,7 @@ Please see the `README.md` files within each sub-folder for more information abo
 
 ## Testing
 
-See [e2e-testing.md](./e2e-testing.md) if you plan to e2e test your fork of this app.
+See [docs/e2e-testing.md](./docs/e2e-testing.md) if you plan to e2e test your fork of this app.
 
 ## Related
 
