@@ -339,7 +339,7 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
-      # NOTE(mhuynh): this causes Detox issues only on iOS
+      # NOTE(mhuynh): JIRA-2072 this causes Detox issues only on iOS
       # - restore_cache:
       #     keys:
       #       - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
