@@ -147,7 +147,7 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-        manifestPlaceholders = [auth0Domain: project.env.get("DOMAIN_NAME"), auth0Scheme: "${applicationId}"]
+        manifestPlaceholders = [auth0Domain: project.env.get("DOMAIN_NAME"), auth0Scheme: "${applicationId}.auth0"]
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
