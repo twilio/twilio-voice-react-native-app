@@ -48,11 +48,16 @@ export const voiceGetCallInvites = jest.fn().mockResolvedValue(
   ]),
 );
 
+export const voiceInitializePushRegistry = jest
+  .fn()
+  .mockResolvedValue(undefined);
+
 let callUuid = 0;
 
 export const Voice = jest.fn().mockReturnValue({
   connect: voiceConnect,
   getCallInvites: voiceGetCallInvites,
+  initializePushRegistry: voiceInitializePushRegistry,
   on: voiceOn,
   register: voiceRegister,
 });

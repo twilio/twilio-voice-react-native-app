@@ -7,8 +7,9 @@ import {
   bootstrapAudioDevices,
   bootstrapCalls,
   bootstrapCallInvites,
-  bootstrapUser,
   bootstrapNavigation,
+  bootstrapPushRegistry,
+  bootstrapUser,
 } from './store/bootstrap';
 import { navigationRef } from './util/navigation';
 
@@ -26,6 +27,7 @@ const App = () => {
    */
   React.useEffect(() => {
     const bootstrap = async () => {
+      await defaultStore.dispatch(bootstrapPushRegistry());
       await defaultStore.dispatch(bootstrapAudioDevices());
       await defaultStore.dispatch(bootstrapUser());
       await defaultStore.dispatch(bootstrapCalls());

@@ -1,6 +1,10 @@
 import { type Middleware } from '@reduxjs/toolkit';
 import { createStore, Store } from '../app';
-import { bootstrapUser, bootstrapCallInvites } from '../bootstrap';
+import {
+  bootstrapPushRegistry,
+  bootstrapUser,
+  bootstrapCallInvites,
+} from '../bootstrap';
 import { checkLoginStatus } from '../user';
 import { getAccessToken } from '../voice/accessToken';
 import { receiveCallInvite, setCallInvite } from '../voice/call/callInvite';
@@ -9,6 +13,9 @@ import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
 
 let fetchMock: jest.Mock;
+let mockPlatform: {
+  OS: string;
+};
 
 jest.mock('../../../src/util/fetch', () => ({
   fetch: (fetchMock = jest.fn().mockResolvedValue({
@@ -16,6 +23,12 @@ jest.mock('../../../src/util/fetch', () => ({
     text: jest.fn().mockResolvedValue('some mock token'),
   })),
 }));
+
+jest.mock('react-native', () => {
+  return {
+    Platform: (mockPlatform = { OS: 'ios' }),
+  };
+});
 
 describe('bootstrap', () => {
   let store: Store;
@@ -45,6 +58,45 @@ describe('bootstrap', () => {
       }
     }
   };
+
+  describe('bootstrapPushRegistry', () => {
+    it('succeeds', async () => {
+      const { type, payload } = await store.dispatch(bootstrapPushRegistry());
+      expect(type).toStrictEqual('bootstrap/pushRegistry/fulfilled');
+      expect(payload).toBeUndefined();
+
+      expect(voiceSdk.voiceInitializePushRegistry.mock.calls).toStrictEqual([
+        [],
+      ]);
+    });
+
+    it('handles the voice module rejecting', async () => {
+      const error = new Error('foobar');
+      delete error.stack;
+      voiceSdk.voiceInitializePushRegistry.mockRejectedValueOnce(error);
+
+      const { type, payload } = await store.dispatch(bootstrapPushRegistry());
+      expect(type).toStrictEqual('bootstrap/pushRegistry/rejected');
+      expect(payload?.error).toStrictEqual({
+        name: error.name,
+        message: error.message,
+      });
+
+      expect(voiceSdk.voiceInitializePushRegistry.mock.calls).toStrictEqual([
+        [],
+      ]);
+    });
+
+    it('does nothing on platforms other than ios', async () => {
+      mockPlatform.OS = 'android';
+
+      const { type, payload } = await store.dispatch(bootstrapPushRegistry());
+      expect(type).toStrictEqual('bootstrap/pushRegistry/fulfilled');
+      expect(payload).toBeUndefined();
+
+      expect(voiceSdk.voiceInitializePushRegistry.mock.calls).toStrictEqual([]);
+    });
+  });
 
   describe('bootstrapUser', () => {
     it('succeeds', async () => {

@@ -1,9 +1,4 @@
-# 1.0.0-beta.1 (Ongoing)
-* Android API >= 30 devices now don't have their microphones turn off upon inactivity. 
-
-## Known Issues
-* Audio device selection is not working as expected on iOS platforms for bluetooth devices.
-  * If a bluetooth audio device is connected to the iOS device, then selecting other audio devices has inconsistent behavior.
+# 1.0.0-beta.1 (In Progress)
 
 ## App
 
@@ -13,7 +8,7 @@
 * Outgoing call support
   * Users can make outgoing calls to clients and PSTN numbers.
 * Auth0 example Authentication
-  * Auth0 implemented as the example Authentication service 
+  * Auth0 implemented as the example Authentication service
 * Detox e2e testing
 * Added the ability to select an audio device within the active call screen.
 
