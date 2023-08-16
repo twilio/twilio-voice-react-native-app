@@ -24,6 +24,7 @@
 * Added tests
   * Added e2e tests for outgoing calls
   * Added unit tests for store and screens
+* Upgrade react-native-auth0 to `3.0.0`
 
 ## Server
 
