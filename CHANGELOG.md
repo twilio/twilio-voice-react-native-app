@@ -13,7 +13,7 @@
 * Added the ability to select an audio device within the active call screen.
 
 ### Changes
-* Upgraded Twilio Voice SDK to `1.0.0-beta.2`.
+* Upgraded Twilio Voice SDK to `1.0.0-beta.3`.
 * Upgraded React Native from `0.70.6` to `0.70.9`.
   * Potentially fixes iOS builds for newer versions of Xcode.
 * Added tests
