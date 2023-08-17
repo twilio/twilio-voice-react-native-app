@@ -4,6 +4,7 @@ import {
   Call as TwilioCall,
   CallInvite as TwilioCallInvite,
 } from '@twilio/voice-react-native-sdk';
+import { Platform } from 'react-native';
 import { createTypedAsyncThunk, generateThunkActionTypes } from './common';
 import { checkLoginStatus } from './user';
 import { getAccessToken } from './voice/accessToken';
@@ -14,6 +15,37 @@ import { register } from './voice/registration';
 import { getNavigate } from '../util/navigation';
 import { settlePromise } from '../util/settlePromise';
 import { voice } from '../util/voice';
+
+const sliceName = 'bootstrap';
+
+/**
+ * Bootstrap push registration. This action is applicable only to the iOS
+ * platform. This action is a no-op on all other platforms.
+ */
+type BootstrapPushRegistryRejectValue = {
+  reason: 'INITIALIZE_PUSH_REGISTRY_REJECTED';
+  error: SerializedError;
+};
+const bootstrapPushRegistryActionTypes = generateThunkActionTypes(
+  `${sliceName}/pushRegistry`,
+);
+export const bootstrapPushRegistry = createTypedAsyncThunk<
+  void,
+  void,
+  { rejectValue: BootstrapPushRegistryRejectValue }
+>(bootstrapPushRegistryActionTypes.prefix, async (_, { rejectWithValue }) => {
+  if (Platform.OS !== 'ios') {
+    return;
+  }
+
+  const initializeResult = await settlePromise(voice.initializePushRegistry());
+  if (initializeResult.status === 'rejected') {
+    return rejectWithValue({
+      reason: 'INITIALIZE_PUSH_REGISTRY_REJECTED',
+      error: miniSerializeError(initializeResult.reason),
+    });
+  }
+});
 
 /**
  * Bootstrap user action. Gets the login-state of the user, and if logged in
