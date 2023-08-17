@@ -60,6 +60,7 @@ commands:
           name: "App: install Yarn dependencies"
           command: |
             cd app
+            yarn cache clean
             yarn install --immutable
             cd ..
 
@@ -139,6 +140,7 @@ commands:
           name: "Server: install dependencies"
           command: |
             cd server
+            yarn cache clean
             yarn install --immutable
             cd ..
 
@@ -269,10 +271,6 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
-      - run:
-          name: "Clean yarn cache"
-          command: |
-            yarn cache clean --all
       - restore_cache:
           keys:
             - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
