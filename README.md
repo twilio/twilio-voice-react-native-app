@@ -77,6 +77,10 @@ Create a new Auth0 `API` from the Auth0 user console, then enter your desired `N
 
 Please see the `README.md` files within each sub-folder for more information about that component.
 
+## Testing
+
+See [docs/e2e-testing.md](./docs/e2e-testing.md) if you plan to e2e test your fork of this app.
+
 ## Related
 
 * [Twilio Voice React Native](https://github.com/twilio/twilio-voice-react-native)

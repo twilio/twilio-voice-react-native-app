@@ -1,11 +1,11 @@
 import express, { Router } from 'express';
-import type { ServerCredentials } from './common/types';
+import type { ServerConfig } from './common/types';
 import { createTokenRoute } from './routes/token';
 import { createTwimlRoute } from './routes/twiml';
 import { createLogMiddleware } from './middlewares/log';
 import { auth } from 'express-oauth2-jwt-bearer';
 
-export function createExpressApp(serverConfig: ServerCredentials) {
+export function createExpressApp(serverConfig: ServerConfig) {
   const app = express();
 
   const jwtCheck = auth({

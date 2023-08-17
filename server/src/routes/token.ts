@@ -1,24 +1,24 @@
 import { Request, Response } from 'express';
 import { jwt } from 'twilio';
-import { Platform, ServerCredentials } from '../common/types';
+import { Platform, ServerConfig } from '../common/types';
 import { getUserInfo, verifyEmail } from '../utils/auth';
 import { log } from '../utils/log';
 
 type ParsePlatformReturnType = {
   incomingAllow: true;
   platform: Platform.Android;
-  pushCredentialSid: string;
+  pushCredentialSid?: string;
 } | {
   incomingAllow: true;
   platform: Platform.Ios;
-  pushCredentialSid: string;
+  pushCredentialSid?: string;
 } | {
   incomingAllow: false;
   platform: undefined;
   pushCredentialSid: undefined;
 };
 export function parsePlatform(
-  serverCredentials: ServerCredentials,
+  serverConfig: ServerConfig,
   platform: string,
 ): ParsePlatformReturnType {
   switch (platform) {
@@ -26,13 +26,13 @@ export function parsePlatform(
       return {
         incomingAllow: true,
         platform: Platform.Android,
-        pushCredentialSid: serverCredentials.FCM_PUSH_CREDENTIAL_SID,
+        pushCredentialSid: serverConfig.FCM_PUSH_CREDENTIAL_SID,
       };
     case Platform.Ios:
       return {
         incomingAllow: true,
         platform: Platform.Ios,
-        pushCredentialSid: serverCredentials.APN_PUSH_CREDENTIAL_SID,
+        pushCredentialSid: serverConfig.APN_PUSH_CREDENTIAL_SID,
       };
     default:
       return {
@@ -43,7 +43,7 @@ export function parsePlatform(
   }
 }
 
-export function createTokenRoute(serverCredentials: ServerCredentials) {
+export function createTokenRoute(serverConfig: ServerConfig) {
   const {
     AccessToken,
     AccessToken: { VoiceGrant },
@@ -61,7 +61,7 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
     }
 
     const userInfoResult = await getUserInfo(
-      serverCredentials.AUTH0_ISSUER_BASE_URL,
+      serverConfig.AUTH0_ISSUER_BASE_URL,
       req.auth.token,
     );
     if (!userInfoResult.success) {
@@ -76,19 +76,19 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
      * Note: For internal use
      */
     if (
-      typeof serverCredentials.EMAIL_VERIFICATION_REGEX !== 'undefined' &&
+      typeof serverConfig.EMAIL_VERIFICATION_REGEX !== 'undefined' &&
       !verifyEmail(
         userInfo.email,
-        new RegExp(serverCredentials.EMAIL_VERIFICATION_REGEX),
+        new RegExp(serverConfig.EMAIL_VERIFICATION_REGEX),
       )
     ) {
-      const msg = `Must be a valid ${serverCredentials.EMAIL_VERIFICATION_REGEX} email`;
+      const msg = `Must be a valid ${serverConfig.EMAIL_VERIFICATION_REGEX} email`;
       logMsg(msg);
       return res.header('Content-Type', 'text/plain').status(401).send(msg);
     }
 
     const { incomingAllow, platform, pushCredentialSid } = parsePlatform(
-      serverCredentials,
+      serverConfig,
       req.body.platform,
     );
 
@@ -100,17 +100,23 @@ export function createTokenRoute(serverCredentials: ServerCredentials) {
     }
 
     const accessToken = new AccessToken(
-      serverCredentials.ACCOUNT_SID,
-      serverCredentials.API_KEY_SID,
-      serverCredentials.API_KEY_SECRET,
+      serverConfig.ACCOUNT_SID,
+      serverConfig.API_KEY_SID,
+      serverConfig.API_KEY_SECRET,
       {
-        identity: userInfo.email,
+        /**
+         * The `CLIENT_IDENTITY` environment variable used to override the
+         * identity here is used for e2e testing.
+         *
+         * See the file `e2e-testing.md` for more information.
+         */
+        identity: serverConfig.CLIENT_IDENTITY ?? userInfo.email,
       },
     );
 
     const voiceGrant = new VoiceGrant({
       incomingAllow,
-      outgoingApplicationSid: serverCredentials.TWIML_APP_SID,
+      outgoingApplicationSid: serverConfig.TWIML_APP_SID,
       pushCredentialSid,
     });
 

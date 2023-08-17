@@ -9,15 +9,15 @@
   * Users can make outgoing calls to clients and PSTN numbers.
 * Auth0 example Authentication
   * Auth0 implemented as the example Authentication service
-* Detox e2e testing
 * Added the ability to select an audio device within the active call screen.
+* Added unregistration from the Voice SDK upon logout.
 
 ### Changes
 * Upgraded Twilio Voice SDK to `1.0.0-beta.3`.
 * Upgraded React Native from `0.70.6` to `0.70.9`.
   * Potentially fixes iOS builds for newer versions of Xcode.
 * Added tests
-  * Added e2e tests for outgoing calls
+  * Added e2e tests using Detox for incoming and outgoing calls
   * Added unit tests for store and screens
 * Upgrade react-native-auth0 to `3.0.0`
   * Minimum supported version for iOS is 13 
