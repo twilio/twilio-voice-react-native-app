@@ -168,6 +168,7 @@ describe('store', () => {
 
           expect(acceptResult).toStrictEqual({
             from: 'mock from 0',
+            initialConnectedTimestamp: 42,
             isMuted: false,
             isOnHold: false,
             sid: 'mock sid 0',

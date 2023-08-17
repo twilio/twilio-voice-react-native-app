@@ -12,6 +12,7 @@ export type CallInfo = {
   state?: string;
   to?: string;
   from?: string;
+  initialConnectedTimestamp?: number;
   isMuted?: boolean;
   isOnHold?: boolean;
 };
@@ -22,6 +23,8 @@ export const getCallInfo = (call: TwilioCall): CallInfo => {
   const to = call.getTo();
   const from = call.getFrom();
 
+  const initialConnectedTimestamp = call.getInitialConnectedTimestamp();
+
   const isMuted = Boolean(call.isMuted());
   const isOnHold = Boolean(call.isOnHold());
 
@@ -30,6 +33,7 @@ export const getCallInfo = (call: TwilioCall): CallInfo => {
     state,
     to,
     from,
+    initialConnectedTimestamp,
     isMuted,
     isOnHold,
   };
@@ -82,7 +86,6 @@ export type BaseCall = {
     mute: AsyncStoreSlice;
     sendDigits: AsyncStoreSlice;
   };
-  initialConnectTimestamp: number | undefined;
   info: CallInfo;
 }>;
 

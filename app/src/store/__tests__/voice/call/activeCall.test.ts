@@ -374,52 +374,6 @@ describe('store', () => {
           ]);
         });
       });
-
-      describe('connectEvent', () => {
-        it('updates connect timestamp', () => {
-          store.dispatch(
-            activeCall.connectEvent({
-              id,
-              timestamp: 100,
-            }),
-          );
-
-          match(store.getState().voice.call.activeCall.entities[id])
-            .with({ initialConnectTimestamp: P.select() }, (t) =>
-              expect(t).toEqual(100),
-            )
-            .run();
-
-          matchDispatchedActions(dispatchedActions, [activeCall.connectEvent]);
-        });
-
-        it('ignores multiple', () => {
-          store.dispatch(
-            activeCall.connectEvent({
-              id,
-              timestamp: 100,
-            }),
-          );
-
-          store.dispatch(
-            activeCall.connectEvent({
-              id,
-              timestamp: 200,
-            }),
-          );
-
-          match(store.getState().voice.call.activeCall.entities[id])
-            .with({ initialConnectTimestamp: P.select() }, (t) =>
-              expect(t).toEqual(100),
-            )
-            .run();
-
-          matchDispatchedActions(dispatchedActions, [
-            activeCall.connectEvent,
-            activeCall.connectEvent,
-          ]);
-        });
-      });
     });
   });
 });

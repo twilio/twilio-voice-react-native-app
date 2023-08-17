@@ -4,7 +4,7 @@ import { voice, callMap } from '../../../util/voice';
 import { settlePromise } from '../../../util/settlePromise';
 import { createTypedAsyncThunk, generateThunkActionTypes } from '../../common';
 import { type CallInfo, getCallInfo, type RecipientType } from './';
-import { connectEvent, setActiveCallInfo } from './activeCall';
+import { setActiveCallInfo } from './activeCall';
 
 export type MakeOutgoingCallRejectValue =
   | {
@@ -70,10 +70,6 @@ export const makeOutgoingCall = createTypedAsyncThunk<
           setActiveCallInfo({ id: requestId, info: getCallInfo(outgoingCall) }),
         );
       });
-    });
-
-    outgoingCall.once(TwilioCall.Event.Connected, () => {
-      dispatch(connectEvent({ id: requestId, timestamp: Date.now() }));
     });
 
     return callInfo;

@@ -53,10 +53,6 @@ export const handleCall = createTypedAsyncThunk<CallInfo, { call: TwilioCall }>(
       });
     });
 
-    call.once(TwilioCall.Event.Connected, () => {
-      dispatch(connectEvent({ id: requestId, timestamp: Date.now() }));
-    });
-
     return callInfo;
   },
 );
@@ -221,26 +217,6 @@ export const activeCallSlice = createSlice({
         })
         .otherwise(() => {});
     },
-    /**
-     * Sets the initial connection timestamp.
-     *
-     * This should be bound to a `.once` listener and therefore should only fire
-     * once and only once a call is connected, but in the off-chance it is
-     * called multiple times for the same call, the sequential calls are no-op.
-     */
-    connectEvent(
-      state,
-      action: PayloadAction<{ id: string; timestamp: number }>,
-    ) {
-      match(state.entities[action.payload.id])
-        .with({ initialConnectTimestamp: undefined }, (call) => {
-          activeCallAdapter.setOne(state, {
-            ...call,
-            initialConnectTimestamp: action.payload.timestamp,
-          });
-        })
-        .otherwise(() => {});
-    },
   },
   extraReducers(builder) {
     /**
@@ -262,7 +238,6 @@ export const activeCallSlice = createSlice({
               sendDigits: { status: 'idle' },
             },
             info: action.payload,
-            initialConnectTimestamp: undefined,
           });
         })
         .otherwise(() => {});
@@ -304,7 +279,6 @@ export const activeCallSlice = createSlice({
               direction,
               id: requestId,
               info: action.payload,
-              initialConnectTimestamp: undefined,
               recipientType,
               status: requestStatus,
               to,
@@ -371,7 +345,6 @@ export const activeCallSlice = createSlice({
             direction,
             id: arg.id,
             info: action.payload,
-            initialConnectTimestamp: undefined,
             status: requestStatus,
           });
         })
@@ -430,4 +403,4 @@ export const activeCallSlice = createSlice({
   },
 });
 
-export const { connectEvent, setActiveCallInfo } = activeCallSlice.actions;
+export const { setActiveCallInfo } = activeCallSlice.actions;

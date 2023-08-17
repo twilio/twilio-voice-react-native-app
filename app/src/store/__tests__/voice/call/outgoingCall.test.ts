@@ -133,6 +133,7 @@ describe('store', () => {
             .with({ payload: P.select() }, (p) => {
               expect(p).toStrictEqual({
                 from: 'mock from foo',
+                initialConnectedTimestamp: 42,
                 isMuted: false,
                 isOnHold: false,
                 sid: 'mock sid foo',

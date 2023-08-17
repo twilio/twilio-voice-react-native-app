@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import '@testing-library/jest-native/extend-expect';
-import { fireEvent, render, RenderResult } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import { Image } from 'react-native';
 import configureStore, { MockStore } from 'redux-mock-store';
@@ -21,6 +21,7 @@ jest.mock('../../util/voice', () => ({
         getSid: jest.fn().mockReturnValue('1111'),
         getState: jest.fn().mockReturnValue('connected'),
         getFrom: jest.fn().mockReturnValue('foo-caller'),
+        getInitialConnectedTimestamp: jest.fn().mockReturnValue(42),
         getTo: jest.fn().mockReturnValue('foobar-outgoing-client-to'),
         isOnHold: jest.fn().mockReturnValue(false),
         ...(() => {
@@ -51,51 +52,27 @@ jest.mock('../../util/voice', () => ({
   },
 }));
 
-const renderActiveCall = (store: MockStore): RenderResult => {
-  const Stack = createNativeStackNavigator<StackParamList>();
-  return render(
-    <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Call" component={ActiveCall} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </Provider>,
-  );
-};
+jest.mock('../../util/setTimeout', () => ({
+  setTimeout: jest.fn(),
+  requestAnimationFrame: jest.fn(),
+}));
 
-// Wait for an action of a particular type to be dispatched to the MockStore.
-// TODO(mmalavalli): Explore using thunk middleware to wait for actions to dispatch.
-// TODO(mmalavalli): Refactor to a util function for re-use in other tests.
-const waitForActionType = (
+const activeCallScreen = (
   store: MockStore,
-  actionType: string,
-): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    const timeoutMS = 2000;
-    const pollIntervalMS = 100;
-
-    const timeout = setTimeout(() => {
-      reject(new Error(`Timed out waiting for action type: "${actionType}"`));
-    }, timeoutMS);
-
-    const poll = () => {
-      const actions = store.getActions();
-      const action = actions.find(({ type }) => type === actionType);
-      if (action) {
-        clearInterval(interval);
-        clearTimeout(timeout);
-        resolve(action);
-      }
-    };
-
-    const interval = setInterval(poll, pollIntervalMS);
-    poll();
-  });
-};
+  Stack: ReturnType<typeof createNativeStackNavigator<StackParamList>>,
+) => (
+  <Provider store={store}>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Call" component={ActiveCall} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  </Provider>
+);
 
 describe('<ActiveCall />', () => {
-  let screen: RenderResult;
+  let screen: ReturnType<typeof render>;
+  let Stack: ReturnType<typeof createNativeStackNavigator<StackParamList>>;
   let state: any;
   let store: MockStore;
 
@@ -122,8 +99,11 @@ describe('<ActiveCall />', () => {
                   sendDigits: { status: 'idle' },
                 },
                 id: '1111',
-                info: { isMuted: false, state: 'connected' },
-                initialConnectTimestamp: undefined,
+                info: {
+                  isMuted: false,
+                  state: 'connected',
+                  initialConnectedTimestamp: 42,
+                },
                 recipientType: 'client',
                 to: 'foobar-outgoing-client-to',
                 direction: 'outgoing',
@@ -152,16 +132,8 @@ describe('<ActiveCall />', () => {
       return state;
     });
 
-    const Stack = createNativeStackNavigator<StackParamList>();
-    screen = render(
-      <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name="Call" component={ActiveCall} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </Provider>,
-    );
+    Stack = createNativeStackNavigator<StackParamList>();
+    screen = render(activeCallScreen(store, Stack));
   });
 
   const activeCallLayoutTests = () => {
@@ -209,24 +181,37 @@ describe('<ActiveCall />', () => {
   describe('UI layout', activeCallLayoutTests);
 
   describe('press mute button', () => {
-    beforeEach(async () => {
-      fireEvent.press(screen.getByTestId('mute_button'));
-      await waitForActionType(store, 'activeCall/setActiveCallInfo');
-      screen = renderActiveCall(store);
-    });
+    it('should dispatch the "muteActiveCall" action with shouldMute = true', async () => {
+      const muteButton = screen.getByTestId('mute_button');
+      await act(() => {
+        fireEvent.press(muteButton);
+      });
 
-    it('should dispatch the "muteActiveCall" action with shouldMute = true', () => {
-      const action = store
-        .getActions()
-        .find(({ type }) => type === 'activeCall/mute/pending');
-      expect(action).not.toBeNull();
-      expect(action.meta.arg).toStrictEqual({
+      const actions = store.getActions();
+
+      const setActiveCallAction = actions.find(
+        ({ type }) => type === 'activeCall/setActiveCallInfo',
+      );
+      expect(setActiveCallAction).toBeDefined();
+
+      const mutePendingAction = actions.find(
+        ({ type }) => type === 'activeCall/mute/pending',
+      );
+      expect(mutePendingAction).toBeDefined();
+      expect(mutePendingAction.meta.arg).toStrictEqual({
         id: '1111',
         shouldMute: true,
       });
     });
 
-    it('should activate the mute button', () => {
+    it('should activate the mute button', async () => {
+      const muteButton = screen.getByTestId('mute_button');
+      await act(() => {
+        fireEvent.press(muteButton);
+      });
+
+      screen = render(activeCallScreen(store, Stack));
+
       expect(
         screen.getByTestId('mute_button').findByType(Image).props
           .accessibilityLabel,
@@ -235,13 +220,22 @@ describe('<ActiveCall />', () => {
 
     describe('press mute button again', () => {
       beforeEach(async () => {
+        let muteButton = screen.getByTestId('mute_button');
+        await act(() => {
+          fireEvent.press(muteButton);
+        });
+        screen = render(activeCallScreen(store, Stack));
+
         store.clearActions();
-        fireEvent.press(screen.getByTestId('mute_button'));
-        await waitForActionType(store, 'activeCall/setActiveCallInfo');
-        screen = renderActiveCall(store);
+
+        muteButton = screen.getByTestId('mute_button');
+        await act(() => {
+          fireEvent.press(muteButton);
+        });
+        screen = render(activeCallScreen(store, Stack));
       });
 
-      it('should dispatch the "muteActiveCall" action with shouldMute = false', () => {
+      it('should dispatch the "muteActiveCall" action with shouldMute = false', async () => {
         const action = store
           .getActions()
           .find(({ type }) => type === 'activeCall/mute/pending');
