@@ -36,9 +36,7 @@ aliases:
         - /^\d+\.\d+\.\d+-preview\d+-rc\d+$/
         - /^\d+\.\d+\.\d+-beta\d+-rc\d+$/
     branches:
-      # TODO: revert this back when done testing
-      only: task/vblocks-1890-build-package-ios-app 
-      # ignore: /.*/
+      ignore: /.*/
 
   - &release-filter
     tags:
@@ -474,10 +472,9 @@ jobs:
   publish-ios-app-appcenter:
     executor: ios-build
     parameters:
-      release-audience:
+      distribution-audience:
         # Use this flag to control the app distrubution audience
-        type: boolean
-        default: false
+        type: string
     steps:
       - run:
           sudo npm install -g appcenter-cli
@@ -490,7 +487,7 @@ jobs:
             export APP_NAME=TwilioVoiceReactNativeReferenceApp
             export ARTIFACTS_DIR=app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp
             appcenter login --token ${APP_CENTER_API_TOKEN}
-            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g Collaborators --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME} -b ${CIRCLE_TAG}
+            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g << parameters.distribution-audience >> --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME} -b ${CIRCLE_TAG}
             appcenter crashes upload-symbols -s ${ARTIFACTS_DIR}/${APP_NAME}-dSYMs.zip --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME}
 
 ###
@@ -543,7 +540,7 @@ workflows:
       - build-archive-ios-app:
           filters: *rc-filter
       - publish-ios-app-appcenter:
-          release-audience: false
+          distribution-audience: ${APP_CENTER_RC_AUDIENCE}
           filters: *rc-filter
           requires:
             - build-archive-ios-app
@@ -556,7 +553,7 @@ workflows:
       - build-archive-ios-app:
           filters: *release-filter
       - publish-ios-app-appcenter:
-          release-audience: true
+          distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
           filters: *release-filter
           requires:
             - build-archive-ios-app
