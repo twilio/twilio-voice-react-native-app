@@ -36,7 +36,9 @@ aliases:
         - /^\d+\.\d+\.\d+-preview\d+-rc\d+$/
         - /^\d+\.\d+\.\d+-beta\d+-rc\d+$/
     branches:
-      ignore: /.*/
+      # TODO: revert this back when done testing
+      only: task/vblocks-1890-build-package-ios-app 
+      # ignore: /.*/
 
   - &release-filter
     tags:
