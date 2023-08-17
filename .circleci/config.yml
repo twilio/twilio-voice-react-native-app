@@ -30,23 +30,22 @@ executors:
 aliases:
   # Filters
   - &rc-filter
-    branches:
-      ignore:
-        - /.*/
     tags:
       only:
         - /^\d+\.\d+\.\d+-rc\d+$/
         - /^\d+\.\d+\.\d+-preview\d+-rc\d+$/
         - /^\d+\.\d+\.\d+-beta\d+-rc\d+$/
-
-  - &release-filter
     branches:
       ignore: /.*/
+
+  - &release-filter
     tags:
       only:
         - /^\d+\.\d+\.\d+$/
         - /^\d+\.\d+\.\d+-preview\d+$/
         - /^\d+\.\d+\.\d+-beta\d+$/
+    branches:
+      ignore: /.*/
 
 ###
 # Commands
