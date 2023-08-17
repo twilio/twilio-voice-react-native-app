@@ -473,14 +473,24 @@ jobs:
   publish-ios-app-appcenter:
     executor: ios-build
     parameters:
-      release-candidate:
+      release-audience:
         # Use this flag to control the app distrubution audience
         type: boolean
-        default: true
+        default: false
     steps:
+      - run:
+          sudo npm install -g appcenter-cli
       - checkout
       - attach_workspace:
           at: app/ios/temp
+      - run:
+          name: "Publishing iOS app to AppCenter"
+          command: |
+            export APP_NAME=TwilioVoiceReactNativeReferenceApp
+            export ARTIFACTS_DIR=app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp
+            appcenter login --token ${APP_CENTER_API_TOKEN}
+            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g Collaborators --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME} -b ${CIRCLE_TAG}
+            appcenter crashes upload-symbols -s ${ARTIFACTS_DIR}/${APP_NAME}-dSYMs.zip --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME}
 
 ###
 # Workflows
@@ -532,7 +542,7 @@ workflows:
       - build-archive-ios-app:
           filters: *rc-filter
       - publish-ios-app-appcenter:
-          release-candidate: true
+          release-audience: false
           filters: *rc-filter
           requires:
             - build-archive-ios-app
@@ -545,7 +555,7 @@ workflows:
       - build-archive-ios-app:
           filters: *release-filter
       - publish-ios-app-appcenter:
-          release-candidate: false
+          release-audience: true
           filters: *release-filter
           requires:
             - build-archive-ios-app
