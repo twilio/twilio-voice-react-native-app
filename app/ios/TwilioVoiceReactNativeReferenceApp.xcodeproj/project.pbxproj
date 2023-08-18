@@ -183,6 +183,7 @@
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
+				8F979B3C2A8EEB1200D4A500 /* App Version */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
@@ -284,6 +285,24 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TwilioVoiceReactNativeReferenceApp/Pods-TwilioVoiceReactNativeReferenceApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		8F979B3C2A8EEB1200D4A500 /* App Version */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "App Version";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "IOS_INFO_PLIST_FILE=${CODESIGNING_FOLDER_PATH}/Info.plist\nMAC_INFO_PLIST_FILE=${CODESIGNING_FOLDER_PATH}/Resources/Info.plist\n\nbuildNumber=1\nif [ ! -z \"${CI_BUILD_NUMBER}\" ]; then\n  buildNumber=${CI_BUILD_NUMBER}\nfi\n\nbuildVersion=1.0.0\nif [ ! -z \"${CI_BUILD_VERSION}\" ]; then\n  buildVersion=${CI_BUILD_VERSION}\nfi\n\nif [ -f $IOS_INFO_PLIST_FILE ] ; then\n  INFO_PLIST_FILE=$IOS_INFO_PLIST_FILE\nelif [ -f $MAC_INFO_PLIST_FILE ] ; then\n  INFO_PLIST_FILE=$MAC_INFO_PLIST_FILE\nelse\n  echo \"Neither ${IOS_INFO_PLIST_FILE} or ${$MAC_INFO_PLIST_FILE} exit!s\"\n  exit 1\nfi\n\necho \"Modifying ${INFO_PLIST_FILE}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${INFO_PLIST_FILE}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $buildVersion\" \"${INFO_PLIST_FILE}\"\n";
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
