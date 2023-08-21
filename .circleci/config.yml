@@ -4,7 +4,7 @@ version: 2.1
 # Orbs
 ###
 orbs:
-  android: circleci/android@2.2.0
+  android: circleci/android@2.3.0
 
 ###
 # Parameters
@@ -60,6 +60,7 @@ commands:
           name: "App: install Yarn dependencies"
           command: |
             cd app
+            yarn cache clean
             yarn install --immutable
             cd ..
 
@@ -139,6 +140,7 @@ commands:
           name: "Server: install dependencies"
           command: |
             cd server
+            yarn cache clean
             yarn install --immutable
             cd ..
 
@@ -217,11 +219,10 @@ jobs:
       - attach_project
       - restore_cache:
           keys:
-            - app-dependencies-{{ checksum "app/package.json" }}
-            - app-dependencies-
+            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
       - app-install-dependencies
       - save_cache:
-          key: app-dependencies-{{ checksum "app/package.json" }}
+          key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
           paths: app/node_modules
       - persist_to_workspace:
           root: .
@@ -266,16 +267,40 @@ jobs:
     executor:
       name: android/android-machine
       resource-class: 2xlarge
-      tag: 2023.02.1
+      tag: 2023.07.1
     steps:
       - checkout
       - app-save-env-file
+      - restore_cache:
+          keys:
+            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
       - app-install-dependencies
+      - save_cache:
+          key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+          paths: app/node_modules
       - app-save-google-services-json
+      - restore_cache:
+          keys:
+            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
       - server-install-dependencies
+      - save_cache:
+          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+          paths: server/node_modules
       - ngrok-install
+      - run:
+          name: "Generate a client identity"
+          command: |
+            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
+      - run:
+          name: "Read client identity"
+          command: |
+            echo $CLIENT_IDENTITY
       - server-build
       - server-start
+      - run:
+          name: "Update NDK"
+          command: |
+            sdkmanager --update
       - android/create-avd:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
@@ -285,13 +310,14 @@ jobs:
           memory: 8192
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
+          wait-for-emulator: false
       - app-detox-build:
           configuration: android.emu.release
       - app-expose-port
       - run:
           name: "Wait for emulator to settle"
           command: |
-            sleep 300
+            sleep 150
       - app-detox-test:
           configuration: android.emu.release
       - run:
@@ -311,11 +337,32 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
+      # NOTE(mhuynh): JIRA-2072 this causes Detox issues only on iOS
+      # - restore_cache:
+      #     keys:
+      #       - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
       - app-install-dependencies
+      # - save_cache:
+      #     key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      #     paths: app/node_modules
       - app-install-applesimutils
       - app-install-pods
+      - restore_cache:
+          keys:
+            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
       - server-install-dependencies
+      - save_cache:
+          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+          paths: server/node_modules
       - ngrok-install-mac
+      - run:
+          name: "Generate a client identity"
+          command: |
+            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
+      - run:
+          name: "Read client identity"
+          command: |
+            echo $CLIENT_IDENTITY
       - server-build
       - server-start
       - app-detox-build:
@@ -326,18 +373,17 @@ jobs:
   ###
   # Server jobs
   ###
-  server-cache-install-dependencies:
+  server-cache-install-yarn-dependencies:
     executor: default
     steps:
       - checkout
       - attach_project
       - restore_cache:
           keys:
-            - server-dependencies-{{ checksum "server/package.json" }}
-            - server-dependencies-
+            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
       - server-install-dependencies
       - save_cache:
-          key: server-dependencies-{{ checksum "server/package.json" }}
+          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
           paths: server/node_modules
       - persist_to_workspace:
           root: .
@@ -395,16 +441,16 @@ workflows:
           requires:
             - app-cache-install-yarn-dependencies
       # server jobs
-      - server-cache-install-dependencies
+      - server-cache-install-yarn-dependencies
       - server-test:
           requires:
-            - server-cache-install-dependencies
+            - server-cache-install-yarn-dependencies
       - server-lint:
           requires:
-            - server-cache-install-dependencies
+            - server-cache-install-yarn-dependencies
       - server-build:
           requires:
-            - server-cache-install-dependencies
+            - server-cache-install-yarn-dependencies
       # e2e jobs
       - app-detox-android:
           context:

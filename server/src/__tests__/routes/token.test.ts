@@ -95,6 +95,23 @@ describe('createTokenRoute()', () => {
       ]);
     });
 
+    it('uses the override client identity env var', async () => {
+      (mockServerConfig as any).CLIENT_IDENTITY = 'foobar';
+
+      await tokenRoute(mockReq as any, mockRes as any);
+
+      expect(mockedAccessToken.mock.calls).toEqual([
+        [
+          mockServerConfig.ACCOUNT_SID,
+          mockServerConfig.API_KEY_SID,
+          mockServerConfig.API_KEY_SECRET,
+          {
+            identity: 'foobar',
+          },
+        ],
+      ]);
+    })
+
     it('constructs a voice grant', async () => {
       await tokenRoute(mockReq as any, mockRes as any);
 
