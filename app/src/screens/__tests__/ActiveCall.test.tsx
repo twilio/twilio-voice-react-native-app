@@ -104,8 +104,10 @@ describe('<ActiveCall />', () => {
                   state: 'connected',
                   initialConnectedTimestamp: 42,
                 },
-                recipientType: 'client',
-                to: 'foobar-outgoing-client-to',
+                params: {
+                  recipientType: 'client',
+                  to: 'foobar-outgoing-client-to',
+                },
                 direction: 'outgoing',
                 status: 'fulfilled',
               },
