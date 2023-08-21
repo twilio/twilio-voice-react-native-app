@@ -4,7 +4,8 @@
 
 ### Features
 * Incoming call support
-  * Users are now automatically registered based on their Auth0 emails, and can receive calls.
+  * Users are now automatically registered based on their Auth0 emails, and can
+  receive calls.
 * Outgoing call support
   * Users can make outgoing calls to clients and PSTN numbers.
 * Auth0 example Authentication
@@ -20,7 +21,13 @@
   * Added e2e tests using Detox for incoming and outgoing calls
   * Added unit tests for store and screens
 * Upgrade react-native-auth0 to `3.0.0`
-  * Minimum supported version for iOS is 13 
+  * Minimum supported version for iOS is 13
+
+### Fixes
+* The call state and duration are now persisted between JS runtimes.
+  * In effect, on Android, if a user is in an active call and closes the app,
+  when they reopen the app while still in the active call, it will show the
+  proper call duration and state.
 
 ## Server
 

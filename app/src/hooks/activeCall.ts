@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { match, P } from 'ts-pattern';
 import { type State } from '../store/app';
 import { type ActiveCall } from '../store/voice/call/activeCall';
-import { setTimeout } from '../util/setTimeout';
+import { setTimeout, requestAnimationFrame } from '../util/setTimeout';
 
 /**
  * Default time interval for updating the state of the active call time.
@@ -133,11 +133,15 @@ export const useActiveCallTime = (
         match(activeCall)
           .with(
             {
-              initialConnectTimestamp: P.not(undefined),
-              info: { state: P.not('disconnected') },
+              info: {
+                state: P.not('disconnected'),
+                initialConnectedTimestamp: P.not(undefined),
+              },
             },
             (c) => {
-              setActiveCallTimeMs(Date.now() - c.initialConnectTimestamp);
+              setActiveCallTimeMs(
+                Date.now() - c.info.initialConnectedTimestamp,
+              );
               if (!doneAnimating) {
                 timeoutId = setTimeout(animate, timeIntervalUpdatesMs);
               }

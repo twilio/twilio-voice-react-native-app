@@ -16,7 +16,7 @@ import {
   type CallInfo,
   type CallInviteInfo,
 } from './';
-import { connectEvent, setActiveCallInfo } from './activeCall';
+import { setActiveCallInfo } from './activeCall';
 import { type AsyncStoreSlice } from '../../app';
 import { createTypedAsyncThunk, generateThunkActionTypes } from '../../common';
 import { navigateToCallInviteScreen } from '../../../util/behavior';
@@ -137,10 +137,6 @@ export const acceptCallInvite = createTypedAsyncThunk<
       call.on(callEvent, () => {
         dispatch(setActiveCallInfo({ id, info: getCallInfo(call) }));
       });
-    });
-
-    call.once(TwilioCall.Event.Connected, () => {
-      dispatch(connectEvent({ id, timestamp: Date.now() }));
     });
 
     return callInfo;

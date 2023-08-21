@@ -18,6 +18,7 @@ export const createMockCall = jest.fn((id: string) => {
       .fn()
       .mockReturnValue(`mock custom parameters ${id}`),
     getFrom: jest.fn().mockReturnValue(`mock from ${id}`),
+    getInitialConnectedTimestamp: jest.fn().mockReturnValue(42),
     getState: jest.fn().mockReturnValue(`mock state ${id}`),
     getTo: jest.fn().mockReturnValue(`mock to ${id}`),
     isMuted: jest.fn().mockReturnValue(false),
