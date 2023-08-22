@@ -5,6 +5,7 @@ import {
   bootstrapUser,
   bootstrapCallInvites,
   bootstrapCalls,
+  bootstrapNavigation,
 } from '../bootstrap';
 import { checkLoginStatus } from '../user';
 import { getAccessToken } from '../voice/accessToken';
@@ -13,6 +14,8 @@ import { register } from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
 import * as asyncStorage from '../../../__mocks__/@react-native-async-storage/async-storage';
+import * as voiceUtil from '../../../src/util/voice';
+import * as navigationUtil from '../../../src/util/navigation';
 
 let fetchMock: jest.Mock;
 let mockPlatform: {
@@ -37,6 +40,8 @@ describe('bootstrap', () => {
   const dispatchedActions: any[] = [];
 
   beforeEach(() => {
+    jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValue(jest.fn());
+
     dispatchedActions.splice(0);
     const logAction: Middleware = () => (next) => (action) => {
       dispatchedActions.push(action);
@@ -319,6 +324,42 @@ describe('bootstrap', () => {
           }),
         ],
       ]);
+    });
+  });
+
+  describe('bootstrapNavigation', () => {
+    // TODO(mhuynh): increase coverage. See JIRA VBLOCKS-2078.
+
+    it('listens for call invite notification tapped events', async () => {
+      const onSpy = jest.spyOn(voiceUtil.voice, 'on');
+      jest
+        .spyOn(navigationUtil, 'getNavigate')
+        .mockResolvedValueOnce(jest.fn());
+
+      const { type, payload } = await store.dispatch(bootstrapNavigation());
+
+      expect(type).toMatch(/fulfilled/);
+      expect(payload).toBeUndefined();
+
+      expect(onSpy.mock.calls).toHaveLength(1);
+      const [[event]] = onSpy.mock.calls;
+      expect(event).toStrictEqual('callInviteNotificationTapped');
+    });
+
+    it('navigates to the call invite screen', async () => {
+      const navigateSpy = jest.fn();
+      jest
+        .spyOn(navigationUtil, 'getNavigate')
+        .mockResolvedValueOnce(navigateSpy);
+
+      const { type, payload } = await store.dispatch(bootstrapNavigation());
+
+      expect(type).toMatch(/fulfilled/);
+      expect(payload).toBeUndefined();
+
+      voiceUtil.voice.emit('callInviteNotificationTapped' as any);
+
+      expect(navigateSpy.mock.calls).toStrictEqual([['Incoming Call']]);
     });
   });
 });

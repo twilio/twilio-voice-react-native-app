@@ -105,6 +105,8 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 >(
   bootstrapCallInvitesActionTypes.prefix,
   async (_, { dispatch, getState, rejectWithValue }) => {
+    const navigate = await getNavigate();
+
     /**
      * Handle an incoming, pending, call invite.
      */
@@ -142,10 +144,6 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
         dispatch(handleCall({ call }));
         handleSettledCallInvite(callInvite);
 
-        const navigate = getNavigate();
-        if (!navigate) {
-          return;
-        }
         const callSid = callInvite.getCallSid();
         navigate('Call', { callSid });
       },
@@ -243,13 +241,18 @@ export const bootstrapNavigationActionTypes = generateThunkActionTypes(
 );
 export const bootstrapNavigation = createTypedAsyncThunk(
   bootstrapNavigationActionTypes.prefix,
-  (_, { getState }) => {
+  async (_, { getState }) => {
+    const navigate = await getNavigate();
+
     const state = getState();
 
-    const navigate = getNavigate();
-    if (typeof navigate === 'undefined') {
-      return;
-    }
+    /**
+     * If the call invite notification body is tapped, navigate to the call
+     * invite screen.
+     */
+    voice.on(Voice.Event.CallInviteNotificationTapped, () => {
+      navigate('Incoming Call');
+    });
 
     if (state.voice.call.activeCall.ids.length) {
       navigate('Call', {});
