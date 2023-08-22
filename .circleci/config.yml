@@ -283,7 +283,6 @@ jobs:
       name: android/android-machine
       resource-class: 2xlarge
       tag: 2023.07.1
-      description: "Build & archive Android App"
     steps:
       - checkout
       - app-save-env-file
