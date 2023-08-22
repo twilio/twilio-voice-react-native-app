@@ -33,8 +33,8 @@ aliases:
     tags:
       only:
         - /^\d+\.\d+\.\d+-rc\d+$/
-        - /^\d+\.\d+\.\d+-preview\d+-rc\d+$/
-        - /^\d+\.\d+\.\d+-beta\d+-rc\d+$/
+        - /^\d+\.\d+\.\d+-preview.\d+-rc\d+$/
+        - /^\d+\.\d+\.\d+-beta.\d+-rc\d+$/
     branches:
       ignore: /.*/
 
@@ -42,8 +42,8 @@ aliases:
     tags:
       only:
         - /^\d+\.\d+\.\d+$/
-        - /^\d+\.\d+\.\d+-preview\d+$/
-        - /^\d+\.\d+\.\d+-beta\d+$/
+        - /^\d+\.\d+\.\d+-preview.\d+$/
+        - /^\d+\.\d+\.\d+-beta.\d+$/
     branches:
       ignore: /.*/
 
