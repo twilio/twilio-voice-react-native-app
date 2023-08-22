@@ -85,6 +85,10 @@ export const makeOutgoingCall = createTypedAsyncThunk<
         return;
       }
       AsyncStorage.setItem(callSid, JSON.stringify({ to, recipientType }));
+
+      const info = getCallInfo(outgoingCall);
+      info.initialConnectedTimestamp ||= Date.now();
+      dispatch(setActiveCallInfo({ id: requestId, info }));
     });
 
     return callInfo;
