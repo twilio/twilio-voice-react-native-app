@@ -344,7 +344,7 @@ jobs:
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
           wait-for-emulator: false
-      - app--build:
+      - app-detox-build:
           configuration: android.emu.release
       - app-expose-port
       - run:
