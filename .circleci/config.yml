@@ -541,9 +541,13 @@ workflows:
     jobs:
       - build-archive-ios-app:
           filters: *rc-filter
+          context:
+            - vblocks-dogfood-reference-app
       - publish-ios-app-appcenter:
           distribution-audience: ${APP_CENTER_RC_AUDIENCE}
           filters: *rc-filter
+          context:
+            - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
 
@@ -554,8 +558,12 @@ workflows:
     jobs:
       - build-archive-ios-app:
           filters: *release-filter
+          context:
+            - vblocks-dogfood-reference-app
       - publish-ios-app-appcenter:
           distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
           filters: *release-filter
+          context:
+            - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
