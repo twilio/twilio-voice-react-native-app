@@ -13,6 +13,9 @@ parameters:
   pr_workflow:
     type: boolean
     default: true # by default pr workflow will get executed.
+  test_android_build:
+    type: boolean
+    default: false
 
 ###
 # Executors
@@ -102,15 +105,17 @@ commands:
   app-detox-build:
     parameters:
       configuration:
-        description: The Detox config to build as defined in .detoxrc.js
         type: string
     steps:
       - run:
           name: "App: Detox build"
           command: |
-            cd app
-            yarn detox:build --configuration << parameters.configuration >>
-            cd ..
+            cd android
+             ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release
+      - persist_to_workspace:
+          root: .
+          paths:
+            - app/android/app/build/outputs/apk/release/app-release.apk
 
   app-detox-test:
     parameters:
@@ -263,7 +268,28 @@ jobs:
             yarn typecheck
             cd ..
 
-  app-detox-android:
+  app-build-android:
+    executor:
+      name: android/android-machine
+      resource-class: 2xlarge
+      tag: 2023.07.1
+      description: "Build & archive Android App"
+    steps:
+      - checkout
+      - app-save-env-file
+      - restore_cache:
+          keys:
+            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      - app-install-dependencies
+      - app-save-google-services-json
+      - run:
+          name: "Update SDK & NDK"
+          command: |
+            sdkmanager --update
+      - run:
+          name: "Build App"
+
+  test-detox-android:
     executor:
       name: android/android-machine
       resource-class: 2xlarge
@@ -419,10 +445,40 @@ jobs:
       - store_artifacts:
           path: server/coverage
 
+# Publish the android app
+  publish-ios-app-appcenter:
+    executor:
+      name: android/android-machine
+      resource-class: 2xlarge
+      tag: 2023.07.1
+    parameters:
+      distribution-audience:
+        # Use this flag to control the app distrubution audience
+        type: string
+    steps:
+      - run:
+          sudo npm install -g appcenter-cli
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Publishing iOS app to AppCenter"
+          command: |
+            sudo npm install webpack
+            echo no | sudo npm install -g appcenter-cli
+            export APP_NAME=TwilioVoiceReactNativeReferenceApp
+            appcenter login --token ${APP_CENTER_API_TOKEN}
+            appcenter distribute release -f app/android/app/build/outputs/apk/release/app-release.apk -g << parameters.distribution-audience >> --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME} -b ${CIRCLE_TAG}
+
+
 ###
 # Workflows
 ###
 workflows:
+  build-archive-android:
+    when: << pipeline.parameters.test_android_build >>
+    jobs:
+      - app-build-android
   ###
   # Pull request workflow
   ###
@@ -452,11 +508,11 @@ workflows:
           requires:
             - server-cache-install-yarn-dependencies
       # e2e jobs
-      - app-detox-android:
+      - test-detox-android:
           context:
             - vblocks-js
       - app-detox-ios:
           requires:
-            - app-detox-android
+            - test-detox-android
           context:
             - vblocks-js
