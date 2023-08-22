@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 import StackNavigator from './screens/StackNavigator';
 import { defaultStore } from './store/app';
@@ -40,9 +41,11 @@ const App = () => {
 
   return (
     <Provider store={defaultStore}>
-      <NavigationContainer ref={navigationRef}>
-        <StackNavigator />
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer ref={navigationRef}>
+          <StackNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
     </Provider>
   );
 };
