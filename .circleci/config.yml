@@ -284,10 +284,8 @@ jobs:
       - app-save-google-services-json
       - run:
           name: "Update SDK & NDK"
-          command: |
-            sdkmanager --update
-      - run:
-          name: "Build App"
+          command: sdkmanager --update
+      - app-detox-build
 
   test-detox-android:
     executor:
