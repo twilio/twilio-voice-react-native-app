@@ -22,7 +22,6 @@ const Dialer: React.FC = () => {
 
   return (
     <View style={styles.container} testID="dialer">
-      <View style={styles.spacer} />
       <View style={styles.remoteParticipant}>
         <OutgoingRemoteParticipant
           outgoingIdentity={outgoing.client.value}
@@ -31,10 +30,12 @@ const Dialer: React.FC = () => {
           setOutgoingIdentity={outgoing.client.setValue}
         />
       </View>
-      <Dialpad
-        disabled={dialpad.input.isDisabled}
-        onPress={dialpad.input.handle}
-      />
+      <View style={styles.dialpad}>
+        <Dialpad
+          disabled={dialpad.input.isDisabled}
+          onPress={dialpad.input.handle}
+        />
+      </View>
       <View style={styles.buttons}>
         <ToggleClientInputButton
           disabled={recipientToggle.isDisabled}
@@ -47,7 +48,6 @@ const Dialer: React.FC = () => {
         />
         {backspaceButton}
       </View>
-      <View style={styles.spacer} />
     </View>
   );
 };
@@ -55,20 +55,21 @@ const Dialer: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    display: 'flex',
     flexDirection: 'column',
     height: '100%',
   },
-  spacer: {
-    flexGrow: 1,
-  },
   remoteParticipant: {
-    alignSelf: 'stretch',
     padding: 16,
+    height: '25%',
+    flexDirection: 'column-reverse',
+  },
+  dialpad: {
+    height: '55%',
   },
   buttons: {
     display: 'flex',
     flexDirection: 'row',
+    height: '20%',
   },
   emptyButton: {
     width: 96,
