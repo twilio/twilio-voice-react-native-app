@@ -12,6 +12,11 @@
   * Auth0 implemented as the example Authentication service
 * Added the ability to select an audio device within the active call screen.
 * Added unregistration from the Voice SDK upon logout.
+* Tapping on the call invite notification will bring the call invite screen to
+the foreground on Android devices.
+  * Note that iOS will have similar UX because CallKit will handle the call
+  invite UX. It is, however, not within the responsibility of the React
+  environment.
 
 ### Changes
 * Upgraded Twilio Voice SDK to `1.0.0-beta.3`.

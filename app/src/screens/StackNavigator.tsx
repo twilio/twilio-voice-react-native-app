@@ -1,6 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { Text } from 'react-native';
 import { useSelector } from 'react-redux';
 import ActiveCall from './ActiveCall';
 import TabNavigator from './TabNavigator';
@@ -18,21 +17,25 @@ const StackNavigator = () => {
     (state: State) => state.loginAndRegister,
   );
 
+  const isBootstrapping = loginAndRegister?.status === 'pending';
+  if (isBootstrapping) {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name="Busy" component={Busy} />
+      </Stack.Navigator>
+    );
+  }
+
   const isLoggedIn =
     user?.status === 'fulfilled' &&
     user.accessToken &&
     loginAndRegister?.status === 'fulfilled';
-
-  if (user === null) {
-    return <Text>Application not bootstrapped.</Text>;
-  }
-
-  if (loginAndRegister?.status === 'pending') {
-    return <Busy />;
-  }
-
   if (!isLoggedIn) {
-    return <SignIn />;
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name="Sign In" component={SignIn} />
+      </Stack.Navigator>
+    );
   }
 
   return (

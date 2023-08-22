@@ -50,7 +50,7 @@ export const receiveCallInvite = createTypedAsyncThunk<
    * Hard-code navigation to the Incoming Call screen for tests.
    */
   if (navigateToCallInviteScreen) {
-    getNavigate()?.('Incoming Call');
+    (await getNavigate())('Incoming Call');
   }
 
   return requestId;

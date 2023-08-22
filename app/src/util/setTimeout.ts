@@ -13,4 +13,8 @@ export const setTimeout = globalThis.setTimeout as unknown as (
   handler: () => void,
   timeout: number,
 ) => number;
+export const setInterval = globalThis.setInterval as unknown as (
+  handler: () => void,
+  timeout: number,
+) => number;
 export const requestAnimationFrame = globalThis.requestAnimationFrame;
