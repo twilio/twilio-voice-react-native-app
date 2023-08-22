@@ -464,7 +464,7 @@ jobs:
         type: string
     steps:
       - run:
-          sudo npm install -g appcenter-cli
+          npm install -g appcenter-cli
       - checkout
       - attach_workspace:
           at: .
