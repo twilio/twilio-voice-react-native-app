@@ -105,7 +105,17 @@ commands:
   app-detox-build:
     parameters:
       configuration:
+        description: The Detox config to build as defined in .detoxrc.js
         type: string
+    steps:
+      - run:
+          name: "App: Detox build"
+          command: |
+            cd app
+            yarn detox:build --configuration << parameters.configuration >>
+            cd ..
+
+  app-android-build:
     steps:
       - run:
           name: "App: Detox build"
@@ -285,7 +295,7 @@ jobs:
       - run:
           name: "Update SDK & NDK"
           command: sdkmanager --update
-      - app-detox-build
+      - app-android-build
 
   test-detox-android:
     executor:
@@ -335,7 +345,7 @@ jobs:
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
           wait-for-emulator: false
-      - app-detox-build:
+      - app--build:
           configuration: android.emu.release
       - app-expose-port
       - run:
@@ -444,7 +454,7 @@ jobs:
           path: server/coverage
 
 # Publish the android app
-  publish-ios-app-appcenter:
+  publish-android-app-appcenter:
     executor:
       name: android/android-machine
       resource-class: 2xlarge
@@ -506,11 +516,11 @@ workflows:
           requires:
             - server-cache-install-yarn-dependencies
       # e2e jobs
-      - test-detox-android:
+      - app-detox-android:
           context:
             - vblocks-js
       - app-detox-ios:
           requires:
-            - test-detox-android
+            - app-detox-android
           context:
             - vblocks-js
