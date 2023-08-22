@@ -4,6 +4,7 @@ import {
   bootstrapPushRegistry,
   bootstrapUser,
   bootstrapCallInvites,
+  bootstrapCalls,
   bootstrapNavigation,
 } from '../bootstrap';
 import { checkLoginStatus } from '../user';
@@ -12,6 +13,7 @@ import { receiveCallInvite, setCallInvite } from '../voice/call/callInvite';
 import { register } from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
+import * as asyncStorage from '../../../__mocks__/@react-native-async-storage/async-storage';
 import * as voiceUtil from '../../../src/util/voice';
 import * as navigationUtil from '../../../src/util/navigation';
 
@@ -251,6 +253,76 @@ describe('bootstrap', () => {
         receiveCallInvite.fulfilled,
         receiveCallInvite.fulfilled,
         bootstrapCallInvites.fulfilled,
+      ]);
+    });
+  });
+
+  describe('bootstrapCalls', () => {
+    // TODO(mhuynh): [VBLOCKS-2078] Increase coverage.
+
+    beforeEach(() => {
+      voiceSdk.voiceGetCalls.mockImplementationOnce(() => {
+        return Promise.resolve(new Map([['1', voiceSdk.createMockCall('1')]]));
+      });
+      asyncStorage.keyValueStore.clear();
+      const mockAsyncStorage = [
+        [
+          'mock sid 1',
+          JSON.stringify({ to: 'foo to', recipientType: 'client' }),
+        ],
+        [
+          'mock sid 2',
+          JSON.stringify({ to: 'bar to', recipientType: 'client' }),
+        ],
+        [
+          'mock sid 3',
+          JSON.stringify({ to: 'biff to', recipientType: 'number' }),
+        ],
+      ];
+      for (const [k, v] of mockAsyncStorage) {
+        asyncStorage.keyValueStore.set(k, v);
+      }
+    });
+
+    it('should read from async storage for an outgoing call', async () => {
+      const { type, payload } = await store.dispatch(bootstrapCalls());
+      expect(type).toMatch(/fulfilled/);
+      expect(payload).toBeUndefined();
+
+      expect(asyncStorage.getAllKeys.mock.calls).toStrictEqual([[]]);
+      expect(asyncStorage.getItem.mock.calls).toStrictEqual([['mock sid 1']]);
+
+      const { ids, entities } = store.getState().voice.call.activeCall;
+      const callEntity = entities[ids[0]];
+
+      if (callEntity?.status !== 'fulfilled') {
+        throw new Error('call entity not fulfilled');
+      }
+      if (callEntity?.direction !== 'outgoing') {
+        throw new Error('call direction should be outgoing');
+      }
+      expect(callEntity?.params).toStrictEqual({
+        to: 'foo to',
+        recipientType: 'client',
+      });
+    });
+
+    it('should clear values out of async storage if not active', async () => {
+      const { type, payload } = await store.dispatch(bootstrapCalls());
+      expect(type).toMatch(/fulfilled/);
+      expect(payload).toBeUndefined();
+
+      expect(asyncStorage.multiRemove.mock.calls).toStrictEqual([
+        [['mock sid 2', 'mock sid 3']],
+      ]);
+      expect(Array.from(asyncStorage.keyValueStore.entries())).toStrictEqual([
+        [
+          'mock sid 1',
+          JSON.stringify({
+            to: 'foo to',
+            recipientType: 'client',
+          }),
+        ],
       ]);
     });
   });

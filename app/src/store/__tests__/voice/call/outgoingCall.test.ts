@@ -6,6 +6,7 @@ import { getAccessToken } from '../../../voice/accessToken';
 import { login } from '../../../user';
 import * as mockVoiceSdk from '../../../../../__mocks__/@twilio/voice-react-native-sdk';
 import * as voiceUtil from '../../../../util/voice';
+import * as asyncStorage from '../../../../../__mocks__/@react-native-async-storage/async-storage';
 
 jest.mock('../../../../util/fetch', () => ({
   fetch: jest.fn().mockResolvedValue({
@@ -147,6 +148,123 @@ describe('store', () => {
             makeOutgoingCall.pending,
             makeOutgoingCall.fulfilled,
           ]);
+        });
+
+        it('saves params to storage upon connected event', async () => {
+          asyncStorage.keyValueStore.clear();
+
+          const defer = deferNative(voiceUtil.voice, 'connect');
+
+          await store.dispatch(login());
+          await store.dispatch(getAccessToken());
+          dispatchedActions.splice(0);
+
+          const callPromise = store.dispatch(
+            makeOutgoingCall({
+              recipientType: 'number',
+              to: 'some random number foobar',
+            }),
+          );
+
+          match(
+            store.getState().voice.call.activeCall.entities[
+              callPromise.requestId
+            ],
+          )
+            .with({ status: 'pending' }, () => {})
+            .run();
+
+          const mockCall = mockVoiceSdk.createMockCall('foo');
+          mockCall.getSid.mockImplementation(() => 'mock sid 1');
+          defer.resolve(mockCall);
+
+          const callResult = await callPromise;
+          match(callResult)
+            .with({ payload: P.select() }, (p) => {
+              expect(p).toStrictEqual({
+                from: 'mock from foo',
+                initialConnectedTimestamp: 42,
+                isMuted: false,
+                isOnHold: false,
+                sid: 'mock sid 1',
+                state: 'mock state foo',
+                to: 'mock to foo',
+              });
+            })
+            .run();
+
+          matchDispatchedActions(dispatchedActions, [
+            makeOutgoingCall.pending,
+            makeOutgoingCall.fulfilled,
+          ]);
+
+          mockCall.emit('connected');
+
+          const entries = Array.from(
+            asyncStorage.keyValueStore.entries(),
+          ).reduce((reduction, [k, v]) => ({ ...reduction, [k]: v }), {});
+          expect(entries).toStrictEqual({
+            'mock sid 1': JSON.stringify({
+              to: 'some random number foobar',
+              recipientType: 'number',
+            }),
+          });
+        });
+
+        it('removes params from storage upon disconnect', async () => {
+          asyncStorage.keyValueStore.clear();
+
+          const defer = deferNative(voiceUtil.voice, 'connect');
+
+          await store.dispatch(login());
+          await store.dispatch(getAccessToken());
+          dispatchedActions.splice(0);
+
+          const callPromise = store.dispatch(
+            makeOutgoingCall({
+              recipientType: 'number',
+              to: 'some random number foobar',
+            }),
+          );
+
+          match(
+            store.getState().voice.call.activeCall.entities[
+              callPromise.requestId
+            ],
+          )
+            .with({ status: 'pending' }, () => {})
+            .run();
+
+          const mockCall = mockVoiceSdk.createMockCall('foo');
+          mockCall.getSid.mockImplementation(() => 'mock sid 1');
+          defer.resolve(mockCall);
+
+          const callResult = await callPromise;
+          match(callResult)
+            .with({ payload: P.select() }, (p) => {
+              expect(p).toStrictEqual({
+                from: 'mock from foo',
+                initialConnectedTimestamp: 42,
+                isMuted: false,
+                isOnHold: false,
+                sid: 'mock sid 1',
+                state: 'mock state foo',
+                to: 'mock to foo',
+              });
+            })
+            .run();
+
+          matchDispatchedActions(dispatchedActions, [
+            makeOutgoingCall.pending,
+            makeOutgoingCall.fulfilled,
+          ]);
+
+          mockCall.emit('disconnected');
+
+          const entries = Array.from(
+            asyncStorage.keyValueStore.entries(),
+          ).reduce((reduction, [k, v]) => ({ ...reduction, [k]: v }), {});
+          expect(entries).toStrictEqual({});
         });
       });
     });

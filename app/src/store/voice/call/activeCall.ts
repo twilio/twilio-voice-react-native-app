@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   createEntityAdapter,
   createSlice,
@@ -6,12 +7,13 @@ import {
   type SerializedError,
 } from '@reduxjs/toolkit';
 import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
-import { match } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 import {
   type CallInfo,
   getCallInfo,
   type IncomingCall,
   type OutgoingCall,
+  type OutgoingCallParameters,
 } from './';
 import { createTypedAsyncThunk, generateThunkActionTypes } from '../../common';
 import { callMap } from '../../../util/voice';
@@ -25,14 +27,50 @@ const sliceName = 'activeCall' as const;
  * Handle existing call action. Used when bootstrapping the app or receiving a
  * call that was accepted through the native layer.
  */
+type HandleCallRejectValue =
+  | {
+      reason: 'ASYNC_STORAGE_GET_ITEM_REJECTED';
+      error: SerializedError;
+    }
+  | {
+      reason: 'JSON_PARSE_THREW';
+      error: SerializedError;
+    };
 export const handleCallActionType = generateThunkActionTypes(
   `${sliceName}/handleCall`,
 );
-export const handleCall = createTypedAsyncThunk<CallInfo, { call: TwilioCall }>(
+export const handleCall = createTypedAsyncThunk<
+  { callInfo: CallInfo; customParameters?: OutgoingCallParameters },
+  { call: TwilioCall },
+  { rejectValue: HandleCallRejectValue }
+>(
   handleCallActionType.prefix,
-  async ({ call }, { dispatch, requestId }) => {
+  async ({ call }, { dispatch, requestId, rejectWithValue }) => {
     const callInfo = getCallInfo(call);
     callMap.set(requestId, call);
+
+    let customParameters: OutgoingCallParameters | undefined;
+    if (typeof callInfo.sid === 'string') {
+      const getItemResult = await settlePromise(
+        AsyncStorage.getItem(callInfo.sid),
+      );
+      if (getItemResult.status === 'rejected') {
+        return rejectWithValue({
+          reason: 'ASYNC_STORAGE_GET_ITEM_REJECTED',
+          error: miniSerializeError(getItemResult.reason),
+        });
+      }
+      try {
+        customParameters = getItemResult.value
+          ? JSON.parse(getItemResult.value)
+          : undefined;
+      } catch (exception) {
+        return rejectWithValue({
+          reason: 'JSON_PARSE_THREW',
+          error: miniSerializeError(exception),
+        });
+      }
+    }
 
     call.on(TwilioCall.Event.ConnectFailure, (error) =>
       console.error('ConnectFailure:', error),
@@ -45,6 +83,12 @@ export const handleCall = createTypedAsyncThunk<CallInfo, { call: TwilioCall }>(
       if (error) {
         console.error('Disconnected:', error);
       }
+
+      const callSid = call.getSid();
+      if (typeof callSid !== 'string') {
+        return;
+      }
+      AsyncStorage.removeItem(callSid);
     });
 
     Object.values(TwilioCall.Event).forEach((callEvent) => {
@@ -53,7 +97,7 @@ export const handleCall = createTypedAsyncThunk<CallInfo, { call: TwilioCall }>(
       });
     });
 
-    return callInfo;
+    return { callInfo, customParameters };
   },
 );
 
@@ -224,9 +268,10 @@ export const activeCallSlice = createSlice({
      */
     builder.addCase(handleCall.fulfilled, (state, action) => {
       const { requestId } = action.meta;
+      const { callInfo, customParameters } = action.payload;
 
-      match(state.entities[requestId])
-        .with(undefined, () => {
+      match([state.entities[requestId], customParameters])
+        .with([undefined, undefined], () => {
           activeCallAdapter.setOne(state, {
             direction: 'incoming',
             id: requestId,
@@ -237,7 +282,25 @@ export const activeCallSlice = createSlice({
               mute: { status: 'idle' },
               sendDigits: { status: 'idle' },
             },
-            info: action.payload,
+            info: callInfo,
+          });
+        })
+        .with([undefined, P.not(undefined)], ([_, _customParameters]) => {
+          activeCallAdapter.setOne(state, {
+            direction: 'outgoing',
+            id: requestId,
+            status: 'fulfilled',
+            action: {
+              disconnect: { status: 'idle' },
+              hold: { status: 'idle' },
+              mute: { status: 'idle' },
+              sendDigits: { status: 'idle' },
+            },
+            params: {
+              recipientType: _customParameters.recipientType,
+              to: _customParameters.to,
+            },
+            info: action.payload.callInfo,
           });
         })
         .otherwise(() => {});
@@ -254,9 +317,11 @@ export const activeCallSlice = createSlice({
           activeCallAdapter.setOne(state, {
             direction: 'outgoing',
             id: requestId,
-            recipientType: arg.recipientType,
+            params: {
+              recipientType: arg.recipientType,
+              to: arg.to,
+            },
             status: requestStatus,
-            to: arg.to,
           });
         })
         .otherwise(() => {});
@@ -268,7 +333,7 @@ export const activeCallSlice = createSlice({
       match(state.entities[requestId])
         .with(
           { direction: 'outgoing', status: 'pending' },
-          ({ direction, recipientType, to }) => {
+          ({ direction, params: { recipientType, to } }) => {
             activeCallAdapter.setOne(state, {
               action: {
                 disconnect: { status: 'idle' },
@@ -279,9 +344,11 @@ export const activeCallSlice = createSlice({
               direction,
               id: requestId,
               info: action.payload,
-              recipientType,
+              params: {
+                recipientType,
+                to,
+              },
               status: requestStatus,
-              to,
             });
           },
         )
@@ -294,13 +361,15 @@ export const activeCallSlice = createSlice({
       match(state.entities[requestId])
         .with(
           { direction: 'outgoing', status: 'pending' },
-          ({ direction, recipientType, to }) => {
+          ({ direction, params: { recipientType, to } }) => {
             activeCallAdapter.setOne(state, {
               direction,
               id: requestId,
-              recipientType,
+              params: {
+                recipientType,
+                to,
+              },
               status: requestStatus,
-              to,
             });
           },
         )

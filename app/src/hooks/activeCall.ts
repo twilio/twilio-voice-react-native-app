@@ -98,7 +98,7 @@ export const useActiveCallRemoteParticipant = (
           { direction: 'incoming', status: 'fulfilled' },
           (c) => c.info.from || '',
         )
-        .with({ direction: 'outgoing' }, (c) => c.to)
+        .with({ direction: 'outgoing' }, (c) => c.params.to)
         .otherwise(() => ''),
     [activeCall],
   );

@@ -93,8 +93,12 @@ export type IncomingCall = {
   direction: 'incoming';
 } & BaseCall;
 
-export type OutgoingCall = {
-  direction: 'outgoing';
+export type OutgoingCallParameters = {
   recipientType: RecipientType;
   to: string;
+};
+
+export type OutgoingCall = {
+  direction: 'outgoing';
+  params: OutgoingCallParameters;
 } & BaseCall;

@@ -29,10 +29,11 @@ the foreground on Android devices.
   * Minimum supported version for iOS is 13
 
 ### Fixes
-* The call state and duration are now persisted between JS runtimes.
+* The call state, duration and outgoing parameters are now persisted between JS
+runtimes.
   * In effect, on Android, if a user is in an active call and closes the app,
   when they reopen the app while still in the active call, it will show the
-  proper call duration and state.
+  proper call duration, state, and outgoing call parameters (such as identity).
 
 ## Server
 

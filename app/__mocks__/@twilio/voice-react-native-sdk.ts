@@ -39,7 +39,12 @@ export const voiceConnect = jest.fn(async () =>
   createMockCall(`${callUuid++}`),
 );
 
+export const voiceGetCalls = jest.fn(() => {
+  return Promise.resolve(new Map());
+});
+
 export const createMockCall = jest.fn((id: string) => {
+  const listeners: Map<string, ((...args: any[]) => any)[]> = new Map();
   const mockCall = {
     _uuid: `mock uuid ${id}`,
     disconnect: jest.fn().mockResolvedValue(undefined),
@@ -56,8 +61,43 @@ export const createMockCall = jest.fn((id: string) => {
     getTo: jest.fn().mockReturnValue(`mock to ${id}`),
     isMuted: jest.fn().mockReturnValue(false),
     isOnHold: jest.fn().mockReturnValue(false),
-    on: jest.fn(),
-    once: jest.fn(),
+    on: jest
+      .fn()
+      .mockImplementation(
+        (event: string, listener: (...args: any[]) => void) => {
+          const newListeners = listeners.has(event)
+            ? [...listeners.get(event)!, listener]
+            : [listener];
+          listeners.set(event, newListeners);
+        },
+      ),
+    once: jest
+      .fn()
+      .mockImplementation(
+        (event: string, listener: (...args: any[]) => void) => {
+          let didWrappedListenerFire = false;
+          const wrappedListener = (...argsPrime: any[]) => {
+            if (didWrappedListenerFire) {
+              return;
+            }
+            didWrappedListenerFire = true;
+            listener(...argsPrime);
+          };
+          const newListeners = listeners.has(event)
+            ? [...listeners.get(event)!, wrappedListener]
+            : [wrappedListener];
+          listeners.set(event, newListeners);
+        },
+      ),
+    emit: (event: string, ...args: any[]) => {
+      const eventListeners = listeners.get(event);
+      if (!eventListeners) {
+        return;
+      }
+      for (const listener of eventListeners) {
+        listener(...args);
+      }
+    },
   };
   return mockCall;
 });
@@ -97,6 +137,7 @@ export const Voice = jest.fn().mockImplementation(() => {
     connect: voiceConnect,
     emit,
     getCallInvites: voiceGetCallInvites,
+    getCalls: voiceGetCalls,
     initializePushRegistry: voiceInitializePushRegistry,
     on,
     once,

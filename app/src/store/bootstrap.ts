@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { miniSerializeError, type SerializedError } from '@reduxjs/toolkit';
 import {
   Voice,
@@ -207,9 +208,25 @@ export const bootstrapCalls = createTypedAsyncThunk<
     }
 
     const calls = callsResult.value;
+    // Get all the call sids stored in async storage.
+    const storedCallSids = new Set(await AsyncStorage.getAllKeys());
     for (const call of calls.values()) {
       await dispatch(handleCall({ call }));
+
+      // If the call is still active, the native layer will still have it
+      // cached.
+      const callSid = call.getSid();
+      if (callSid) {
+        // Mark a call as still active, and therefore keep it in async storage.
+        storedCallSids.delete(callSid);
+      }
     }
+
+    /**
+     * Free the AsyncStorage if there are some calls in AsyncStorage that are
+     * no longer tracked by the native layer.
+     */
+    await AsyncStorage.multiRemove(Array.from(storedCallSids.values()));
   },
 );
 
