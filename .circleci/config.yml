@@ -296,7 +296,7 @@ jobs:
           command: sdkmanager --update
       - app-android-build
 
-  test-detox-android:
+  app-detox-android:
     executor:
       name: android/android-machine
       resource-class: 2xlarge
