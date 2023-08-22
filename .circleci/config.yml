@@ -120,8 +120,8 @@ commands:
       - run:
           name: "App: Detox build"
           command: |
-            cd android
-             ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release
+            cd app/android
+            ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release
       - persist_to_workspace:
           root: .
           paths:
