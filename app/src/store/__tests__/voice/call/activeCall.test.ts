@@ -8,10 +8,6 @@ import { login } from '../../../user';
 import * as mockVoiceSdk from '../../../../../__mocks__/@twilio/voice-react-native-sdk';
 import * as asyncStorage from '../../../../../__mocks__/@react-native-async-storage/async-storage';
 
-let mockPlatform: {
-  OS: string;
-};
-
 jest.mock('../../../../util/fetch', () => ({
   fetch: jest.fn().mockResolvedValue({
     ok: true,
@@ -21,7 +17,7 @@ jest.mock('../../../../util/fetch', () => ({
 
 jest.mock('react-native', () => {
   return {
-    Platform: (mockPlatform = { OS: 'android' }),
+    Platform: { OS: 'android' },
   };
 });
 
