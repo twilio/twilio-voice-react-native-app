@@ -147,6 +147,8 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+        buildConfigField 'String', 'APPCENTER_APP_KEY', stringifyNull(getLocalPropertyOrEnv("APPCENTER_APP_KEY"))
+
         manifestPlaceholders = [auth0Domain: project.env.get("DOMAIN_NAME"), auth0Scheme: "${applicationId}.auth0"]
         testBuildType System.getProperty('testBuildType', 'debug')
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -269,6 +271,8 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
+    implementation "com.microsoft.appcenter:appcenter-distribute:4.3.1"
+
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
     }
@@ -323,4 +327,21 @@ def isNewArchitectureEnabled() {
     // - Invoke gradle with `-newArchEnabled=true`
     // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
     return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+def getLocalPropertyOrEnv(key) {
+    def return_value = System.getenv(key)
+    if (null == return_value && project.rootProject.file('local.properties').exists()) {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        return_value = properties.getProperty(key)
+    }
+    return return_value;
+}
+
+def stringifyNull(var) {
+    if (null == var) {
+        var = "null"
+    }
+    return var;
 }
