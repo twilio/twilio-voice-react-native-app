@@ -137,6 +137,7 @@ export const Voice = jest.fn().mockImplementation(() => {
     connect: voiceConnect,
     emit,
     getCallInvites: voiceGetCallInvites,
+    getCalls: voiceGetCalls,
     initializePushRegistry: voiceInitializePushRegistry,
     on,
     once,
