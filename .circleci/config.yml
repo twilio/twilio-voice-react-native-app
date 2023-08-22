@@ -489,7 +489,7 @@ workflows:
       - publish-android-app-appcenter:
           distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
           requires:
-	    - app-build-android
+            - app-build-android
 
   ###
   # Pull request workflow
