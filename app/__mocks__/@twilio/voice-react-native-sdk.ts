@@ -1,6 +1,39 @@
-export const voiceRegister = jest.fn().mockResolvedValue(undefined);
+type Listener = (...args: any[]) => void;
 
-export const voiceOn = jest.fn();
+class BasicEventEmitter {
+  listeners: Map<string, Listener[]> = new Map();
+
+  on(event: string, listener: Listener) {
+    const newListeners = this.listeners.has(event)
+      ? [...this.listeners.get(event)!, listener]
+      : [listener];
+    this.listeners.set(event, newListeners);
+  }
+
+  once(event: string, listener: Listener) {
+    let hasFired: boolean = false;
+    const wrappedListener = (...args: any[]) => {
+      if (hasFired) {
+        return;
+      }
+      hasFired = true;
+      listener(...args);
+    };
+    this.on(event, wrappedListener);
+  }
+
+  emit(event: string, ...args: any[]) {
+    const boundListeners = this.listeners.get(event);
+    if (typeof boundListeners === 'undefined') {
+      return;
+    }
+    for (const l of boundListeners) {
+      l(...args);
+    }
+  }
+}
+
+export const voiceRegister = jest.fn().mockResolvedValue(undefined);
 
 export const voiceConnect = jest.fn(async () =>
   createMockCall(`${callUuid++}`),
@@ -55,16 +88,25 @@ export const voiceInitializePushRegistry = jest
 
 let callUuid = 0;
 
-export const Voice = jest.fn().mockReturnValue({
-  connect: voiceConnect,
-  getCallInvites: voiceGetCallInvites,
-  initializePushRegistry: voiceInitializePushRegistry,
-  on: voiceOn,
-  register: voiceRegister,
+export const Voice = jest.fn().mockImplementation(() => {
+  const voiceEventEmitter = new BasicEventEmitter();
+  const emit = voiceEventEmitter.emit.bind(voiceEventEmitter);
+  const on = voiceEventEmitter.on.bind(voiceEventEmitter);
+  const once = voiceEventEmitter.once.bind(voiceEventEmitter);
+  return {
+    connect: voiceConnect,
+    emit,
+    getCallInvites: voiceGetCallInvites,
+    initializePushRegistry: voiceInitializePushRegistry,
+    on,
+    once,
+    register: voiceRegister,
+  };
 });
 
 (Voice as any).Event = {
-  CallInvite: 'mock call invite event key',
+  CallInvite: 'callInvite',
+  CallInviteNotificationTapped: 'callInviteNotificationTapped',
 };
 
 export const Call = {
