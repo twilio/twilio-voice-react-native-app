@@ -119,7 +119,7 @@ commands:
     steps:
       - run:
           name: "Install Appcenter Secret"
-	  command: echo "{ \"app_secret\": \"$APP_CENTER_APP_SECRET_ANDROID\"}" > app/android/app/src/main/assets/appcenter-config.json
+          command: echo "{ \"app_secret\": \"$APP_CENTER_APP_SECRET_ANDROID\"}" > app/android/app/src/main/assets/appcenter-config.json
 
   app-android-build:
     steps:
@@ -300,6 +300,7 @@ jobs:
       - run:
           name: "Update SDK & NDK"
           command: sdkmanager --update
+      - app-android-install-appcenter-secret
       - app-android-build
 
   app-detox-android:
@@ -489,6 +490,7 @@ workflows:
   build-archive-android:
     when: << pipeline.parameters.test_android_build >>
     jobs:
+      - publish-android-app-appcenter
       - app-build-android
       - publish-android-app-appcenter:
           distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
