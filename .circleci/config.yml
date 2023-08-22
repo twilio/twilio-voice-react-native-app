@@ -487,6 +487,7 @@ workflows:
     jobs:
       - app-build-android
       - publish-android-app-appcenter
+          distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
   ###
   # Pull request workflow
   ###
