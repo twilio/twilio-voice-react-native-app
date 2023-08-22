@@ -263,7 +263,9 @@ export const activeCallSlice = createSlice({
     ) {
       match(state.entities[action.payload.id])
         .with({ status: 'fulfilled' }, (call) => {
+          const originalTimestamp = call.info.initialConnectedTimestamp;
           call.info = action.payload.info;
+          call.info.initialConnectedTimestamp ||= originalTimestamp;
         })
         .otherwise(() => {});
     },
