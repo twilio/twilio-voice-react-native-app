@@ -76,6 +76,8 @@ commands:
             echo "AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID" >> .env
             echo "AUTH0_CLIENT_SECRET=$AUTH0_CLIENT_SECRET" >> .env
             echo "ENABLE_ABOUT_PAGE=$ENABLE_ABOUT_PAGE" >> .env
+            echo "SLACK_URL=$SLACK_URL" >> .env
+            echo "SLACK_CHANNEL_NAME=$SLACK_CHANNEL_NAME" >> .env
             cd ..
 
   app-install-dependencies:
