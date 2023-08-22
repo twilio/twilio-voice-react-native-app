@@ -486,6 +486,7 @@ workflows:
     when: << pipeline.parameters.test_android_build >>
     jobs:
       - app-build-android
+      - publish-android-app-appcenter
   ###
   # Pull request workflow
   ###
