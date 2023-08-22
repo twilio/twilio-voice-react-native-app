@@ -4,7 +4,7 @@
 <dict>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>com.twilio.ReactNativeReferenceApp</key>
+		<key>com.twilio.TwilioVoiceReactNativeReferenceApp</key>
 		<string>match InHouse com.twilio.TwilioVoiceReactNativeReferenceApp</string>
 	</dict>
 	<key>method</key>
