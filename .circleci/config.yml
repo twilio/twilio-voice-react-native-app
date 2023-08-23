@@ -410,7 +410,5 @@ workflows:
           context:
             - vblocks-js
       - app-detox-ios:
-          requires:
-            - app-detox-android
           context:
             - vblocks-js
