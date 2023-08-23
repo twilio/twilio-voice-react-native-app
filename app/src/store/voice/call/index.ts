@@ -31,7 +31,7 @@ export const getCallInfo = (call: TwilioCall): CallInfo => {
   ])
     .with([undefined, P._], () => undefined)
     .with([P.not(undefined), 'ios'], ([timestamp]) => Number(timestamp) * 1000)
-    .with([P.not(undefined), P._], ([timestamp]) => timestamp)
+    .with([P.not(undefined), P._], ([timestamp]) => Number(timestamp))
     .exhaustive();
 
   const isMuted = Boolean(call.isMuted());
