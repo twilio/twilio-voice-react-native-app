@@ -18,6 +18,12 @@ jest.mock('../../../../util/fetch', () => ({
   }),
 }));
 
+jest.mock('react-native', () => {
+  return {
+    Platform: { OS: 'android' },
+  };
+});
+
 describe('store', () => {
   let store: Store;
   const dispatchedActions: any[] = [];

@@ -97,6 +97,14 @@ export const handleCall = createTypedAsyncThunk<
       });
     });
 
+    call.once(TwilioCall.Event.Connected, () => {
+      const info = getCallInfo(call);
+      if (typeof info.initialConnectedTimestamp === 'undefined') {
+        info.initialConnectedTimestamp = Date.now();
+      }
+      dispatch(setActiveCallInfo({ id: requestId, info }));
+    });
+
     return { callInfo, customParameters };
   },
 );
@@ -257,7 +265,11 @@ export const activeCallSlice = createSlice({
     ) {
       match(state.entities[action.payload.id])
         .with({ status: 'fulfilled' }, (call) => {
+          const originalTimestamp = call.info.initialConnectedTimestamp;
           call.info = action.payload.info;
+          if (typeof call.info.initialConnectedTimestamp === 'undefined') {
+            call.info.initialConnectedTimestamp = originalTimestamp;
+          }
         })
         .otherwise(() => {});
     },

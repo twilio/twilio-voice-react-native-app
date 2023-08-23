@@ -4,6 +4,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ActiveCallBanner from '../components/ActiveCallBanner';
 import { useConnectedActiveCallBanner } from '../components/ActiveCallBanner/hooks';
 import Home from './Home';
@@ -81,6 +82,7 @@ const TabNavigator: React.FC = () => {
   const isAboutPageEnabled = React.useMemo(() => {
     return getEnvVariable('ENABLE_ABOUT_PAGE') === 'true';
   }, []);
+  const safeAreaInsets = useSafeAreaInsets();
 
   const screen = React.useMemo(
     () => (
@@ -109,7 +111,11 @@ const TabNavigator: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        ...styles.container,
+        paddingTop: safeAreaInsets.top,
+      }}>
       <ActiveCallBanner {...bannerProps} />
       {screen}
     </View>

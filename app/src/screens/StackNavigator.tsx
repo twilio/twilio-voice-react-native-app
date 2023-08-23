@@ -21,7 +21,11 @@ const StackNavigator = () => {
   if (isBootstrapping) {
     return (
       <Stack.Navigator>
-        <Stack.Screen name="Busy" component={Busy} />
+        <Stack.Screen
+          name="Busy"
+          options={{ headerShown: false }}
+          component={Busy}
+        />
       </Stack.Navigator>
     );
   }

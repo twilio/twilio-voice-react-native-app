@@ -123,9 +123,12 @@ const useMakeOutgoingCall = (
   }, [dispatch, navigation, recipientType, to]);
 
   const isDisabled = React.useMemo(() => {
-    return isDialerDisabled || recipientType === 'client'
-      ? outgoingClient.length === 0
-      : outgoingNumber.length === 0;
+    return (
+      isDialerDisabled ||
+      (recipientType === 'client'
+        ? outgoingClient.length === 0
+        : outgoingNumber.length === 0)
+    );
   }, [isDialerDisabled, outgoingClient, outgoingNumber, recipientType]);
 
   return { handle, isDisabled };

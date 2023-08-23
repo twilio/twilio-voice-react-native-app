@@ -15,6 +15,12 @@ jest.mock('../../../../util/fetch', () => ({
   }),
 }));
 
+jest.mock('react-native', () => {
+  return {
+    Platform: { OS: 'android' },
+  };
+});
+
 describe('store', () => {
   let id: string;
   let call: ReturnType<typeof mockVoiceSdk.createMockCall>;

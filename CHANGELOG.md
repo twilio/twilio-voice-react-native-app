@@ -1,4 +1,4 @@
-# 1.0.0-beta.1 (In Progress)
+# 1.0.0-beta.1 (Aug 22, 2023)
 
 ## App
 

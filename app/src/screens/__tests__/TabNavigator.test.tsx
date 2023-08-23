@@ -1,6 +1,7 @@
 import '@testing-library/jest-native/extend-expect';
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 import TabNavigator from '../TabNavigator';
 import configureStore from 'redux-mock-store';
@@ -8,6 +9,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import Config from '../../../__mocks__/react-native-config';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+jest.mock(
+  'react-native-safe-area-context',
+  () => require('react-native-safe-area-context/jest/mock').default,
+);
 
 describe('<TabNavigator />', () => {
   let wrapper: React.ComponentType<any>;
@@ -21,7 +26,9 @@ describe('<TabNavigator />', () => {
     const store = mockStore(initialState);
     wrapper = ({ children }) => (
       <Provider store={store}>
-        <NavigationContainer>{children}</NavigationContainer>
+        <SafeAreaProvider>
+          <NavigationContainer>{children}</NavigationContainer>
+        </SafeAreaProvider>
       </Provider>
     );
   });
