@@ -334,14 +334,14 @@ def getLocalPropertyOrEnv(key) {
     if (null == return_value && project.rootProject.file('local.properties').exists()) {
         Properties properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        return_value = properties.getProperty(key)
+        return_value = "\"" + properties.getProperty(key) + "\""
     }
     return return_value;
 }
 
 def stringifyNull(var) {
     if (null == var) {
-        var = "null"
+        var = "\"null\""
     }
     return var;
 }
