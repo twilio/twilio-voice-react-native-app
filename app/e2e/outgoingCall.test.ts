@@ -1,12 +1,29 @@
 import { by, element, expect, waitFor, device } from 'detox';
 
-describe('Outgoing Call', () => {
-  beforeAll(async () => {
-    await device.launchApp({
-      newInstance: true,
-    });
-  });
+const createTimerPromise = async (
+  durationMs: number,
+  reason: string = 'not given',
+) => {
+  const SECOND_IN_MS = 1000;
+  const MINUTE_IN_MS = 60 * SECOND_IN_MS;
 
+  for (
+    let remainingTimeMs = durationMs;
+    remainingTimeMs > 0;
+    remainingTimeMs -= MINUTE_IN_MS
+  ) {
+    await new Promise<void>((resolve) => {
+      const nextIntervalMs = Math.min(MINUTE_IN_MS, remainingTimeMs);
+      const remainingTimeSec = remainingTimeMs / SECOND_IN_MS;
+      console.log('waiting', { reason, remainingTimeSec });
+      setTimeout(() => {
+        resolve();
+      }, nextIntervalMs);
+    });
+  }
+};
+
+describe('Outgoing Call', () => {
   const checkDuration = (callStartTime: number, expectedDuration: number) => {
     const callEndTime = Date.now();
     const measuredDuration = callEndTime - callStartTime;
@@ -27,8 +44,15 @@ describe('Outgoing Call', () => {
     await element(by.id('dialer_button')).tap();
   };
 
+  beforeAll(async () => {
+    await device.launchApp({ newInstance: true });
+    await createTimerPromise(10 * 1000, 'device.launchApp');
+  });
+
   beforeEach(async () => {
     await device.reloadReactNative();
+    await createTimerPromise(10 * 1000, 'device.reloadReactNative');
+
     await navigateToDialer();
   });
 
