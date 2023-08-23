@@ -99,7 +99,9 @@ export const handleCall = createTypedAsyncThunk<
 
     call.once(TwilioCall.Event.Connected, () => {
       const info = getCallInfo(call);
-      info.initialConnectedTimestamp ||= Date.now();
+      if (typeof info.initialConnectedTimestamp === 'undefined') {
+        info.initialConnectedTimestamp = Date.now();
+      }
       dispatch(setActiveCallInfo({ id: requestId, info }));
     });
 
@@ -265,7 +267,9 @@ export const activeCallSlice = createSlice({
         .with({ status: 'fulfilled' }, (call) => {
           const originalTimestamp = call.info.initialConnectedTimestamp;
           call.info = action.payload.info;
-          call.info.initialConnectedTimestamp ||= originalTimestamp;
+          if (typeof call.info.initialConnectedTimestamp === 'undefined') {
+            call.info.initialConnectedTimestamp = originalTimestamp;
+          }
         })
         .otherwise(() => {});
     },

@@ -141,7 +141,9 @@ export const acceptCallInvite = createTypedAsyncThunk<
 
     call.once(TwilioCall.Event.Connected, () => {
       const info = getCallInfo(call);
-      info.initialConnectedTimestamp ||= Date.now();
+      if (typeof info.initialConnectedTimestamp === 'undefined') {
+        info.initialConnectedTimestamp = Date.now();
+      }
       dispatch(setActiveCallInfo({ id, info }));
     });
 
