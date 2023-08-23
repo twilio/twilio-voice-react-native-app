@@ -120,7 +120,7 @@ commands:
       - run:
           name: "Install Appcenter Secret"
           command: |
-	    echo "{ \"app_secret\": \"$APP_CENTER_APP_SECRET_ANDROID\"}" > app/android/app/src/main/assets/appcenter-config.json
+            echo "{ \"app_secret\": \"$APP_CENTER_APP_SECRET_ANDROID\"}" > app/android/app/src/main/assets/appcenter-config.json
 
   app-android-build:
     steps:
