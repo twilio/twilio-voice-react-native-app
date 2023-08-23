@@ -147,7 +147,7 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-        buildConfigField 'String', 'APPCENTER_APP_KEY', stringifyNull(getLocalPropertyOrEnv("APPCENTER_APP_KEY"))
+        buildConfigField 'String', 'APPCENTER_APP_KEY', stringifyNull(getLocalPropertyOrEnv("APP_CENTER_APP_SECRET_ANDROID"))
 
         manifestPlaceholders = [auth0Domain: project.env.get("DOMAIN_NAME"), auth0Scheme: "${applicationId}.auth0"]
         testBuildType System.getProperty('testBuildType', 'debug')
