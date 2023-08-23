@@ -491,7 +491,6 @@ workflows:
   build-archive-android:
     when: << pipeline.parameters.test_android_build >>
     jobs:
-      - publish-android-app-appcenter
       - app-build-android
       - publish-android-app-appcenter:
           distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
