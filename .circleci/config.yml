@@ -471,7 +471,6 @@ jobs:
           command: |
             npm install webpack
             echo no | npm install -g appcenter-cli
-            export APP_NAME=TwilioVoiceReactNativeReferenceApp
             appcenter login --token ${APP_CENTER_API_TOKEN}
             appcenter distribute release -f app/android/app/build/outputs/apk/release/app-release.apk -g << parameters.distribution-audience >> --app nico-hokeyapp-dzyz/TwilioVoice-React-Native-Reference-App-1 -b ${CIRCLE_TAG} --disable-telemetry --debug
 
