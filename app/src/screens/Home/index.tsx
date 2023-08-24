@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
   StyleSheet,
@@ -7,6 +8,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { StackNavigationProp } from '../types';
 import { type Dispatch, type State } from '../../store/app';
 import { logout } from '../../store/user';
 import { unregister } from '../../store/voice/registration';
@@ -51,17 +53,30 @@ const styles = StyleSheet.create({
 const Home: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
   const user = useSelector((state: State) => state.user);
+  const navigation = useNavigation<StackNavigationProp<'App'>>();
 
   const handleLogout = async () => {
+    navigation.reset({ routes: [{ name: 'Busy' }] });
+
     const logoutAction = await dispatch(logout());
     if (logout.rejected.match(logoutAction)) {
       console.error(logoutAction.payload || logoutAction.error);
+      navigation.reset({
+        routes: [{ name: 'App', params: { screen: 'Home' } }],
+      });
+      return;
     }
 
     const unregisterAction = await dispatch(unregister());
     if (unregister.rejected.match(unregisterAction)) {
       console.error(unregisterAction.payload || unregisterAction.error);
+      navigation.reset({
+        routes: [{ name: 'App', params: { screen: 'Home' } }],
+      });
+      return;
     }
+
+    navigation.reset({ routes: [{ name: 'Sign In' }] });
   };
 
   return (

@@ -1,6 +1,8 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { StackNavigationProp } from '../types';
 import { loginAndRegister } from '../../store/loginAndRegister';
 import { type Dispatch, type State } from '../../store/app';
 
@@ -83,6 +85,8 @@ const styles = StyleSheet.create({
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch<Dispatch>();
+  const navigation = useNavigation<StackNavigationProp<'Sign In'>>();
+
   const errorMessage = useSelector((state: State) => {
     if (state.voice.accessToken.status === 'rejected') {
       switch (state.voice.accessToken.reason) {
@@ -95,10 +99,16 @@ const SignIn: React.FC = () => {
   });
 
   const handleLogin = async () => {
+    navigation.reset({ routes: [{ name: 'Busy' }] });
+
     const loginAction = await dispatch(loginAndRegister());
     if (loginAndRegister.rejected.match(loginAction)) {
       console.error(loginAction.payload || loginAction.error);
+      navigation.reset({ routes: [{ name: 'Sign In' }] });
+      return;
     }
+
+    navigation.reset({ routes: [{ name: 'App', params: { screen: 'Home' } }] });
   };
 
   return (

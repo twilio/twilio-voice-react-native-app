@@ -62,11 +62,10 @@ export type BootstrapUserRejectValue =
   | {
       reason: 'REGISTER_REJECTED';
     };
-export type BootstrapUserFulfillValue = 'NOT_LOGGED_IN' | 'LOGGED_IN';
 export const bootstrapUserActionTypes =
   generateThunkActionTypes('bootstrap/user');
 export const bootstrapUser = createTypedAsyncThunk<
-  BootstrapUserFulfillValue,
+  void,
   void,
   { rejectValue: BootstrapUserRejectValue }
 >(bootstrapUserActionTypes.prefix, async (_, { dispatch, rejectWithValue }) => {
@@ -84,8 +83,6 @@ export const bootstrapUser = createTypedAsyncThunk<
   if (register.rejected.match(registerResult)) {
     return rejectWithValue({ reason: 'REGISTER_REJECTED' });
   }
-
-  return 'LOGGED_IN';
 });
 
 /**
@@ -105,7 +102,7 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 >(
   bootstrapCallInvitesActionTypes.prefix,
   async (_, { dispatch, getState, rejectWithValue }) => {
-    const navigate = await getNavigate();
+    const { navigate } = await getNavigate();
 
     /**
      * Handle an incoming, pending, call invite.
@@ -236,30 +233,49 @@ export const bootstrapCalls = createTypedAsyncThunk<
  *
  * For example, navigate to the call invite screen when there are call invites.
  */
+type BootstrapNavigationReturnValue =
+  | 'App'
+  | 'Call'
+  | 'Incoming Call'
+  | 'Sign In';
 export const bootstrapNavigationActionTypes = generateThunkActionTypes(
   'bootstrap/navigation',
 );
-export const bootstrapNavigation = createTypedAsyncThunk(
-  bootstrapNavigationActionTypes.prefix,
-  async (_, { getState }) => {
-    const navigate = await getNavigate();
+export const bootstrapNavigation =
+  createTypedAsyncThunk<BootstrapNavigationReturnValue>(
+    bootstrapNavigationActionTypes.prefix,
+    async (_, { getState }) => {
+      const { reset, navigate } = await getNavigate();
 
-    const state = getState();
+      /**
+       * If the call invite notification body is tapped, navigate to the call
+       * invite screen.
+       */
+      voice.on(Voice.Event.CallInviteNotificationTapped, () => {
+        navigate('Incoming Call');
+      });
 
-    /**
-     * If the call invite notification body is tapped, navigate to the call
-     * invite screen.
-     */
-    voice.on(Voice.Event.CallInviteNotificationTapped, () => {
-      navigate('Incoming Call');
-    });
+      const state = getState();
 
-    if (state.voice.call.activeCall.ids.length) {
-      navigate('Call', {});
-      return 'Call';
-    }
-  },
-);
+      if (state.voice.call.activeCall.ids.length) {
+        reset({ routes: [{ name: 'App' }, { name: 'Call' }] });
+        return 'Call';
+      }
+
+      if (state.voice.call.callInvite.ids.length) {
+        reset({ routes: [{ name: 'App' }, { name: 'Incoming Call' }] });
+        return 'Incoming Call';
+      }
+
+      if (state.voice.accessToken.status !== 'fulfilled') {
+        reset({ routes: [{ name: 'Sign In' }] });
+        return 'Sign In';
+      }
+
+      reset({ routes: [{ name: 'App' }] });
+      return 'App';
+    },
+  );
 
 /**
  * Bootstrap audio devices.

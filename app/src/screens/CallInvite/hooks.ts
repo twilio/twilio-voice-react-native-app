@@ -34,7 +34,7 @@ export const useCallInvite = (): HookReturnValue => {
   const handleAccept = React.useCallback(async () => {
     if (callInviteEntity?.id) {
       await dispatch(acceptCallInvite({ id: callInviteEntity.id }));
-      navigation.navigate('Call', {});
+      navigation.replace('Call', {});
     }
   }, [callInviteEntity, dispatch, navigation]);
 
@@ -43,14 +43,6 @@ export const useCallInvite = (): HookReturnValue => {
       await dispatch(rejectCallInvite({ id: callInviteEntity.id }));
     }
   }, [callInviteEntity, dispatch]);
-
-  React.useEffect(() => {
-    if (typeof callInviteEntity !== 'undefined') {
-      return;
-    }
-
-    navigation.goBack();
-  }, [callInviteEntity, navigation]);
 
   return {
     callInviteEntity,

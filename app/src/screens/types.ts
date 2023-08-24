@@ -9,7 +9,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 
 export type StackParamList = {
-  App: undefined;
+  App: { screen: keyof TabParamList };
   Busy: undefined;
   Call: { callSid?: string };
   'Sign In': undefined;
