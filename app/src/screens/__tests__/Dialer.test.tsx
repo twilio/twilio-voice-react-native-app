@@ -6,11 +6,11 @@ import { Provider } from 'react-redux';
 import configureStore, { MockStore } from 'redux-mock-store';
 import thunkMiddleware from 'redux-thunk';
 import { NavigationContainer } from '@react-navigation/native';
-import Dialer from '..';
+import Dialer from '../Dialer';
 
 jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 
-jest.mock('../../../util/fetch', () => ({
+jest.mock('../../util/fetch', () => ({
   fetch: jest.fn().mockResolvedValue({
     ok: true,
     text: jest.fn().mockResolvedValue('foo'),
@@ -18,7 +18,6 @@ jest.mock('../../../util/fetch', () => ({
 }));
 
 const mockNavigate = jest.fn();
-
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
   useNavigation: () => ({ navigate: mockNavigate }),

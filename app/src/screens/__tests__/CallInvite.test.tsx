@@ -3,9 +3,11 @@ import '@testing-library/jest-native/extend-expect';
 import { render, screen } from '@testing-library/react-native';
 import React from 'react';
 import { Provider } from 'react-redux';
-import CallInvite from '../';
-import { createStore } from '../../../store/app';
-import { setCallInvite } from '../../../store/voice/call/callInvite';
+import CallInvite from '../CallInvite';
+import { createStore } from '../../store/app';
+import { setCallInvite } from '../../store/voice/call/callInvite';
+
+jest.unmock('@react-navigation/native');
 
 describe('<CallInvite />', () => {
   let store: ReturnType<typeof createStore>;
