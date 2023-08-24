@@ -231,7 +231,7 @@ const useActiveCallScreen = (callSid?: string) => {
         navigation.removeListener('state', onNavStateChanged);
       };
       timeoutId = setTimeout(() => {
-        navigation.navigate('App', { screen: 'Dialer' });
+        navigation.goBack();
       }, 1000);
       navigation.addListener('state', onNavStateChanged);
     }

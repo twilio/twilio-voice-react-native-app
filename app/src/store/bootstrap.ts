@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackActions } from '@react-navigation/native';
 import { miniSerializeError, type SerializedError } from '@reduxjs/toolkit';
 import {
   Voice,
@@ -102,7 +103,13 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 >(
   bootstrapCallInvitesActionTypes.prefix,
   async (_, { dispatch, getState, rejectWithValue }) => {
-    const { navigate } = await getNavigate();
+    const {
+      canGoBack,
+      getCurrentRoute,
+      goBack,
+      dispatch: navDispatch,
+      navigate,
+    } = await getNavigate();
 
     /**
      * Handle an incoming, pending, call invite.
@@ -142,12 +149,21 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
         handleSettledCallInvite(callInvite);
 
         const callSid = callInvite.getCallSid();
-        navigate('Call', { callSid });
+        const currentRoute = getCurrentRoute();
+        if (currentRoute?.name !== 'Incoming Call') {
+          navigate('Call', { callSid });
+        } else {
+          navDispatch(StackActions.replace('Call', { callSid }));
+        }
       },
     );
 
     voice.on(Voice.Event.CallInviteRejected, (callInvite: TwilioCallInvite) => {
       handleSettledCallInvite(callInvite);
+      const currentRoute = getCurrentRoute();
+      if (currentRoute?.name === 'Incoming Call' && canGoBack()) {
+        goBack();
+      }
     });
 
     voice.on(
