@@ -468,6 +468,9 @@ jobs:
             cp -R ${ARCHIVE_PATH}/dSYMs/*.zip ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cd ../..
       - run:
+          name: "Install appcenter-cli"
+          command: sudo npm install -g appcenter-cli
+      - run:
           name: "App: publish iOS app to AppCenter"
           command: |
             export APP_NAME=TwilioVoiceReactNativeReferenceApp
