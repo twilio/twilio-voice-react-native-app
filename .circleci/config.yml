@@ -34,11 +34,11 @@ executors:
   ios-build:
     macos:
       xcode: "14.3.1"
-    resource_class: macos.x86.medium.gen2
+      resource_class: macos.x86.medium.gen2
   android-build:
       name: android/android-machine
       resource-class: Medium
-      tag: 2023.07.1  
+      tag: 2023.07.1
 
 aliases:
   # Filters
