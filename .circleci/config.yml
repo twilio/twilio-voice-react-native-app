@@ -27,26 +27,7 @@ parameters:
 # Anhors & Aliases
 ###
 aliases:
-  - &android-build
-    name: android/android-machine
-    resource-class: Medium
-    tag: 2023.07.1
 
-###
-# Executors
-###
-executors:
-  default:
-    docker:
-      - image: cimg/node:16.19
-    working_directory: ~/project
-  ios-build:
-    macos:
-      xcode: "14.3.1"
-      resource_class: macos.x86.medium.gen2
-
-aliases:
-  # Filters
   - &rc-filter
     tags:
       only:
@@ -64,6 +45,24 @@ aliases:
         - /^\d+\.\d+\.\d+-beta.\d+$/
     branches:
       ignore: /.*/
+
+  - &android-build
+      name: android/android-machine
+      resource-class: Medium
+      tag: 2023.07.1
+
+###
+# Executors
+###
+executors:
+  default:
+    docker:
+      - image: cimg/node:16.19
+    working_directory: ~/project
+  ios-build:
+    macos:
+      xcode: "14.3.1"
+      resource_class: macos.x86.medium.gen2
 
 ###
 # Commands
