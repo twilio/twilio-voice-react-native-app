@@ -47,7 +47,7 @@ aliases:
 
   - &android-build
     name: android/android-machine
-    resource-class: Medium
+    resource-class: medium
     tag: 2023.07.1
 
 ###
