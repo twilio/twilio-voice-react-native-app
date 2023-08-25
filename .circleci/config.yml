@@ -24,6 +24,15 @@ parameters:
     default: false
 
 ###
+# Anhors & Aliases
+###
+aliases:
+  - &android-build
+    name: android/android-machine
+    resource-class: Medium
+    tag: 2023.07.1
+
+###
 # Executors
 ###
 executors:
@@ -35,10 +44,6 @@ executors:
     macos:
       xcode: "14.3.1"
       resource_class: macos.x86.medium.gen2
-  android-build:
-      name: android/android-machine
-      resource-class: Medium
-      tag: 2023.07.1
 
 aliases:
   # Filters
@@ -324,7 +329,8 @@ jobs:
             cd ..
 
   app-build-android:
-    executor: android-build
+    executor:
+      <<: *android-build
     steps:
       - checkout
       - app-save-env-file
@@ -339,7 +345,8 @@ jobs:
       - app-android-build
 
   app-detox-android:
-    executor: android-buuild
+    executor:
+      <<: *android-build
     steps:
       - checkout
       - app-save-env-file
@@ -493,7 +500,8 @@ jobs:
 
 # Publish the android app
   publish-android-app-appcenter:
-    executor: android-build
+    executor:
+      <<: *android-build
     parameters:
       distribution-audience:
         # Use this flag to control the app distrubution audience
