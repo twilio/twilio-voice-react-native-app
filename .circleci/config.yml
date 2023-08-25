@@ -410,6 +410,10 @@ jobs:
 
   build-archive-ios-app:
     executor: ios-build
+    parameters:
+      distribution-audience:
+        # Use this flag to control the app distrubution audience
+        type: string
     description: "Build and archive iOS app"
     steps:
       - checkout
@@ -463,6 +467,14 @@ jobs:
             cp -R ${ARCHIVE_PATH} ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${ARCHIVE_PATH}/dSYMs/*.zip ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cd ../..
+      - run:
+          name: "App: publish iOS app to AppCenter"
+          command: |
+            export APP_NAME=TwilioVoiceReactNativeReferenceApp
+            export ARTIFACTS_DIR=app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp
+            appcenter login --token ${APP_CENTER_API_TOKEN}
+            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g << parameters.distribution-audience >> --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME} -b ${CIRCLE_TAG}
+            appcenter crashes upload-symbols -s ${ARTIFACTS_DIR}/${APP_NAME}-dSYMs.zip --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME}
       - persist_to_workspace:
           root: app/ios/temp
           paths:
@@ -545,13 +557,14 @@ workflows:
           filters: *rc-filter
           context:
             - vblocks-dogfood-reference-app
-      - publish-ios-app-appcenter:
           distribution-audience: ${APP_CENTER_RC_AUDIENCE}
-          filters: *rc-filter
-          context:
-            - vblocks-dogfood-reference-app
-          requires:
-            - build-archive-ios-app
+      # - publish-ios-app-appcenter:
+      #     distribution-audience: ${APP_CENTER_RC_AUDIENCE}
+      #     filters: *rc-filter
+      #     context:
+      #       - vblocks-dogfood-reference-app
+      #     requires:
+      #       - build-archive-ios-app
 
   ###
   # Release workflow
@@ -562,10 +575,11 @@ workflows:
           filters: *release-filter
           context:
             - vblocks-dogfood-reference-app
-      - publish-ios-app-appcenter:
-          distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
-          filters: *release-filter
-          context:
-            - vblocks-dogfood-reference-app
-          requires:
-            - build-archive-ios-app
+          distribution-audience: ${APP_CENTER_RC_AUDIENCE}
+      # - publish-ios-app-appcenter:
+      #     distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
+      #     filters: *release-filter
+      #     context:
+      #       - vblocks-dogfood-reference-app
+      #     requires:
+      #       - build-archive-ios-app
