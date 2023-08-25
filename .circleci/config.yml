@@ -33,8 +33,8 @@ aliases:
         - /^\d+\.\d+\.\d+-rc\d+$/
         - /^\d+\.\d+\.\d+-preview.\d+-rc\d+$/
         - /^\d+\.\d+\.\d+-beta.\d+-rc\d+$/
-      branches:
-        ignore: /.*/
+    branches:
+      ignore: /.*/
 
   - &release-filter
     tags:
@@ -42,8 +42,8 @@ aliases:
         - /^\d+\.\d+\.\d+$/
         - /^\d+\.\d+\.\d+-preview.\d+$/
         - /^\d+\.\d+\.\d+-beta.\d+$/
-      branches:
-        ignore: /.*/
+    branches:
+      ignore: /.*/
 
   - &android-build
     name: android/android-machine
