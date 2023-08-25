@@ -1,6 +1,12 @@
 version: 2.1
 
 ###
+# NOTE: env vars to move to context:
+# APP_CENTER_RELEASE_AUDIENCE, APP_CENTER_API_TOKEN, APP_CENTER_APP_SECRET_ANDROID
+# APP_CENTER_RELEASE_AUDIENCE
+###
+
+###
 # Orbs
 ###
 orbs:
