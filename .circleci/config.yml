@@ -53,6 +53,15 @@ aliases:
   - &package-json
     keys: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
+   - &save-package-json
+     <<: *package-json
+     name: Save Javascript Dependencies
+
+   - &restore-package-json
+     <<: *package-json
+     name: Restore javascript Dependencies
+     paths: server/node_modules
+
 ###
 # Executors
 ###
@@ -283,10 +292,9 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache: <<: *package-json
+      - restore_cache: *restore-package-json
       - app-install-dependencies
-      - save_cache: <<: *package-json
-          paths: app/node_modules
+      - save_cache: *save-package-json
       - persist_to_workspace:
           root: .
           paths: .
@@ -327,12 +335,11 @@ jobs:
             cd ..
 
   app-build-android:
-    executor:
-      <<: *android-build
+    executor: <<: *android-build
     steps:
       - checkout
       - app-save-env-file
-      - restore_cache: <<: *package-json
+      - restore_cache: *restore-package-json
       - app-install-dependencies
       - app-save-google-services-json
       - run:
@@ -346,15 +353,13 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
-      - restore_cache: <<: *package-json
+      - restore_cache: *restore-package-json
       - app-install-dependencies
-      - save_cache: <<: *package-json
-          paths: app/node_modules
+      - save_cache: *save-package-json
       - app-save-google-services-json
-      - restore_cache: <<: *package-json
+      - restore_cache: *restore-package-json
       - server-install-dependencies
-      - save_cache: <<: *package-json
-          paths: server/node_modules
+      - save_cache: *save-package-json
       - ngrok-install
       - run:
           name: "Generate a client identity"
@@ -416,9 +421,9 @@ jobs:
       #     paths: app/node_modules
       - app-install-applesimutils
       - app-install-pods
-      - restore_cache: <<: *package-json
+      - restore_cache: *restore-package-json
       - server-install-dependencies
-      - save_cache: <<: *package-json
+      - save_cache: *save-package-json
           paths: server/node_modules
       - ngrok-install-mac
       - run:
@@ -444,10 +449,9 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache: <<: *package-json
+      - restore_cache: *restore-package-json
       - server-install-dependencies
-      - save_cache: <<: *package-json
-          paths: server/node_modules
+      - save_cache: *save-package-json
       - persist_to_workspace:
           root: .
           paths: .
@@ -484,8 +488,7 @@ jobs:
 
 # Publish the android app
   publish-android-app-appcenter:
-    executor:
-      <<: *android-build
+    executor: <<: *android-build
     parameters:
       distribution-audience:
         # Use this flag to control the app distrubution audience
