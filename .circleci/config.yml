@@ -50,6 +50,9 @@ aliases:
     resource-class: medium
     tag: 2023.07.1
 
+  - &package-json
+    keys: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+
 ###
 # Executors
 ###
@@ -280,12 +283,9 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache:
-          keys:
-            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      - restore_cache: <<: *package-json
       - app-install-dependencies
-      - save_cache:
-          key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      - save_cache: <<: *package-json
           paths: app/node_modules
       - persist_to_workspace:
           root: .
@@ -332,9 +332,7 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
-      - restore_cache:
-          keys:
-            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      - restore_cache: <<: *package-json
       - app-install-dependencies
       - app-save-google-services-json
       - run:
@@ -348,20 +346,14 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
-      - restore_cache:
-          keys:
-            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      - restore_cache: <<: *package-json
       - app-install-dependencies
-      - save_cache:
-          key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      - save_cache: <<: *package-json
           paths: app/node_modules
       - app-save-google-services-json
-      - restore_cache:
-          keys:
-            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - restore_cache: <<: *package-json
       - server-install-dependencies
-      - save_cache:
-          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - save_cache: <<: *package-json
           paths: server/node_modules
       - ngrok-install
       - run:
@@ -424,12 +416,9 @@ jobs:
       #     paths: app/node_modules
       - app-install-applesimutils
       - app-install-pods
-      - restore_cache:
-          keys:
-            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - restore_cache: <<: *package-json
       - server-install-dependencies
-      - save_cache:
-          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - save_cache: <<: *package-json
           paths: server/node_modules
       - ngrok-install-mac
       - run:
@@ -455,12 +444,9 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache:
-          keys:
-            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - restore_cache: <<: *package-json
       - server-install-dependencies
-      - save_cache:
-          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - save_cache: <<: *package-json
           paths: server/node_modules
       - persist_to_workspace:
           root: .
@@ -515,9 +501,11 @@ jobs:
             echo no | npm install -g appcenter-cli
             appcenter login --token ${APP_CENTER_API_TOKEN}
             appcenter distribute release \
-                      -f app/android/app/build/outputs/apk/release/app-release.apk \
-                      -g << parameters.distribution-audience >> --app nico-hokeyapp-dzyz/TwilioVoice-React-Native-Reference-App-1 \
-                      -b ${CIRCLE_TAG} --disable-telemetry --debug
+              -f app/android/app/build/outputs/apk/release/app-release.apk \
+              -g << parameters.distribution-audience >> \
+              --app nico-hokeyapp-dzyz/TwilioVoice-React-Native-Reference-App-1 \
+              -b ${CIRCLE_TAG} \
+              --disable-telemetry
 
   build-archive-ios-app:
     executor: ios-build
