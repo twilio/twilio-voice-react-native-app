@@ -292,11 +292,9 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache:
-        <<: *restore-package-json
+      - restore_cache: *restore-package-json
       - app-install-dependencies
-      - save_cache:
-        <<: *save-package-json
+      - save_cache: *save-package-json
       - persist_to_workspace:
           root: .
           paths: .
