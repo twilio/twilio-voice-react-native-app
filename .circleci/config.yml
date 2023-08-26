@@ -50,17 +50,17 @@ aliases:
     resource-class: large
     tag: 2023.07.1
 
-  - &package-json
-    key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+  - &package-json-key
+    app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
   - &save-package-json
-    <<: *package-json
     name: Save Javascript Dependencies
+    key: *package-json-key
     paths: server/node_modules
 
   - &restore-package-json
-    <<: *package-json
     name: Restore javascript Dependencies
+    key: *package-json-key
 
 ###
 # Executors
@@ -392,7 +392,6 @@ jobs:
           command: |
             cd app
             adb logcat -d > ./detox_artifacts/logcat.txt
-            cd ..
       - store_artifacts:
           when: always
           path: app/detox_artifacts
@@ -450,7 +449,6 @@ jobs:
           command: |
             cd server
             yarn lint
-            cd ..
 
   server-build:
     executor: default
@@ -467,7 +465,6 @@ jobs:
           command: |
             cd server
             yarn test --coverage
-            cd ..
       - store_artifacts:
           path: server/coverage
 
@@ -518,7 +515,6 @@ jobs:
             echo $FASTLANE_FILE_FASTFILE_BASE64 | base64 -D -o app/ios/fastlane/Fastfile
             cd app/ios
             fastlane ci_match_install
-            cd ../..
       - attach_workspace:
           at: app/ios/temp
       - run:
@@ -530,7 +526,6 @@ jobs:
             export CI_BUILD_VERSION=${CIRCLE_TAG}
             cd app/ios
             xcodebuild -workspace ${APP_NAME}.xcworkspace -scheme ${APP_NAME} -configuration Release -sdk iphoneos -archivePath ${ARCHIVE_PATH} ONLY_ACTIVE_ARCH=NO DEVELOPMENT_TEAM=${XCODE_DEVELOPMENT_TEAM} PRODUCT_BUNDLE_IDENTIFIER=${XCODE_DEVELOPMENT_BUNDLE_ID} PROVISIONING_PROFILE_SPECIFIER="${XCODE_PROVISIONING_PROFILE}" CODE_SIGN_IDENTITY="${XCODE_CODE_SIGN_IDENTITY}" CI_BUILD_NUMBER=${CI_BUILD_NUMBER} CI_BUILD_VERSION=${CI_BUILD_VERSION} CODE_SIGN_STYLE="Manual" archive
-            cd ../..
       - run:
           name: "App: archive iOS dogfood app"
           command: |
@@ -540,7 +535,6 @@ jobs:
             export EXPORT_OPTIONS_PLIST=TwilioVoiceReactNativeReferenceApp/ExportOptions/enterprise.plist
             cd app/ios
             xcodebuild -exportArchive -archivePath ${ARCHIVE_PATH} -exportPath ${IPA_DIR} -exportOptionsPlist ${EXPORT_OPTIONS_PLIST}
-            cd ../..
       - run:
           name: "App: gather iOS app artifacts"
           command: |
@@ -554,7 +548,6 @@ jobs:
             cp -R ${IPA_DIR}/Apps/TwilioVoiceReactNativeReferenceApp.ipa ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${ARCHIVE_PATH} ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${ARCHIVE_PATH}/dSYMs/*.zip ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
-            cd ../..
       - run:
           name: "Install appcenter-cli"
           command: sudo npm install -g appcenter-cli
