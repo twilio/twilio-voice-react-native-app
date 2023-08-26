@@ -51,7 +51,7 @@ aliases:
     tag: 2023.07.1
 
   - &package-json
-    keys: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+    key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
   - &save-package-json
     <<: *package-json
