@@ -193,13 +193,15 @@ commands:
     steps:
       - run:
           name: "Generate a client identity"
-          command: echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
+          command: |
+            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
 
   display-client-identity:
     steps:
       - run:
         name: "Read client identity"
-        command: echo $CLIENT_IDENTITY
+        command: |
+          echo $CLIENT_IDENTITY
 
   ###
   # Server commands
