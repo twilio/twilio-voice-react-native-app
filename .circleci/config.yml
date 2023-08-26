@@ -53,14 +53,14 @@ aliases:
   - &package-json
     keys: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
-   - &save-package-json
-     <<: *package-json
-     name: Save Javascript Dependencies
+  - &save-package-json
+    <<: *package-json
+    name: Save Javascript Dependencies
 
-   - &restore-package-json
-     <<: *package-json
-     name: Restore javascript Dependencies
-     paths: server/node_modules
+  - &restore-package-json
+    <<: *package-json
+    name: Restore javascript Dependencies
+    paths: server/node_modules
 
 ###
 # Executors
