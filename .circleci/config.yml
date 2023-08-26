@@ -106,7 +106,6 @@ commands:
             echo "ENABLE_ABOUT_PAGE=$ENABLE_ABOUT_PAGE" >> .env
             echo "SLACK_URL=$SLACK_URL" >> .env
             echo "SLACK_CHANNEL_NAME=$SLACK_CHANNEL_NAME" >> .env
-            cd ..
 
   app-install-dependencies:
     steps:
@@ -116,7 +115,6 @@ commands:
             cd app
             yarn cache clean
             yarn install --immutable
-            cd ..
 
   app-save-google-services-json:
     steps:
@@ -125,7 +123,6 @@ commands:
           command: |
             cd app
             echo $GOOGLE_SERVICES_JSON | base64 -d > android/app/google-services.json
-            cd ..
 
   app-setup-cocoapods:
     steps:
@@ -139,11 +136,8 @@ commands:
       - run:
           name: "App: install Pods"
           command: |
-            cd app
-            cd ios
+            cd app/ios
             pod install
-            cd ..
-            cd ..
 
   app-install-applesimutils:
     steps:
@@ -164,7 +158,6 @@ commands:
           command: |
             cd app
             yarn detox:build --configuration << parameters.configuration >>
-            cd ..
 
   app-android-build:
     steps:
@@ -189,13 +182,24 @@ commands:
           command: |
             cd app
             yarn detox:test --configuration << parameters.configuration >> --artifacts-location "./detox_artifacts" --headless --take-screenshots all
-            cd ..
 
   app-expose-port:
     steps:
       - run:
           name: "App: expose port"
           command: adb reverse tcp:${PORT} tcp:${PORT}
+
+  generate-client-identity:
+    steps:
+      - run:
+          name: "Generate a client identity"
+          command: echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
+
+  display-client-identity:
+    steps:
+      - run:
+        name: "Read client identity"
+        command: echo $CLIENT_IDENTITY
 
   ###
   # Server commands
@@ -208,7 +212,6 @@ commands:
             cd server
             yarn cache clean
             yarn install --immutable
-            cd ..
 
   server-build:
     steps:
@@ -217,7 +220,6 @@ commands:
           command: |
             cd server
             yarn build
-            cd ..
 
   server-start:
     steps:
@@ -227,7 +229,6 @@ commands:
           command: |
             cd server
             yarn start
-            cd ..
 
   ###
   # Ngrok Commands
@@ -255,7 +256,6 @@ commands:
           command: |
             cd server/scripts
             node updateTwimlApp.js
-            cd ../..
 
   ngrok-install-mac:
     steps:
@@ -308,7 +308,6 @@ jobs:
           command: |
             cd app
             yarn test --coverage
-            cd ..
       - store_artifacts:
           path: app/coverage
 
@@ -321,7 +320,6 @@ jobs:
           command: |
             cd app
             yarn lint
-            cd ..
 
   app-typecheck:
     executor: default
@@ -332,7 +330,6 @@ jobs:
           command: |
             cd app
             yarn typecheck
-            cd ..
 
   app-build-android:
     executor:
@@ -362,14 +359,8 @@ jobs:
       - server-install-dependencies
       - save_cache: *save-package-json
       - ngrok-install
-      - run:
-          name: "Generate a client identity"
-          command: |
-            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
-      - run:
-          name: "Read client identity"
-          command: |
-            echo $CLIENT_IDENTITY
+      - generate-client-identity
+      - display-client-identity
       - server-build
       - server-start
       - run:
@@ -426,14 +417,8 @@ jobs:
       - server-install-dependencies
       - save_cache: *save-package-json
       - ngrok-install-mac
-      - run:
-          name: "Generate a client identity"
-          command: |
-            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
-      - run:
-          name: "Read client identity"
-          command: |
-            echo $CLIENT_IDENTITY
+      - generate-client-identity
+      - display-client-identity
       - server-build
       - server-start
       - app-detox-build:
