@@ -335,7 +335,8 @@ jobs:
             cd ..
 
   app-build-android:
-    executor: <<: *android-build
+    executor:
+      <<: *android-build
     steps:
       - checkout
       - app-save-env-file
@@ -488,7 +489,8 @@ jobs:
 
 # Publish the android app
   publish-android-app-appcenter:
-    executor: <<: *android-build
+    executor:
+      <<: *android-build
     parameters:
       distribution-audience:
         # Use this flag to control the app distrubution audience
