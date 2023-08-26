@@ -47,7 +47,7 @@ aliases:
 
   - &android-build
     name: android/android-machine
-    resource-class: medium
+    resource-class: large
     tag: 2023.07.1
 
   - &package-json
@@ -192,16 +192,14 @@ commands:
   generate-client-identity:
     steps:
       - run:
-          name: "Generate a client identity"
-          command: |
-            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
+        name: "Generate a client identity"
+        command: echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
 
   display-client-identity:
     steps:
       - run:
         name: "Read client identity"
-        command: |
-          echo $CLIENT_IDENTITY
+        command: echo ${CLIENT_IDENTITY}
 
   ###
   # Server commands
