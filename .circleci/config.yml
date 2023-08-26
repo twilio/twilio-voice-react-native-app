@@ -16,12 +16,12 @@ orbs:
 # Parameters
 ###
 parameters:
-  pr_workflow:
-    type: boolean
-    default: true # by default pr workflow will get executed.
-  test_android_build:
-    type: boolean
-    default: false
+  - pr_workflow:
+      type: boolean
+      default: true # by default pr workflow will get executed.
+  - test_android_build:
+      type: boolean
+      default: false
 
 ###
 # Anhors & Aliases
