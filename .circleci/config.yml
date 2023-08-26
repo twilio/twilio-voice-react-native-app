@@ -425,7 +425,6 @@ jobs:
       - restore_cache: *restore-package-json
       - server-install-dependencies
       - save_cache: *save-package-json
-          paths: server/node_modules
       - ngrok-install-mac
       - run:
           name: "Generate a client identity"
