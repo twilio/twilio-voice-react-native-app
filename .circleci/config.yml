@@ -56,11 +56,11 @@ aliases:
   - &save-package-json
     <<: *package-json
     name: Save Javascript Dependencies
+    paths: server/node_modules
 
   - &restore-package-json
     <<: *package-json
     name: Restore javascript Dependencies
-    paths: server/node_modules
 
 ###
 # Executors
