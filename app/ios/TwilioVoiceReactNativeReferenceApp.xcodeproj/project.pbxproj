@@ -14,6 +14,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-TwilioVoiceReactNativeReferenceApp-TwilioVoiceReactNativeReferenceAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-TwilioVoiceReactNativeReferenceApp-TwilioVoiceReactNativeReferenceAppTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8FDD25AB2A969E23005393C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8FDD25AA2A969E23005393C7 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = TwilioVoiceReactNativeReferenceApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-TwilioVoiceReactNativeReferenceApp-TwilioVoiceReactNativeReferenceAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TwilioVoiceReactNativeReferenceApp-TwilioVoiceReactNativeReferenceAppTests.release.xcconfig"; path = "Target Support Files/Pods-TwilioVoiceReactNativeReferenceApp-TwilioVoiceReactNativeReferenceAppTests/Pods-TwilioVoiceReactNativeReferenceApp-TwilioVoiceReactNativeReferenceAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		8F95B8992A8181FF00E6E347 /* TwilioVoiceReactNativeReferenceApp.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = TwilioVoiceReactNativeReferenceApp.entitlements; path = TwilioVoiceReactNativeReferenceApp/TwilioVoiceReactNativeReferenceApp.entitlements; sourceTree = "<group>"; };
+		8FDD25AA2A969E23005393C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -94,6 +96,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				8F95B8992A8181FF00E6E347 /* TwilioVoiceReactNativeReferenceApp.entitlements */,
+				8FDD25AA2A969E23005393C7 /* Assets.xcassets */,
 			);
 			name = TwilioVoiceReactNativeReferenceApp;
 			sourceTree = "<group>";
@@ -183,6 +186,7 @@
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
+				8F979B3C2A8EEB1200D4A500 /* App Version */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
@@ -245,6 +249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				8FDD25AB2A969E23005393C7 /* Assets.xcassets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -284,6 +289,24 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TwilioVoiceReactNativeReferenceApp/Pods-TwilioVoiceReactNativeReferenceApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		8F979B3C2A8EEB1200D4A500 /* App Version */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "App Version";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "IOS_INFO_PLIST_FILE=${CODESIGNING_FOLDER_PATH}/Info.plist\nMAC_INFO_PLIST_FILE=${CODESIGNING_FOLDER_PATH}/Resources/Info.plist\n\nbuildNumber=1\nif [ ! -z \"${CI_BUILD_NUMBER}\" ]; then\n  buildNumber=${CI_BUILD_NUMBER}\nfi\n\nbuildVersion=1.0.0\nif [ ! -z \"${CI_BUILD_VERSION}\" ]; then\n  buildVersion=${CI_BUILD_VERSION}\nfi\n\nif [ -f $IOS_INFO_PLIST_FILE ] ; then\n  INFO_PLIST_FILE=$IOS_INFO_PLIST_FILE\nelif [ -f $MAC_INFO_PLIST_FILE ] ; then\n  INFO_PLIST_FILE=$MAC_INFO_PLIST_FILE\nelse\n  echo \"Neither ${IOS_INFO_PLIST_FILE} or ${$MAC_INFO_PLIST_FILE} exit!s\"\n  exit 1\nfi\n\necho \"Modifying ${INFO_PLIST_FILE}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${INFO_PLIST_FILE}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $buildVersion\" \"${INFO_PLIST_FILE}\"\n";
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -486,9 +509,12 @@
 			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-TwilioVoiceReactNativeReferenceApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = TwilioVoiceReactNativeReferenceApp/TwilioVoiceReactNativeReferenceApp.entitlements;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = TwilioVoiceReactNativeReferenceApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -502,6 +528,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = TwilioVoiceReactNativeReferenceApp;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -513,9 +540,12 @@
 			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-TwilioVoiceReactNativeReferenceApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = TwilioVoiceReactNativeReferenceApp/TwilioVoiceReactNativeReferenceApp.entitlements;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = TwilioVoiceReactNativeReferenceApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -528,6 +558,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = TwilioVoiceReactNativeReferenceApp;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

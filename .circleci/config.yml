@@ -22,6 +22,30 @@ executors:
     docker:
       - image: cimg/node:16.19
     working_directory: ~/project
+  ios-build:
+    macos:
+      xcode: "14.3.1"
+    resource_class: macos.m1.medium.gen1
+
+aliases:
+  # Filters
+  - &rc-filter
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-rc\d+$/
+        - /^\d+\.\d+\.\d+-preview.\d+-rc\d+$/
+        - /^\d+\.\d+\.\d+-beta.\d+-rc\d+$/
+    branches:
+      ignore: /.*/
+
+  - &release-filter
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+$/
+        - /^\d+\.\d+\.\d+-preview.\d+$/
+        - /^\d+\.\d+\.\d+-beta.\d+$/
+    branches:
+      ignore: /.*/
 
 ###
 # Commands
@@ -133,9 +157,9 @@ commands:
           name: "App: expose port"
           command: adb reverse tcp:${PORT} tcp:${PORT}
 
-  ##
+  ###
   # Server commands
-  ##
+  ###
   server-install-dependencies:
     steps:
       - run:
@@ -165,9 +189,9 @@ commands:
             yarn start
             cd ..
 
-  ##
+  ###
   # Ngrok Commands
-  ##
+  ###
   ngrok-install:
     steps:
       - run:
@@ -209,6 +233,15 @@ commands:
           command: |
             sleep 30
             curl http://127.0.0.1:4040/api/tunnels
+
+  configure-git-user:
+    description: "Configures the git user for committing"
+    steps:
+      - run:
+         name: Git User Config
+         command: |
+           git config --global user.email "${GITHUB_EMAIL_SDK_BUILD}"
+           git config --global user.name "${GITHUB_USERNAME_SDK_BUILD}"
 
 jobs:
   ###
@@ -421,6 +454,92 @@ jobs:
       - store_artifacts:
           path: server/coverage
 
+  build-archive-ios-app:
+    executor: ios-build
+    description: "Build and archive iOS app"
+    steps:
+      - checkout
+      - app-save-env-file
+      - app-install-dependencies
+      - app-install-pods
+      - configure-git-user
+      - run:
+          name: "Set up Xcode signing"
+          command: |
+            mkdir -p app/ios/fastlane
+            echo $FASTLANE_FILE_APPFILE_BASE64 | base64 -D -o app/ios/fastlane/Appfile
+            echo $FASTLANE_FILE_MATCHFILE_BASE64 | base64 -D -o app/ios/fastlane/Matchfile
+            echo $FASTLANE_FILE_FASTFILE_BASE64 | base64 -D -o app/ios/fastlane/Fastfile
+            cd app/ios
+            fastlane ci_match_install
+            cd ../..
+      - attach_workspace:
+          at: app/ios/temp
+      - run:
+          name: "App: build iOS dogfood app"
+          command: |
+            export APP_NAME=TwilioVoiceReactNativeReferenceApp
+            export ARCHIVE_PATH=temp/Archives/${APP_NAME}.xcarchive
+            export CI_BUILD_NUMBER=${CIRCLE_BUILD_NUM}
+            export CI_BUILD_VERSION=${CIRCLE_TAG}
+            cd app/ios
+            xcodebuild -workspace ${APP_NAME}.xcworkspace -scheme ${APP_NAME} -configuration Release -sdk iphoneos -archivePath ${ARCHIVE_PATH} ONLY_ACTIVE_ARCH=NO DEVELOPMENT_TEAM=${XCODE_DEVELOPMENT_TEAM} PRODUCT_BUNDLE_IDENTIFIER=${XCODE_DEVELOPMENT_BUNDLE_ID} PROVISIONING_PROFILE_SPECIFIER="${XCODE_PROVISIONING_PROFILE}" CODE_SIGN_IDENTITY="${XCODE_CODE_SIGN_IDENTITY}" CI_BUILD_NUMBER=${CI_BUILD_NUMBER} CI_BUILD_VERSION=${CI_BUILD_VERSION} CODE_SIGN_STYLE="Manual" archive
+            cd ../..
+      - run:
+          name: "App: archive iOS dogfood app"
+          command: |
+            export APP_NAME=TwilioVoiceReactNativeReferenceApp
+            export ARCHIVE_PATH=temp/Archives/${APP_NAME}.xcarchive
+            export IPA_DIR=temp/IPAs
+            export EXPORT_OPTIONS_PLIST=TwilioVoiceReactNativeReferenceApp/ExportOptions/enterprise.plist
+            cd app/ios
+            xcodebuild -exportArchive -archivePath ${ARCHIVE_PATH} -exportPath ${IPA_DIR} -exportOptionsPlist ${EXPORT_OPTIONS_PLIST}
+            cd ../..
+      - run:
+          name: "App: gather iOS app artifacts"
+          command: |
+            export APP_NAME=TwilioVoiceReactNativeReferenceApp
+            export ARCHIVE_PATH=temp/Archives/${APP_NAME}.xcarchive
+            export IPA_DIR=temp/IPAs
+            export ARTIFACTS_DIR=temp/Artifacts
+            cd app/ios
+            zip --quiet -r ${ARCHIVE_PATH}/dSYMs/TwilioVoiceReactNativeReferenceApp-dSYMs.zip ${ARCHIVE_PATH}/dSYMs/*.dSYM
+            mkdir -p ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
+            cp -R ${IPA_DIR}/Apps/TwilioVoiceReactNativeReferenceApp.ipa ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
+            cp -R ${ARCHIVE_PATH} ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
+            cp -R ${ARCHIVE_PATH}/dSYMs/*.zip ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
+            cd ../..
+      - persist_to_workspace:
+          root: app/ios/temp
+          paths:
+            - Artifacts/Release/TwilioVoiceReactNativeReferenceApp/*
+      - store_artifacts:
+          path: app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp/TwilioVoiceReactNativeReferenceApp.ipa
+      - store_artifacts:
+          path: app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp/TwilioVoiceReactNativeReferenceApp-dSYMs.zip
+
+  # Publish the iOS app
+  publish-ios-app-appcenter:
+    executor: ios-build
+    parameters:
+      distribution-audience:
+        # Use this flag to control the app distrubution audience
+        type: string
+    steps:
+      - run:
+          sudo npm install -g appcenter-cli
+      - checkout
+      - attach_workspace:
+          at: app/ios/temp
+      - run:
+          name: "Publishing iOS app to AppCenter"
+          command: |
+            export APP_NAME=TwilioVoiceReactNativeReferenceApp
+            export ARTIFACTS_DIR=app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp
+            appcenter login --token ${APP_CENTER_API_TOKEN}
+            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g << parameters.distribution-audience >> --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME} -b ${CIRCLE_TAG}
+            appcenter crashes upload-symbols -s ${ARTIFACTS_DIR}/${APP_NAME}-dSYMs.zip --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME}
+
 ###
 # Workflows
 ###
@@ -462,3 +581,37 @@ workflows:
             - app-detox-android
           context:
             - vblocks-js
+
+  ###
+  # RC workflow
+  ###
+  release-candidate:
+    jobs:
+      - build-archive-ios-app:
+          filters: *rc-filter
+          context:
+            - vblocks-dogfood-reference-app
+      - publish-ios-app-appcenter:
+          distribution-audience: ${APP_CENTER_RC_AUDIENCE}
+          filters: *rc-filter
+          context:
+            - vblocks-dogfood-reference-app
+          requires:
+            - build-archive-ios-app
+
+  ###
+  # Release workflow
+  ###
+  release:
+    jobs:
+      - build-archive-ios-app:
+          filters: *release-filter
+          context:
+            - vblocks-dogfood-reference-app
+      - publish-ios-app-appcenter:
+          distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
+          filters: *release-filter
+          context:
+            - vblocks-dogfood-reference-app
+          requires:
+            - build-archive-ios-app
