@@ -50,7 +50,7 @@ export const receiveCallInvite = createTypedAsyncThunk<
    * Hard-code navigation to the Incoming Call screen for tests.
    */
   if (navigateToCallInviteScreen) {
-    getNavigate()?.('Incoming Call');
+    (await getNavigate())('Incoming Call');
   }
 
   return requestId;
@@ -137,6 +137,14 @@ export const acceptCallInvite = createTypedAsyncThunk<
       call.on(callEvent, () => {
         dispatch(setActiveCallInfo({ id, info: getCallInfo(call) }));
       });
+    });
+
+    call.once(TwilioCall.Event.Connected, () => {
+      const info = getCallInfo(call);
+      if (typeof info.initialConnectedTimestamp === 'undefined') {
+        info.initialConnectedTimestamp = Date.now();
+      }
+      dispatch(setActiveCallInfo({ id, info }));
     });
 
     return callInfo;

@@ -1,4 +1,4 @@
-# 1.0.0-beta.1 (In Progress)
+# 1.0.0-beta.1 (Aug 23, 2023)
 
 ## App
 
@@ -12,6 +12,11 @@
   * Auth0 implemented as the example Authentication service
 * Added the ability to select an audio device within the active call screen.
 * Added unregistration from the Voice SDK upon logout.
+* Tapping on the call invite notification will bring the call invite screen to
+the foreground on Android devices.
+  * Note that iOS will have similar UX because CallKit will handle the call
+  invite UX. It is, however, not within the responsibility of the React
+  environment.
 
 ### Changes
 * Upgraded Twilio Voice SDK to `1.0.0-beta.3`.
@@ -24,10 +29,11 @@
   * Minimum supported version for iOS is 13
 
 ### Fixes
-* The call state and duration are now persisted between JS runtimes.
+* The call state, duration and outgoing parameters are now persisted between JS
+runtimes.
   * In effect, on Android, if a user is in an active call and closes the app,
   when they reopen the app while still in the active call, it will show the
-  proper call duration and state.
+  proper call duration, state, and outgoing call parameters (such as identity).
 
 ## Server
 

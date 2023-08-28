@@ -17,6 +17,29 @@ const bootstrap = () => {
   return { twilioClient, clientId: mockClientId as string };
 };
 
+const createTimerPromise = async (
+  durationMs: number,
+  reason: string = 'not given',
+) => {
+  const SECOND_IN_MS = 1000;
+  const MINUTE_IN_MS = 60 * SECOND_IN_MS;
+
+  for (
+    let remainingTimeMs = durationMs;
+    remainingTimeMs > 0;
+    remainingTimeMs -= MINUTE_IN_MS
+  ) {
+    await new Promise<void>((resolve) => {
+      const nextIntervalMs = Math.min(MINUTE_IN_MS, remainingTimeMs);
+      const remainingTimeSec = remainingTimeMs / SECOND_IN_MS;
+      console.log('waiting', { reason, remainingTimeSec });
+      setTimeout(() => {
+        resolve();
+      }, nextIntervalMs);
+    });
+  }
+};
+
 describe('Incoming Call', () => {
   let twilioClient: ReturnType<typeof twilio>;
   let clientId: string;
@@ -25,9 +48,8 @@ describe('Incoming Call', () => {
   beforeAll(async () => {
     ({ twilioClient, clientId } = bootstrap());
 
-    await device.launchApp({
-      newInstance: true,
-    });
+    await device.launchApp({ newInstance: true });
+    await createTimerPromise(10 * 1000, 'device.launchApp');
 
     /**
      * We need to let the registration settle for a bit before attempting an
@@ -35,8 +57,8 @@ describe('Incoming Call', () => {
      * subsequent waits can be shorter.
      */
     registrationTimeout = (function* () {
-      // The first timeout should be 10 minutes.
-      yield 10 * 60 * 1000;
+      // The first timeout should be 5 minutes.
+      yield 5 * 60 * 1000;
       while (true) {
         // All subsequent timeouts should be 10 seconds.
         yield 10 * 1000;
@@ -46,6 +68,7 @@ describe('Incoming Call', () => {
 
   beforeEach(async () => {
     await device.reloadReactNative();
+    await createTimerPromise(10 * 1000, 'device.reloadReactNative');
   });
 
   afterAll(async () => {
@@ -76,28 +99,7 @@ describe('Incoming Call', () => {
   const setup = async () => {
     await login();
 
-    await new Promise<void>(async (primaryResolve) => {
-      const timeToWait = registrationTimeout.next().value;
-
-      // issue secondary timeouts every minute until total time waited is
-      // more than time to wait
-      const minuteInMs = 60 * 1000;
-      for (
-        let timeWaited = 0;
-        timeWaited < timeToWait;
-        timeWaited += minuteInMs
-      ) {
-        await new Promise<void>((secondaryResolve) => {
-          const minutesRemaining = (timeToWait - timeWaited) / minuteInMs;
-          console.log(`remaining time to wait: ${minutesRemaining} minutes`);
-          setTimeout(() => {
-            secondaryResolve();
-          }, minuteInMs);
-        });
-      }
-
-      primaryResolve();
-    });
+    await createTimerPromise(registrationTimeout.next().value, 'setup');
 
     const testCall = await twilioClient.calls.create({
       twiml: '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
@@ -117,9 +119,11 @@ describe('Incoming Call', () => {
     /**
      * Hard refresh the app so it's in a consistent state.
      */
-    await device.launchApp({
-      newInstance: true,
-    });
+    await device.reloadReactNative();
+
+    // Let the teardown process settle.
+    await createTimerPromise(10 * 1000, 'teardown device.reloadReactNative');
+
     await login();
     await logout();
   };

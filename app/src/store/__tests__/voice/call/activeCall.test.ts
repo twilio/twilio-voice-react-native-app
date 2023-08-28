@@ -6,6 +6,7 @@ import { makeOutgoingCall } from '../../../voice/call/outgoingCall';
 import { getAccessToken } from '../../../voice/accessToken';
 import { login } from '../../../user';
 import * as mockVoiceSdk from '../../../../../__mocks__/@twilio/voice-react-native-sdk';
+import * as asyncStorage from '../../../../../__mocks__/@react-native-async-storage/async-storage';
 
 jest.mock('../../../../util/fetch', () => ({
   fetch: jest.fn().mockResolvedValue({
@@ -14,6 +15,12 @@ jest.mock('../../../../util/fetch', () => ({
   }),
 }));
 
+jest.mock('react-native', () => {
+  return {
+    Platform: { OS: 'android' },
+  };
+});
+
 describe('store', () => {
   let id: string;
   let call: ReturnType<typeof mockVoiceSdk.createMockCall>;
@@ -21,6 +28,8 @@ describe('store', () => {
   const dispatchedActions: any[] = [];
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const logAction: Middleware = () => (next) => (action) => {
       dispatchedActions.push(action);
       next(action);
@@ -47,6 +56,7 @@ describe('store', () => {
     call = mockVoiceSdk.createMockCall.mock.results[0].value;
 
     dispatchedActions.splice(0);
+
     jest.clearAllMocks();
   });
 
@@ -371,6 +381,169 @@ describe('store', () => {
 
           matchDispatchedActions(dispatchedActions, [
             activeCall.setActiveCallInfo,
+          ]);
+        });
+      });
+
+      describe('handleCall', () => {
+        // TODO(mhuynh): [VBLOCKS-2078] Increase coverage.
+        it('reads from the async storage', async () => {
+          asyncStorage.keyValueStore.clear();
+          const mockAsyncStorage = [
+            [
+              'mock sid 1',
+              JSON.stringify({ to: 'foo to', recipientType: 'client' }),
+            ],
+            [
+              'mock sid 2',
+              JSON.stringify({ to: 'bar to', recipientType: 'client' }),
+            ],
+            [
+              'mock sid 3',
+              JSON.stringify({ to: 'biff to', recipientType: 'number' }),
+            ],
+          ];
+          for (const [k, v] of mockAsyncStorage) {
+            asyncStorage.keyValueStore.set(k, v);
+          }
+
+          const res = await store.dispatch(
+            activeCall.handleCall({
+              call: mockVoiceSdk.createMockCall('3') as any,
+            }),
+          );
+
+          if (activeCall.handleCall.rejected.match(res)) {
+            throw new Error('handle call should have fulfilled');
+          }
+          expect(res.payload.customParameters).toStrictEqual({
+            to: 'biff to',
+            recipientType: 'number',
+          });
+
+          const { entities, ids } = store.getState().voice.call.activeCall;
+          const callEntity = entities[ids[1]];
+
+          if (callEntity?.status !== 'fulfilled') {
+            throw new Error('call entity should be fulfilled');
+          }
+          if (callEntity?.direction !== 'outgoing') {
+            throw new Error('call entity should be outgoing');
+          }
+          expect(callEntity.params).toStrictEqual({
+            to: 'biff to',
+            recipientType: 'number',
+          });
+        });
+
+        it('handles when the async storage throws', async () => {
+          const err = new Error('get item error');
+          delete err.stack;
+          asyncStorage.getItem.mockRejectedValueOnce(err);
+
+          const res = await store.dispatch(
+            activeCall.handleCall({
+              call: mockVoiceSdk.createMockCall('3') as any,
+            }),
+          );
+
+          if (activeCall.handleCall.fulfilled.match(res)) {
+            throw new Error('handle call should have rejected');
+          }
+          expect(res.payload).toStrictEqual({
+            reason: 'ASYNC_STORAGE_GET_ITEM_REJECTED',
+            error: {
+              name: err.name,
+              message: err.message,
+            },
+          });
+        });
+
+        it('handles when the async storage holds invalid json', async () => {
+          asyncStorage.getItem.mockResolvedValueOnce('foobar');
+
+          const res = await store.dispatch(
+            activeCall.handleCall({
+              call: mockVoiceSdk.createMockCall('3') as any,
+            }),
+          );
+
+          if (activeCall.handleCall.fulfilled.match(res)) {
+            throw new Error('handle call should have rejected');
+          }
+          expect(res.payload?.reason).toStrictEqual('JSON_PARSE_THREW');
+          expect(res.payload?.error.name).toStrictEqual('SyntaxError');
+          expect(res.payload?.error.message).toStrictEqual(
+            'Unexpected token o in JSON at position 1',
+          );
+        });
+
+        it('handles when the async storage does not contain an entry', async () => {
+          asyncStorage.keyValueStore.clear();
+
+          const res = await store.dispatch(
+            activeCall.handleCall({
+              call: mockVoiceSdk.createMockCall('3') as any,
+            }),
+          );
+
+          if (activeCall.handleCall.rejected.match(res)) {
+            throw new Error('handle call should have fulfilled');
+          }
+          expect(res.payload.customParameters).toBeUndefined();
+
+          const { entities, ids } = store.getState().voice.call.activeCall;
+          const callEntity = entities[ids[1]];
+
+          if (callEntity?.status !== 'fulfilled') {
+            throw new Error('call entity should be fulfilled');
+          }
+          if (callEntity?.direction !== 'incoming') {
+            throw new Error('call entity should be incoming');
+          }
+        });
+
+        it('removes from the storage when the call is disconnected', async () => {
+          asyncStorage.keyValueStore.clear();
+          const mockAsyncStorage = [
+            [
+              'mock sid 1',
+              JSON.stringify({ to: 'foo to', recipientType: 'client' }),
+            ],
+            [
+              'mock sid 2',
+              JSON.stringify({ to: 'bar to', recipientType: 'client' }),
+            ],
+            [
+              'mock sid 3',
+              JSON.stringify({ to: 'biff to', recipientType: 'number' }),
+            ],
+          ];
+          for (const [k, v] of mockAsyncStorage) {
+            asyncStorage.keyValueStore.set(k, v);
+          }
+
+          const mockCall = mockVoiceSdk.createMockCall('3') as any;
+
+          await store.dispatch(
+            activeCall.handleCall({
+              call: mockCall,
+            }),
+          );
+
+          mockCall.emit('disconnected');
+
+          expect(
+            Array.from(asyncStorage.keyValueStore.entries()),
+          ).toStrictEqual([
+            [
+              'mock sid 1',
+              JSON.stringify({ to: 'foo to', recipientType: 'client' }),
+            ],
+            [
+              'mock sid 2',
+              JSON.stringify({ to: 'bar to', recipientType: 'client' }),
+            ],
           ]);
         });
       });
