@@ -364,10 +364,11 @@ jobs:
       - display-client-identity
       - server-build
       - server-start
-      - run:
-          name: "Update NDK"
-          command: |
-            sdkmanager --update
+      - android/install-ndk     
+          version: 21.4.7075529      
+      # for aarch64
+      - android/install-ndk     
+          version: 24.0.8215888
       - android/create-avd:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
