@@ -592,19 +592,6 @@ jobs:
 # Workflows
 ###
 workflows:
-  build-archive-android:
-    when: << pipeline.parameters.test_android_build >>
-    jobs:
-      - app-build-android:
-          context:
-            - vblocks-dogfood-reference-app
-      - publish-android-app-appcenter:
-          distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
-          requires:
-            - app-build-android
-          context:
-            - vblocks-dogfood-reference-app
-
   ###
   # Pull request workflow
   ###
