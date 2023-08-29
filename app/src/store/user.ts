@@ -51,6 +51,7 @@ export const login = createTypedAsyncThunk<
   { rejectValue: RejectValue }
 >(loginActionTypes.prefix, async (_, { rejectWithValue }) => {
   const loginResult = await settlePromise(auth.login());
+  console.error(`debug checkpoint ${loginResult}`);
   if (loginResult.status === 'rejected') {
     return rejectWithValue({
       reason: 'AUTH_REJECTED',
