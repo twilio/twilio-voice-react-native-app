@@ -3,12 +3,11 @@ import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginAndRegister } from '../../store/loginAndRegister';
 import { type Dispatch, type State } from '../../store/app';
-import { SvgXml } from 'react-native-svg';
-import LoginGirl from '../../util/svgXml/loginGirl';
 
 const ArrowForward = require('../../../assets/icons/arrow-forward.png');
 const TwilioLogo = require('../../../assets/icons/twilio-logo.png');
 const ErrorWarning = require('../../../assets/icons/error.png');
+const LoginGirl = require('../../../assets/icons/login-girl.png');
 
 const styles = StyleSheet.create({
   container: {
@@ -17,9 +16,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignContent: 'center',
   },
-  helloFigureContainer: {
+  loginGirlContainer: {
     flex: 1,
     justifyContent: 'flex-end',
+  },
+  loginGirlImage: {
+    height: 249,
+    width: 240,
   },
   body: {
     marginHorizontal: 40,
@@ -142,8 +145,12 @@ const SignIn: React.FC = () => {
           </View>
         )}
       </View>
-      <View style={styles.helloFigureContainer}>
-        <SvgXml xml={LoginGirl} />
+      <View style={styles.loginGirlContainer}>
+        <Image
+          source={LoginGirl}
+          style={styles.loginGirlImage}
+          resizeMode="contain"
+        />
       </View>
     </View>
   );
