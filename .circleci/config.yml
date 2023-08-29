@@ -478,6 +478,7 @@ jobs:
       - run:
           name: "App: build iOS dogfood app"
           command: |
+            export MY_APP_MODE=""
             export APP_NAME=TwilioVoiceReactNativeReferenceApp
             export ARCHIVE_PATH=temp/Archives/${APP_NAME}.xcarchive
             export CI_BUILD_NUMBER=${CIRCLE_BUILD_NUM}
