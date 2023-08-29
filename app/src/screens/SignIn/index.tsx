@@ -3,10 +3,11 @@ import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginAndRegister } from '../../store/loginAndRegister';
 import { type Dispatch, type State } from '../../store/app';
+import { SvgXml } from 'react-native-svg';
+import LoginGirl from '../../util/svgXml/loginGirl';
 
 const ArrowForward = require('../../../assets/icons/arrow-forward.png');
-const TwilioLogo = require('../../../assets/icons/logo-twilio-red.png');
-const HelloFigure = require('../../../assets/icons/hello-figure.png');
+const TwilioLogo = require('../../../assets/icons/twilio-logo.png');
 const ErrorWarning = require('../../../assets/icons/error.png');
 
 const styles = StyleSheet.create({
@@ -33,7 +34,8 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     marginTop: '45%',
-    marginLeft: 18,
+    marginLeft: 40,
+    marginBottom: 20,
   },
   text: {
     marginBottom: 20,
@@ -79,6 +81,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#D61F1F',
   },
+  twilioLogo: {
+    height: 50,
+    width: 150,
+  },
 });
 
 const SignIn: React.FC = () => {
@@ -104,7 +110,11 @@ const SignIn: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image source={TwilioLogo} resizeMode="contain" />
+        <Image
+          source={TwilioLogo}
+          style={styles.twilioLogo}
+          resizeMode="contain"
+        />
       </View>
       <View style={styles.body}>
         <Text style={styles.text}>
@@ -133,7 +143,7 @@ const SignIn: React.FC = () => {
         )}
       </View>
       <View style={styles.helloFigureContainer}>
-        <Image source={HelloFigure} resizeMode="contain" />
+        <SvgXml xml={LoginGirl} />
       </View>
     </View>
   );

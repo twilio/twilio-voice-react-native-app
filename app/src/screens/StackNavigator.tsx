@@ -20,12 +20,8 @@ const StackNavigator = () => {
   const isBootstrapping = loginAndRegister?.status === 'pending';
   if (isBootstrapping) {
     return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Busy"
-          options={{ headerShown: false }}
-          component={Busy}
-        />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Busy" component={Busy} />
       </Stack.Navigator>
     );
   }
@@ -36,19 +32,15 @@ const StackNavigator = () => {
     loginAndRegister?.status === 'fulfilled';
   if (!isLoggedIn) {
     return (
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Sign In" component={SignIn} />
       </Stack.Navigator>
     );
   }
 
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="App"
-        options={{ headerShown: false }}
-        component={TabNavigator}
-      />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="App" component={TabNavigator} />
       <Stack.Screen name="Call" component={ActiveCall} />
       <Stack.Screen name="Incoming Call" component={CallInvite} />
     </Stack.Navigator>
