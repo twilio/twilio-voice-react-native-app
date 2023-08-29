@@ -13,6 +13,7 @@ import {
   bootstrapUser,
 } from './store/bootstrap';
 import { navigationRef } from './util/navigation';
+import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
   /**
@@ -27,6 +28,8 @@ const App = () => {
    * longer dispatch actions.
    */
   React.useEffect(() => {
+    SplashScreen.hide();
+
     const bootstrap = async () => {
       await defaultStore.dispatch(bootstrapPushRegistry());
       await defaultStore.dispatch(bootstrapAudioDevices());

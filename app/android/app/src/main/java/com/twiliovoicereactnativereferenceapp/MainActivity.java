@@ -1,6 +1,8 @@
 package com.twiliovoicereactnativereferenceapp;
 
+import android.os.Bundle; // react-native-splash-screen
 import com.facebook.react.ReactActivity;
+import org.devio.rn.splashscreen.SplashScreen; // react-native-splash-screen
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
 
@@ -55,6 +57,7 @@ public class MainActivity extends ReactActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    SplashScreen.show(this);  // react-native-splash-screen
     super.onCreate(savedInstanceState);
 
     if (!checkPermissionForMicrophone()) {

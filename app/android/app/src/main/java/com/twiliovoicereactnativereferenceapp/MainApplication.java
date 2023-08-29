@@ -12,6 +12,7 @@ import com.facebook.soloader.SoLoader;
 import com.twiliovoicereactnativereferenceapp.newarchitecture.MainApplicationReactNativeHost;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
