@@ -492,7 +492,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: "Publishing iOS app to AppCenter"
+          name: "Publishing Android app to AppCenter"
           command: |
             npm install webpack
             echo no | npm install -g appcenter-cli
