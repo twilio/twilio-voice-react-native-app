@@ -660,7 +660,7 @@ workflows:
           requires:
             - build-archive-ios-app
       - app-build-android:
-          filters: * rc-filter-android
+          filters: *rc-filter-android
           context:
             - vblocks-dogfood-reference-app
       - publish-android-app-appcenter:
