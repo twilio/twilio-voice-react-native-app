@@ -169,6 +169,7 @@ commands:
       - run:
           name: "App: Detox build"
           command: |
+            export MY_APP_MODE=""
             cd app
             yarn detox:build --configuration << parameters.configuration >>
 
@@ -177,6 +178,7 @@ commands:
       - run:
           name: "App: Detox build"
           command: |
+            export MY_APP_MODE=""
             cd app/android
             ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release
       - persist_to_workspace:
@@ -353,10 +355,10 @@ jobs:
       - restore_cache: *restore-package-json
       - app-install-dependencies
       - app-save-google-services-json
-      - android/install-ndk:     
-          version: "21.4.7075529"      
+      - android/install-ndk:
+          version: "21.4.7075529"
       # for aarch64
-      - android/install-ndk:     
+      - android/install-ndk:
           version: "24.0.8215888"
       - app-android-build
 
