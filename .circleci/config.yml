@@ -27,21 +27,39 @@ parameters:
 # Anhors & Aliases
 ###
 aliases:
-  - &rc-filter
+  - &rc-filter-ios
     tags:
       only:
-        - /^\d+\.\d+\.\d+-rc\d+$/
-        - /^\d+\.\d+\.\d+-preview.\d+-rc\d+$/
-        - /^\d+\.\d+\.\d+-beta.\d+-rc\d+$/
+        - /^\d+\.\d+\.\d+-rc\d+-ios$/
+        - /^\d+\.\d+\.\d+-preview.\d+-rc\d+-ios$/
+        - /^\d+\.\d+\.\d+-beta.\d+-rc\d+-ios$/
     branches:
       ignore: /.*/
 
-  - &release-filter
+  - &rc-filter-android
     tags:
       only:
-        - /^\d+\.\d+\.\d+$/
-        - /^\d+\.\d+\.\d+-preview.\d+$/
-        - /^\d+\.\d+\.\d+-beta.\d+$/
+        - /^\d+\.\d+\.\d+-rc\d+-android$/
+        - /^\d+\.\d+\.\d+-preview.\d+-rc\d+-android$/
+        - /^\d+\.\d+\.\d+-beta.\d+-rc\d+-android$/
+    branches:
+      ignore: /.*/
+
+  - &release-filter-ios
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-ios$/
+        - /^\d+\.\d+\.\d+-preview.\d+-ios$/
+        - /^\d+\.\d+\.\d+-beta.\d+-ios$/
+    branches:
+      ignore: /.*/
+
+  - &release-filter-android
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-android$/
+        - /^\d+\.\d+\.\d+-preview.\d+-android$/
+        - /^\d+\.\d+\.\d+-beta.\d+-android$/
     branches:
       ignore: /.*/
 
@@ -631,16 +649,27 @@ workflows:
   release-candidate:
     jobs:
       - build-archive-ios-app:
-          filters: *rc-filter
+          filters: *rc-filter-ios
           context:
             - vblocks-dogfood-reference-app
       - publish-ios-app-appcenter:
           distribution-audience: ${APP_CENTER_RC_AUDIENCE}
-          filters: *rc-filter
+          filters: *rc-filter-ios
           context:
             - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
+      - app-build-android:
+          filters: * rc-filter-android
+          context:
+            - vblocks-dogfood-reference-app
+      - publish-android-app-appcenter:
+          distribution-audience: ${APP_CENTER_RC_AUDIENCE}
+          filters: *rc-filter-android
+          context:
+            - vblocks-dogfood-reference-app
+          requires:
+            - app-build-android
 
   ###
   # Release workflow
@@ -648,13 +677,24 @@ workflows:
   release:
     jobs:
       - build-archive-ios-app:
-          filters: *release-filter
+          filters: *release-filter-ios
           context:
             - vblocks-dogfood-reference-app
       - publish-ios-app-appcenter:
           distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
-          filters: *release-filter
+          filters: *release-filter-ios
           context:
             - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
+      - app-build-android:
+          filters: *release-filter-android
+          context:
+            - vblocks-dogfood-reference-app
+      - publish-android-app-appcenter:
+          distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
+          filters: *release-filter-android
+          requires:
+            - app-build-android
+          context:
+            - vblocks-dogfood-reference-app
