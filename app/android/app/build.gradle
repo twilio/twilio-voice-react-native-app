@@ -345,3 +345,4 @@ def stringifyNull(var) {
     }
     return "\"" + var + "\"";
 }
+
