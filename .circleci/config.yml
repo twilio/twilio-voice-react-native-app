@@ -91,7 +91,7 @@ executors:
     docker:
       - image: cimg/node:16.19
     working_directory: ~/project
-  ios-exectuor:
+  ios-executor:
     macos:
       xcode: "14.3.1"
       resource_class: macos.m1.medium.gen1
