@@ -22,8 +22,8 @@ aliases:
     tags:
       only:
         - /^\d+\.\d+\.\d+-rc\d+-ios$/
-        - /^\d+\.\d+\.\d+-preview.\d+-rc\d+-ios$/
-        - /^\d+\.\d+\.\d+-beta.\d+-rc\d+-ios$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-rc\d+-ios$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-rc\d+-ios$/
     branches:
       ignore: /.*/
 
@@ -31,8 +31,8 @@ aliases:
     tags:
       only:
         - /^\d+\.\d+\.\d+-rc\d+-android$/
-        - /^\d+\.\d+\.\d+-preview.\d+-rc\d+-android$/
-        - /^\d+\.\d+\.\d+-beta.\d+-rc\d+-android$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-rc\d+-android$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-rc\d+-android$/
     branches:
       ignore: /.*/
 
@@ -40,8 +40,8 @@ aliases:
     tags:
       only:
         - /^\d+\.\d+\.\d+-ios$/
-        - /^\d+\.\d+\.\d+-preview.\d+-ios$/
-        - /^\d+\.\d+\.\d+-beta.\d+-ios$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-ios$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-ios$/
     branches:
       ignore: /.*/
 
@@ -49,8 +49,8 @@ aliases:
     tags:
       only:
         - /^\d+\.\d+\.\d+-android$/
-        - /^\d+\.\d+\.\d+-preview.\d+-android$/
-        - /^\d+\.\d+\.\d+-beta.\d+-android$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-android$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-android$/
     branches:
       ignore: /.*/
 
@@ -59,17 +59,29 @@ aliases:
     resource-class: large
     tag: 2023.07.1
 
-  - &package-json-key
+  - &app-package-json-key
     app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
-  - &save-package-json
-    name: Save Javascript Dependencies
-    key: *package-json-key
+  - &server-pacakge-json-key
+    app-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+
+  - &save-app-package-json
+    name: Save App Javascript Dependencies
+    key: *app-package-json-key
+    paths: app/node_modules
+
+  - &save-server-package-json
+    name: Save Server Javascript Dependencies
+    key: *server-package-json-key
     paths: server/node_modules
 
-  - &restore-package-json
-    name: Restore javascript Dependencies
-    key: *package-json-key
+  - &restore-app-package-json
+    name: Restore App javascript Dependencies
+    key: *app-package-json-key
+
+  - &restore-server-package-json
+    name: Restore Server javascript Dependencies
+    key: *server-package-json-key
 
 ###
 # Executors
@@ -341,7 +353,7 @@ jobs:
             cd app
             yarn typecheck
 
-  app-build-android:
+  build-archive-android-app:
     executor:
       <<: *android-build
     steps:
@@ -363,13 +375,13 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
-      - restore_cache: *restore-package-json
+      - restore_cache: *restore-app-package-json
       - app-install-dependencies
-      - save_cache: *save-package-json
+      - save_cache: *save-app-package-json
       - app-save-google-services-json
-      - restore_cache: *restore-package-json
+      - restore_cache: *restore-server-package-json
       - server-install-dependencies
-      - save_cache: *save-package-json
+      - save_cache: *save-server-package-json
       - ngrok-install
       - generate-client-identity
       - display-client-identity
@@ -420,9 +432,9 @@ jobs:
       #     paths: app/node_modules
       - app-install-applesimutils
       - app-install-pods
-      - restore_cache: *restore-package-json
+      - restore_cache: *restore-server-package-json
       - server-install-dependencies
-      - save_cache: *save-package-json
+      - save_cache: *save-server-package-json
       - ngrok-install-mac
       - generate-client-identity
       - display-client-identity
@@ -441,9 +453,9 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache: *restore-package-json
+      - restore_cache: *restore-server-package-json
       - server-install-dependencies
-      - save_cache: *save-package-json
+      - save_cache: *save-server-package-json
       - persist_to_workspace:
           root: .
           paths: .
@@ -491,7 +503,6 @@ jobs:
       - run:
           name: "Publishing Android app to AppCenter"
           command: |
-            npm install webpack
             echo no | npm install -g appcenter-cli
             appcenter login --token ${APP_CENTER_API_TOKEN}
             appcenter distribute release \
@@ -641,7 +652,7 @@ workflows:
             - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
-      - app-build-android:
+      - build-archive-android-app:
           filters: *rc-filter-android
           context:
             - vblocks-dogfood-reference-app
@@ -669,7 +680,7 @@ workflows:
             - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
-      - app-build-android:
+      - build-archive-android-app:
           filters: *release-filter-android
           context:
             - vblocks-dogfood-reference-app
