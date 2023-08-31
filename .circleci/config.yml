@@ -62,7 +62,7 @@ aliases:
   - &app-package-json-key
     app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
-  - &server-pacakge-json-key
+  - &server-package-json-key
     app-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
 
   - &save-app-package-json
