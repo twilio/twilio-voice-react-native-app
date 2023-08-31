@@ -314,7 +314,7 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache: *restore-package-json
+      - restore_cache: *restore-app-package-json
       - app-install-dependencies
       - save_cache: *save-package-json
       - persist_to_workspace:
@@ -359,7 +359,7 @@ jobs:
     steps:
       - checkout
       - app-save-env-file
-      - restore_cache: *restore-package-json
+      - restore_cache: *restore-app-package-json
       - app-install-dependencies
       - app-save-google-services-json
       - android/install-ndk:
