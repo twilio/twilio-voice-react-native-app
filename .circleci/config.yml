@@ -662,7 +662,7 @@ workflows:
           context:
             - vblocks-dogfood-reference-app
           requires:
-            - app-build-android
+            - build-archive-android-app
 
   ###
   # Release workflow
@@ -688,7 +688,7 @@ workflows:
           distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
           filters: *release-filter-android
           requires:
-            - app-build-android
+            - build-archive-android-app
           context:
             - vblocks-dogfood-reference-app
 
