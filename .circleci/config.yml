@@ -54,7 +54,7 @@ aliases:
     branches:
       ignore: /.*/
 
-  - &android-build
+  - &android-executor
     name: android/android-machine
     resource-class: large
     tag: 2023.07.1
@@ -91,7 +91,7 @@ executors:
     docker:
       - image: cimg/node:16.19
     working_directory: ~/project
-  ios-build:
+  ios-exectuor:
     macos:
       xcode: "14.3.1"
       resource_class: macos.m1.medium.gen1
@@ -355,7 +355,7 @@ jobs:
 
   build-archive-android-app:
     executor:
-      <<: *android-build
+      <<: *android-executor
     steps:
       - checkout
       - app-save-env-file
@@ -371,7 +371,7 @@ jobs:
 
   app-detox-android:
     executor:
-      <<: *android-build
+      <<: *android-executor
     steps:
       - checkout
       - app-save-env-file
@@ -491,7 +491,7 @@ jobs:
 # Publish the android app
   publish-android-app-appcenter:
     executor:
-      <<: *android-build
+      <<: *android-executor
     parameters:
       distribution-audience:
         # Use this flag to control the app distrubution audience
@@ -508,12 +508,12 @@ jobs:
             appcenter distribute release \
               -f app/android/app/build/outputs/apk/release/app-release.apk \
               -g << parameters.distribution-audience >> \
-              --app nico-hokeyapp-dzyz/TwilioVoice-React-Native-Reference-App-1 \
+              --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME_ANDROID} \
               -b ${CIRCLE_TAG} \
               --disable-telemetry
 
   build-archive-ios-app:
-    executor: ios-build
+    executor: ios-executor
     description: "Build and archive iOS app"
     steps:
       - checkout
@@ -574,7 +574,7 @@ jobs:
 
   # Publish the iOS app
   publish-ios-app-appcenter:
-    executor: ios-build
+    executor: ios-executor
     parameters:
       distribution-audience:
         # Use this flag to control the app distrubution audience
@@ -591,8 +591,8 @@ jobs:
             export APP_NAME=TwilioVoiceReactNativeReferenceApp
             export ARTIFACTS_DIR=app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp
             appcenter login --token ${APP_CENTER_API_TOKEN}
-            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g << parameters.distribution-audience >> --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME} -b ${CIRCLE_TAG}
-            appcenter crashes upload-symbols -s ${ARTIFACTS_DIR}/${APP_NAME}-dSYMs.zip --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME}
+            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g << parameters.distribution-audience >> --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME_IOS} -b ${CIRCLE_TAG}
+            appcenter crashes upload-symbols -s ${ARTIFACTS_DIR}/${APP_NAME}-dSYMs.zip --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME_IOS}
 
 ###
 # Workflows
