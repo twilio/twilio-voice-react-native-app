@@ -37,9 +37,11 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     marginTop: 100,
+    marginLeft: 40,
   },
   logo: {
-    maxHeight: '75%',
+    height: 50,
+    width: 150,
   },
   logoutText: {
     color: '#0263E0',
