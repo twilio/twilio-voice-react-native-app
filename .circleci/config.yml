@@ -15,6 +15,75 @@ parameters:
     default: true # by default pr workflow will get executed.
 
 ###
+# Anchors & Aliases
+###
+aliases:
+  - &rc-filter-ios
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-rc\d+-ios$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-rc\d+-ios$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-rc\d+-ios$/
+    branches:
+      ignore: /.*/
+
+  - &rc-filter-android
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-rc\d+-android$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-rc\d+-android$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-rc\d+-android$/
+    branches:
+      ignore: /.*/
+
+  - &release-filter-ios
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-ios$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-ios$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-ios$/
+    branches:
+      ignore: /.*/
+
+  - &release-filter-android
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-android$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-android$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-android$/
+    branches:
+      ignore: /.*/
+
+  - &android-executor
+    name: android/android-machine
+    resource-class: large
+    tag: 2023.07.1
+
+  - &app-package-json-key
+    app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+
+  - &server-package-json-key
+    server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+
+  - &save-app-package-json
+    name: Save App Javascript Dependencies
+    key: *app-package-json-key
+    paths: app/node_modules
+
+  - &save-server-package-json
+    name: Save Server Javascript Dependencies
+    key: *server-package-json-key
+    paths: server/node_modules
+
+  - &restore-app-package-json
+    name: Restore App javascript Dependencies
+    key: *app-package-json-key
+
+  - &restore-server-package-json
+    name: Restore Server javascript Dependencies
+    key: *server-package-json-key
+
+###
 # Executors
 ###
 executors:
@@ -22,30 +91,10 @@ executors:
     docker:
       - image: cimg/node:16.19
     working_directory: ~/project
-  ios-build:
+  ios-executor:
     macos:
       xcode: "14.3.1"
-    resource_class: macos.m1.medium.gen1
-
-aliases:
-  # Filters
-  - &rc-filter
-    tags:
-      only:
-        - /^\d+\.\d+\.\d+-rc\d+$/
-        - /^\d+\.\d+\.\d+-preview.\d+-rc\d+$/
-        - /^\d+\.\d+\.\d+-beta.\d+-rc\d+$/
-    branches:
-      ignore: /.*/
-
-  - &release-filter
-    tags:
-      only:
-        - /^\d+\.\d+\.\d+$/
-        - /^\d+\.\d+\.\d+-preview.\d+$/
-        - /^\d+\.\d+\.\d+-beta.\d+$/
-    branches:
-      ignore: /.*/
+      resource_class: macos.m1.medium.gen1
 
 ###
 # Commands
@@ -78,7 +127,6 @@ commands:
             echo "ENABLE_ABOUT_PAGE=$ENABLE_ABOUT_PAGE" >> .env
             echo "SLACK_URL=$SLACK_URL" >> .env
             echo "SLACK_CHANNEL_NAME=$SLACK_CHANNEL_NAME" >> .env
-            cd ..
 
   app-install-dependencies:
     steps:
@@ -88,7 +136,6 @@ commands:
             cd app
             yarn cache clean
             yarn install --immutable
-            cd ..
 
   app-save-google-services-json:
     steps:
@@ -97,7 +144,6 @@ commands:
           command: |
             cd app
             echo $GOOGLE_SERVICES_JSON | base64 -d > android/app/google-services.json
-            cd ..
 
   app-setup-cocoapods:
     steps:
@@ -111,11 +157,8 @@ commands:
       - run:
           name: "App: install Pods"
           command: |
-            cd app
-            cd ios
+            cd app/ios
             pod install
-            cd ..
-            cd ..
 
   app-install-applesimutils:
     steps:
@@ -136,7 +179,19 @@ commands:
           command: |
             cd app
             yarn detox:build --configuration << parameters.configuration >>
-            cd ..
+
+  app-android-build:
+    steps:
+      - run:
+          name: "App: Detox build"
+          command: |
+            export MY_APP_MODE=""
+            cd app/android
+            ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release
+      - persist_to_workspace:
+          root: .
+          paths:
+            - app/android/app/build/outputs/apk/release/app-release.apk
 
   app-detox-test:
     parameters:
@@ -149,13 +204,24 @@ commands:
           command: |
             cd app
             yarn detox:test --configuration << parameters.configuration >> --artifacts-location "./detox_artifacts" --headless --take-screenshots all
-            cd ..
 
   app-expose-port:
     steps:
       - run:
           name: "App: expose port"
           command: adb reverse tcp:${PORT} tcp:${PORT}
+
+  generate-client-identity:
+    steps:
+      - run:
+          name: "Generate a client identity"
+          command: echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
+
+  display-client-identity:
+    steps:
+      - run:
+          name: "Read client identity"
+          command: echo ${CLIENT_IDENTITY}
 
   ###
   # Server commands
@@ -168,7 +234,6 @@ commands:
             cd server
             yarn cache clean
             yarn install --immutable
-            cd ..
 
   server-build:
     steps:
@@ -177,7 +242,6 @@ commands:
           command: |
             cd server
             yarn build
-            cd ..
 
   server-start:
     steps:
@@ -187,7 +251,6 @@ commands:
           command: |
             cd server
             yarn start
-            cd ..
 
   ###
   # Ngrok Commands
@@ -215,7 +278,6 @@ commands:
           command: |
             cd server/scripts
             node updateTwimlApp.js
-            cd ../..
 
   ngrok-install-mac:
     steps:
@@ -252,13 +314,9 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache:
-          keys:
-            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      - restore_cache: *restore-app-package-json
       - app-install-dependencies
-      - save_cache:
-          key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
-          paths: app/node_modules
+      - save_cache: *save-app-package-json
       - persist_to_workspace:
           root: .
           paths: .
@@ -272,7 +330,6 @@ jobs:
           command: |
             cd app
             yarn test --coverage
-            cd ..
       - store_artifacts:
           path: app/coverage
 
@@ -285,7 +342,6 @@ jobs:
           command: |
             cd app
             yarn lint
-            cd ..
 
   app-typecheck:
     executor: default
@@ -296,46 +352,41 @@ jobs:
           command: |
             cd app
             yarn typecheck
-            cd ..
 
-  app-detox-android:
+  build-archive-android-app:
     executor:
-      name: android/android-machine
-      resource-class: 2xlarge
-      tag: 2023.07.1
+      <<: *android-executor
     steps:
       - checkout
       - app-save-env-file
-      - restore_cache:
-          keys:
-            - app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+      - restore_cache: *restore-app-package-json
       - app-install-dependencies
-      - save_cache:
-          key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
-          paths: app/node_modules
       - app-save-google-services-json
-      - restore_cache:
-          keys:
-            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - android/install-ndk:
+          version: "21.4.7075529"
+      # for aarch64
+      - android/install-ndk:
+          version: "24.0.8215888"
+      - app-android-build
+
+  app-detox-android:
+    executor:
+      <<: *android-executor
+    steps:
+      - checkout
+      - app-save-env-file
+      - restore_cache: *restore-app-package-json
+      - app-install-dependencies
+      - save_cache: *save-app-package-json
+      - app-save-google-services-json
+      - restore_cache: *restore-server-package-json
       - server-install-dependencies
-      - save_cache:
-          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
-          paths: server/node_modules
+      - save_cache: *save-server-package-json
       - ngrok-install
-      - run:
-          name: "Generate a client identity"
-          command: |
-            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
-      - run:
-          name: "Read client identity"
-          command: |
-            echo $CLIENT_IDENTITY
+      - generate-client-identity
+      - display-client-identity
       - server-build
       - server-start
-      - run:
-          name: "Update NDK"
-          command: |
-            sdkmanager --update
       - android/create-avd:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
@@ -361,7 +412,6 @@ jobs:
           command: |
             cd app
             adb logcat -d > ./detox_artifacts/logcat.txt
-            cd ..
       - store_artifacts:
           when: always
           path: app/detox_artifacts
@@ -382,22 +432,12 @@ jobs:
       #     paths: app/node_modules
       - app-install-applesimutils
       - app-install-pods
-      - restore_cache:
-          keys:
-            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - restore_cache: *restore-server-package-json
       - server-install-dependencies
-      - save_cache:
-          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
-          paths: server/node_modules
+      - save_cache: *save-server-package-json
       - ngrok-install-mac
-      - run:
-          name: "Generate a client identity"
-          command: |
-            echo "export CLIENT_IDENTITY=$(uuidgen)" >> "$BASH_ENV"
-      - run:
-          name: "Read client identity"
-          command: |
-            echo $CLIENT_IDENTITY
+      - generate-client-identity
+      - display-client-identity
       - server-build
       - server-start
       - app-detox-build:
@@ -413,13 +453,9 @@ jobs:
     steps:
       - checkout
       - attach_project
-      - restore_cache:
-          keys:
-            - server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+      - restore_cache: *restore-server-package-json
       - server-install-dependencies
-      - save_cache:
-          key: server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
-          paths: server/node_modules
+      - save_cache: *save-server-package-json
       - persist_to_workspace:
           root: .
           paths: .
@@ -433,7 +469,6 @@ jobs:
           command: |
             cd server
             yarn lint
-            cd ..
 
   server-build:
     executor: default
@@ -450,12 +485,35 @@ jobs:
           command: |
             cd server
             yarn test --coverage
-            cd ..
       - store_artifacts:
           path: server/coverage
 
+# Publish the android app
+  publish-android-app-appcenter:
+    executor:
+      <<: *android-executor
+    parameters:
+      distribution-audience:
+        # Use this flag to control the app distrubution audience
+        type: string
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Publishing Android app to AppCenter"
+          command: |
+            echo no | npm install -g appcenter-cli
+            appcenter login --token ${APP_CENTER_API_TOKEN}
+            appcenter distribute release \
+              -f app/android/app/build/outputs/apk/release/app-release.apk \
+              -g << parameters.distribution-audience >> \
+              --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME_ANDROID} \
+              -b ${CIRCLE_TAG} \
+              --disable-telemetry
+
   build-archive-ios-app:
-    executor: ios-build
+    executor: ios-executor
     description: "Build and archive iOS app"
     steps:
       - checkout
@@ -472,7 +530,6 @@ jobs:
             echo $FASTLANE_FILE_FASTFILE_BASE64 | base64 -D -o app/ios/fastlane/Fastfile
             cd app/ios
             fastlane ci_match_install
-            cd ../..
       - attach_workspace:
           at: app/ios/temp
       - run:
@@ -485,7 +542,6 @@ jobs:
             export CI_BUILD_VERSION=${CIRCLE_TAG}
             cd app/ios
             xcodebuild -workspace ${APP_NAME}.xcworkspace -scheme ${APP_NAME} -configuration Release -sdk iphoneos -archivePath ${ARCHIVE_PATH} ONLY_ACTIVE_ARCH=NO DEVELOPMENT_TEAM=${XCODE_DEVELOPMENT_TEAM} PRODUCT_BUNDLE_IDENTIFIER=${XCODE_DEVELOPMENT_BUNDLE_ID} PROVISIONING_PROFILE_SPECIFIER="${XCODE_PROVISIONING_PROFILE}" CODE_SIGN_IDENTITY="${XCODE_CODE_SIGN_IDENTITY}" CI_BUILD_NUMBER=${CI_BUILD_NUMBER} CI_BUILD_VERSION=${CI_BUILD_VERSION} CODE_SIGN_STYLE="Manual" archive
-            cd ../..
       - run:
           name: "App: archive iOS dogfood app"
           command: |
@@ -495,7 +551,6 @@ jobs:
             export EXPORT_OPTIONS_PLIST=TwilioVoiceReactNativeReferenceApp/ExportOptions/enterprise.plist
             cd app/ios
             xcodebuild -exportArchive -archivePath ${ARCHIVE_PATH} -exportPath ${IPA_DIR} -exportOptionsPlist ${EXPORT_OPTIONS_PLIST}
-            cd ../..
       - run:
           name: "App: gather iOS app artifacts"
           command: |
@@ -509,7 +564,6 @@ jobs:
             cp -R ${IPA_DIR}/Apps/TwilioVoiceReactNativeReferenceApp.ipa ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${ARCHIVE_PATH} ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
             cp -R ${ARCHIVE_PATH}/dSYMs/*.zip ${ARTIFACTS_DIR}/Release/TwilioVoiceReactNativeReferenceApp
-            cd ../..
       - persist_to_workspace:
           root: app/ios/temp
           paths:
@@ -521,7 +575,7 @@ jobs:
 
   # Publish the iOS app
   publish-ios-app-appcenter:
-    executor: ios-build
+    executor: ios-executor
     parameters:
       distribution-audience:
         # Use this flag to control the app distrubution audience
@@ -538,8 +592,8 @@ jobs:
             export APP_NAME=TwilioVoiceReactNativeReferenceApp
             export ARTIFACTS_DIR=app/ios/temp/Artifacts/Release/TwilioVoiceReactNativeReferenceApp
             appcenter login --token ${APP_CENTER_API_TOKEN}
-            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g << parameters.distribution-audience >> --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME} -b ${CIRCLE_TAG}
-            appcenter crashes upload-symbols -s ${ARTIFACTS_DIR}/${APP_NAME}-dSYMs.zip --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME}
+            appcenter distribute release -f ${ARTIFACTS_DIR}/${APP_NAME}.ipa -g << parameters.distribution-audience >> --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME_IOS} -b ${CIRCLE_TAG}
+            appcenter crashes upload-symbols -s ${ARTIFACTS_DIR}/${APP_NAME}-dSYMs.zip --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME_IOS}
 
 ###
 # Workflows
@@ -589,16 +643,27 @@ workflows:
   release-candidate:
     jobs:
       - build-archive-ios-app:
-          filters: *rc-filter
+          filters: *rc-filter-ios
           context:
             - vblocks-dogfood-reference-app
       - publish-ios-app-appcenter:
           distribution-audience: ${APP_CENTER_RC_AUDIENCE}
-          filters: *rc-filter
+          filters: *rc-filter-ios
           context:
             - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
+      - build-archive-android-app:
+          filters: *rc-filter-android
+          context:
+            - vblocks-dogfood-reference-app
+      - publish-android-app-appcenter:
+          distribution-audience: ${APP_CENTER_RC_AUDIENCE}
+          filters: *rc-filter-android
+          context:
+            - vblocks-dogfood-reference-app
+          requires:
+            - build-archive-android-app
 
   ###
   # Release workflow
@@ -606,13 +671,25 @@ workflows:
   release:
     jobs:
       - build-archive-ios-app:
-          filters: *release-filter
+          filters: *release-filter-ios
           context:
             - vblocks-dogfood-reference-app
       - publish-ios-app-appcenter:
           distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
-          filters: *release-filter
+          filters: *release-filter-ios
           context:
             - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
+      - build-archive-android-app:
+          filters: *release-filter-android
+          context:
+            - vblocks-dogfood-reference-app
+      - publish-android-app-appcenter:
+          distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
+          filters: *release-filter-android
+          requires:
+            - build-archive-android-app
+          context:
+            - vblocks-dogfood-reference-app
+
