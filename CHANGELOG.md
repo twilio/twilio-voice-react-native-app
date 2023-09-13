@@ -27,6 +27,7 @@ the foreground on Android devices.
   * Added unit tests for store and screens
 * Upgrade react-native-auth0 to `3.0.0`
   * Minimum supported version for iOS is 13
+* Splash screen iOS and Android
 
 ### Fixes
 * The call state, duration and outgoing parameters are now persisted between JS
