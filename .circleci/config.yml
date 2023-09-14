@@ -161,6 +161,14 @@ commands:
             yarn start
             cd ..
 
+  server-remove-twiml-app:
+    steps:
+      - run:
+        name: "Server: remove twiml app"
+        command: |
+          cd server
+          node deleteTwimlApp.js
+
   ##
   # Ngrok Commands
   ##
@@ -186,7 +194,7 @@ commands:
           name: "ngrok: update twiML app with ngrok public_url"
           command: |
             cd server/scripts
-            node updateTwimlApp.js
+            node createTwimlApp.js
             cd ../..
 
   ngrok-install-mac:
@@ -304,6 +312,7 @@ jobs:
       - store_artifacts:
           when: always
           path: app/detox_artifacts
+      - server-remove-twiml-app
 
   app-detox-ios:
     macos:
@@ -322,6 +331,7 @@ jobs:
           configuration: ios.sim.release
       - app-detox-test:
           configuration: ios.sim.release
+      - server-remove-twiml-app
 
   ###
   # Server jobs
