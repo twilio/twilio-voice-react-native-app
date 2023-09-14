@@ -255,7 +255,7 @@ commands:
       - run:
           name: "Server: delete twiml app"
           command: |
-            cd server
+            cd server/scripts
             node deleteTwimlApp.js
 
   ##
