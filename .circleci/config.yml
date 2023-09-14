@@ -250,10 +250,10 @@ commands:
             cd server
             yarn start
 
-  server-remove-twiml-app:
+  server-delete-twiml-app:
     steps:
       - run:
-        name: "Server: remove twiml app"
+        name: "Server: delete twiml app"
         command: |
           cd server
           node deleteTwimlApp.js
@@ -421,7 +421,7 @@ jobs:
       - store_artifacts:
           when: always
           path: app/detox_artifacts
-      - server-remove-twiml-app
+      - server-delete-twiml-app
 
   app-detox-ios:
     macos:
@@ -451,7 +451,7 @@ jobs:
           configuration: ios.sim.release
       - app-detox-test:
           configuration: ios.sim.release
-      - server-remove-twiml-app
+      - server-delete-twiml-app
 
   ###
   # Server jobs
