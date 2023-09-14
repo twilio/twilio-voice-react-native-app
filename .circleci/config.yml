@@ -253,10 +253,10 @@ commands:
   server-delete-twiml-app:
     steps:
       - run:
-        name: "Server: delete twiml app"
-        command: |
-          cd server
-          node deleteTwimlApp.js
+          name: "Server: delete twiml app"
+          command: |
+            cd server
+            node deleteTwimlApp.js
 
   ##
   # Ngrok Commands
