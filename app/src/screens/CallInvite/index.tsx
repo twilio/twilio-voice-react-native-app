@@ -50,7 +50,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   logo: {
-    maxHeight: '25%',
+    height: 50,
+    width: 150,
   },
 });
 

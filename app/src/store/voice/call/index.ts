@@ -3,6 +3,8 @@ import {
   type CallInvite as TwilioCallInvite,
   type CustomParameters,
 } from '@twilio/voice-react-native-sdk';
+import { Platform } from 'react-native';
+import { match, P } from 'ts-pattern';
 import { type AsyncStoreSlice } from '../../app';
 
 export type RecipientType = 'client' | 'number';
@@ -12,6 +14,7 @@ export type CallInfo = {
   state?: string;
   to?: string;
   from?: string;
+  initialConnectedTimestamp?: number;
   isMuted?: boolean;
   isOnHold?: boolean;
 };
@@ -22,6 +25,15 @@ export const getCallInfo = (call: TwilioCall): CallInfo => {
   const to = call.getTo();
   const from = call.getFrom();
 
+  const initialConnectedTimestamp = match([
+    call.getInitialConnectedTimestamp(),
+    Platform.OS,
+  ])
+    .with([undefined, P._], () => undefined)
+    .with([P.not(undefined), 'ios'], ([timestamp]) => Number(timestamp) * 1000)
+    .with([P.not(undefined), P._], ([timestamp]) => Number(timestamp))
+    .exhaustive();
+
   const isMuted = Boolean(call.isMuted());
   const isOnHold = Boolean(call.isOnHold());
 
@@ -30,6 +42,7 @@ export const getCallInfo = (call: TwilioCall): CallInfo => {
     state,
     to,
     from,
+    initialConnectedTimestamp,
     isMuted,
     isOnHold,
   };
@@ -82,7 +95,6 @@ export type BaseCall = {
     mute: AsyncStoreSlice;
     sendDigits: AsyncStoreSlice;
   };
-  initialConnectTimestamp: number | undefined;
   info: CallInfo;
 }>;
 
@@ -90,8 +102,12 @@ export type IncomingCall = {
   direction: 'incoming';
 } & BaseCall;
 
-export type OutgoingCall = {
-  direction: 'outgoing';
+export type OutgoingCallParameters = {
   recipientType: RecipientType;
   to: string;
+};
+
+export type OutgoingCall = {
+  direction: 'outgoing';
+  params: OutgoingCallParameters;
 } & BaseCall;

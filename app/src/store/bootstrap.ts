@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { miniSerializeError, type SerializedError } from '@reduxjs/toolkit';
 import {
   Voice,
@@ -104,6 +105,8 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 >(
   bootstrapCallInvitesActionTypes.prefix,
   async (_, { dispatch, getState, rejectWithValue }) => {
+    const navigate = await getNavigate();
+
     /**
      * Handle an incoming, pending, call invite.
      */
@@ -141,10 +144,6 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
         dispatch(handleCall({ call }));
         handleSettledCallInvite(callInvite);
 
-        const navigate = getNavigate();
-        if (!navigate) {
-          return;
-        }
         const callSid = callInvite.getCallSid();
         navigate('Call', { callSid });
       },
@@ -209,9 +208,25 @@ export const bootstrapCalls = createTypedAsyncThunk<
     }
 
     const calls = callsResult.value;
+    // Get all the call sids stored in async storage.
+    const storedCallSids = new Set(await AsyncStorage.getAllKeys());
     for (const call of calls.values()) {
       await dispatch(handleCall({ call }));
+
+      // If the call is still active, the native layer will still have it
+      // cached.
+      const callSid = call.getSid();
+      if (callSid) {
+        // Mark a call as still active, and therefore keep it in async storage.
+        storedCallSids.delete(callSid);
+      }
     }
+
+    /**
+     * Free the AsyncStorage if there are some calls in AsyncStorage that are
+     * no longer tracked by the native layer.
+     */
+    await AsyncStorage.multiRemove(Array.from(storedCallSids.values()));
   },
 );
 
@@ -226,13 +241,18 @@ export const bootstrapNavigationActionTypes = generateThunkActionTypes(
 );
 export const bootstrapNavigation = createTypedAsyncThunk(
   bootstrapNavigationActionTypes.prefix,
-  (_, { getState }) => {
+  async (_, { getState }) => {
+    const navigate = await getNavigate();
+
     const state = getState();
 
-    const navigate = getNavigate();
-    if (typeof navigate === 'undefined') {
-      return;
-    }
+    /**
+     * If the call invite notification body is tapped, navigate to the call
+     * invite screen.
+     */
+    voice.on(Voice.Event.CallInviteNotificationTapped, () => {
+      navigate('Incoming Call');
+    });
 
     if (state.voice.call.activeCall.ids.length) {
       navigate('Call', {});

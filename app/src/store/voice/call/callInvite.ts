@@ -16,7 +16,7 @@ import {
   type CallInfo,
   type CallInviteInfo,
 } from './';
-import { connectEvent, setActiveCallInfo } from './activeCall';
+import { setActiveCallInfo } from './activeCall';
 import { type AsyncStoreSlice } from '../../app';
 import { createTypedAsyncThunk, generateThunkActionTypes } from '../../common';
 import { navigateToCallInviteScreen } from '../../../util/behavior';
@@ -50,7 +50,7 @@ export const receiveCallInvite = createTypedAsyncThunk<
    * Hard-code navigation to the Incoming Call screen for tests.
    */
   if (navigateToCallInviteScreen) {
-    getNavigate()?.('Incoming Call');
+    (await getNavigate())('Incoming Call');
   }
 
   return requestId;
@@ -140,7 +140,11 @@ export const acceptCallInvite = createTypedAsyncThunk<
     });
 
     call.once(TwilioCall.Event.Connected, () => {
-      dispatch(connectEvent({ id, timestamp: Date.now() }));
+      const info = getCallInfo(call);
+      if (typeof info.initialConnectedTimestamp === 'undefined') {
+        info.initialConnectedTimestamp = Date.now();
+      }
+      dispatch(setActiveCallInfo({ id, info }));
     });
 
     return callInfo;
