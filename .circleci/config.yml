@@ -280,7 +280,7 @@ commands:
             sleep 30
             curl http://127.0.0.1:4040/api/tunnels
       - run:
-          name: "ngrok: update twiML app with ngrok public_url"
+          name: "ngrok: create twiML app with ngrok public_url"
           command: |
             cd server/scripts
             node createTwimlApp.js
@@ -412,6 +412,7 @@ jobs:
             sleep 150
       - app-detox-test:
           configuration: android.emu.release
+      - server-delete-twiml-app
       - run:
           name: "Save Android logs"
           when: always
@@ -421,7 +422,6 @@ jobs:
       - store_artifacts:
           when: always
           path: app/detox_artifacts
-      - server-delete-twiml-app
 
   app-detox-ios:
     macos:
