@@ -254,6 +254,7 @@ commands:
     steps:
       - run:
           name: "Server: delete twiml app"
+          when: always
           command: |
             cd server/scripts
             node deleteTwimlApp.js
@@ -301,6 +302,11 @@ commands:
           command: |
             sleep 30
             curl http://127.0.0.1:4040/api/tunnels
+      - run:
+          name: "ngrok: create twiML app with ngrok public_url"
+          command: |
+            cd server/scripts
+            node createTwimlApp.js
 
   configure-git-user:
     description: "Configures the git user for committing"
