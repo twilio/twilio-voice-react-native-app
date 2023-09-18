@@ -44,14 +44,9 @@ describe('Outgoing Call', () => {
     await element(by.id('dialer_button')).tap();
   };
 
-  beforeAll(async () => {
-    await device.launchApp({ newInstance: true });
-    await createTimerPromise(10 * 1000, 'device.launchApp');
-  });
-
   beforeEach(async () => {
-    await device.reloadReactNative();
-    await createTimerPromise(10 * 1000, 'device.reloadReactNative');
+    await device.launchApp({ newInstance: true });
+    await createTimerPromise(5 * 1000, 'device.launchApp');
 
     await navigateToDialer();
   });
