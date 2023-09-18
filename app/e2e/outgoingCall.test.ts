@@ -65,6 +65,20 @@ describe('Outgoing Call', () => {
     await expect(element(by.id('formatted_number'))).toHaveText('+1234448888');
   });
 
+  it('shoudl allow user to enter PTSN number 2', async () => {
+    await element(by.id('dialpad_button_3')).tap();
+    await element(by.id('dialpad_button_1')).tap();
+    await element(by.id('dialpad_button_5')).tap();
+    await element(by.id('dialpad_button_6')).tap();
+    await element(by.id('dialpad_button_7')).tap();
+    await element(by.id('dialpad_button_0')).tap();
+    await element(by.id('dialpad_button_3')).tap();
+    await element(by.id('dialpad_button_5')).tap();
+    await element(by.id('dialpad_button_4')).tap();
+    await element(by.id('dialpad_button_1')).tap();
+    await expect(element(by.id('formatted_number'))).toHaveText('+3156703541');
+  });
+
   it('should allow user to enter Client-ID', async () => {
     await element(by.text('Client')).tap();
     await element(by.id('client_text_input')).typeText('Client-Web');
@@ -76,6 +90,11 @@ describe('Outgoing Call', () => {
     describe('Android:', () => {
       describe('Connect', () => {
         it('should make a successful PTSN call', async () => {
+          /**
+           * The call duration label constantly changing will throw Detox
+           * synchronization off. Detox will stop while the app is not idle.
+           */
+          await device.disableSynchronization();
           await element(by.id('dialpad_button_3')).tap();
           await element(by.id('dialpad_button_1')).tap();
           await element(by.id('dialpad_button_5')).tap();
@@ -87,11 +106,6 @@ describe('Outgoing Call', () => {
           await element(by.id('dialpad_button_4')).tap();
           await element(by.id('dialpad_button_1')).tap();
 
-          /**
-           * The call duration label constantly changing will throw Detox
-           * synchronization off. Detox will stop while the app is not idle.
-           */
-          await device.disableSynchronization();
           await element(by.id('call_button')).tap();
 
           await waitFor(element(by.id('active_call')))
@@ -107,6 +121,7 @@ describe('Outgoing Call', () => {
         });
 
         it('should allow user to disconnect the call', async () => {
+          await device.disableSynchronization();
           await element(by.id('dialpad_button_3')).tap();
           await element(by.id('dialpad_button_1')).tap();
           await element(by.id('dialpad_button_5')).tap();
@@ -118,7 +133,6 @@ describe('Outgoing Call', () => {
           await element(by.id('dialpad_button_4')).tap();
           await element(by.id('dialpad_button_1')).tap();
 
-          await device.disableSynchronization();
           await element(by.id('call_button')).tap();
 
           await waitFor(element(by.id('end_call_button')))
