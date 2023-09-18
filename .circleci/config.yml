@@ -403,6 +403,7 @@ jobs:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
           system-image: system-images;android-29;google_apis;x86_64
+          additional-args: --device pixel_4
       - android/start-emulator:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           memory: 8192
