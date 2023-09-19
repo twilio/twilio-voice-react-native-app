@@ -459,6 +459,9 @@ jobs:
       - app-detox-test:
           configuration: ios.sim.release
       - server-delete-twiml-app
+      - store_artifacts:
+          when: always
+          path: app/detox_artifacts
 
   ###
   # Server jobs
