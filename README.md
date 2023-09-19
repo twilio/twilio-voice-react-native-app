@@ -4,14 +4,10 @@ This project consists of a backend server and a React Native app that demonstrat
 
 ## Features
 
-* Dialpad for making outgoing calls to a phone number
+* Dialpad for making outgoing calls to a phone number and other registered clients
+* Registering for and receiving incoming calls
 * Active call screen to interact with and control ongoing calls
 * Login flow for authenticating and authorizing users
-
-### Planned Features
-
-* App to app calls
-* Registration and notifications for incoming calls
 
 ![login](https://user-images.githubusercontent.com/35968892/227046749-f2d3cc70-cfee-44c6-ae22-9e7a1c71c9fb.png)
 ![dialer](https://user-images.githubusercontent.com/35968892/227047077-b58f33b3-067a-4765-a645-75e1562f6607.png)
