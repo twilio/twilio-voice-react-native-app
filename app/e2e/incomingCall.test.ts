@@ -66,10 +66,10 @@ describe('Incoming Call', () => {
     })();
   });
 
-  beforeEach(async () => {
-    await device.reloadReactNative();
-    await createTimerPromise(10 * 1000, 'device.reloadReactNative');
-  });
+  // beforeEach(async () => {
+  //   await device.reloadReactNative();
+  //   await createTimerPromise(10 * 1000, 'device.reloadReactNative');
+  // });
 
   afterAll(async () => {
     await teardown();
