@@ -1,5 +1,6 @@
 ## Submission Checklist
 
+ - [ ] The `README.md` reflects new **features**
  - [ ] The `CHANGELOG.md` reflects any **feature**, **bug fixes**, or **known issues** made in the source code
  - [ ] New unit tests and integration tests have beed added
  - [ ] Code coverage is more or equal to the previous coverage
