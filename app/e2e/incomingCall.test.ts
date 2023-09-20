@@ -43,12 +43,27 @@ const createTimerPromise = async (
 describe('Incoming Call', () => {
   let twilioClient: ReturnType<typeof twilio>;
   let clientId: string;
+  let registrationTimeout: Generator<number>;
 
   beforeEach(async () => {
     ({ twilioClient, clientId } = bootstrap());
 
     await device.launchApp({ newInstance: true });
     await createTimerPromise(10 * 1000, 'device.launchApp');
+
+    /**
+     * We need to let the registration settle for a bit before attempting an
+     * incoming call. However, we only need to do a larger wait initially, and
+     * subsequent waits can be shorter.
+     */
+    registrationTimeout = (function* () {
+      // The first timeout should be 5 minutes.
+      yield 5 * 60 * 1000;
+      while (true) {
+        // All subsequent timeouts should be 10 seconds.
+        yield 10 * 1000;
+      }
+    })();
   });
 
   afterAll(async () => {
@@ -79,7 +94,7 @@ describe('Incoming Call', () => {
   const setup = async () => {
     await login();
 
-    await createTimerPromise(10 * 1000, 'setup');
+    await createTimerPromise(registrationTimeout.next().value, 'setup');
 
     const testCall = await twilioClient.calls.create({
       twiml: '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
