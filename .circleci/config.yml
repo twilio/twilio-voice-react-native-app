@@ -407,8 +407,8 @@ jobs:
       - android/start-emulator:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           memory: 8192
-          # post-emulator-launch-assemble-command: ""
-          # restore-gradle-cache-post-emulator-launch: false
+          post-emulator-launch-assemble-command: ""
+          restore-gradle-cache-post-emulator-launch: false
           # wait-for-emulator: false
       - app-detox-build:
           configuration: android.emu.release
