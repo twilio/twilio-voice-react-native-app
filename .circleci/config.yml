@@ -402,14 +402,14 @@ jobs:
       - android/create-avd:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
-          system-image: system-images;android-32;google_apis;x86_64
+          system-image: system-images;android-29;google_apis;x86_64
           additional-args: --device pixel_4
       - android/start-emulator:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           memory: 8192
-          post-emulator-launch-assemble-command: ""
-          restore-gradle-cache-post-emulator-launch: false
-          wait-for-emulator: false
+          # post-emulator-launch-assemble-command: ""
+          # restore-gradle-cache-post-emulator-launch: false
+          # wait-for-emulator: false
       - app-detox-build:
           configuration: android.emu.release
       - app-expose-port
