@@ -409,14 +409,9 @@ jobs:
           memory: 8192
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
-          # wait-for-emulator: false
       - app-detox-build:
           configuration: android.emu.release
       - app-expose-port
-      - run:
-          name: "Wait for emulator to settle"
-          command: |
-            sleep 150
       - app-detox-test:
           configuration: android.emu.release
       - server-delete-twiml-app
