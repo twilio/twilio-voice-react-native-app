@@ -6,7 +6,7 @@ import {
 import { match } from 'ts-pattern';
 import { getAccessToken } from './accessToken';
 import { type AsyncStoreSlice } from '../app';
-import { createTypedAsyncThunk } from '../common';
+import { createTypedAsyncThunk, generateThunkActionTypes } from '../common';
 import { login, logout } from '../user';
 import { settlePromise } from '../../util/settlePromise';
 import { voice } from '../../util/voice';
@@ -47,6 +47,46 @@ export const register = createTypedAsyncThunk<
     return rejectWithValue({
       reason: 'NATIVE_MODULE_REJECTED',
       error: miniSerializeError(voiceRegisterResult.reason),
+    });
+  }
+});
+
+type UnregisterRejectValue =
+  | {
+      reason: 'ACCESS_TOKEN_NOT_FULFILLED';
+    }
+  | {
+      reason: 'NO_ACCESS_TOKEN';
+    }
+  | {
+      reason: 'NATIVE_MODULE_REJECTED';
+      error: SerializedError;
+    };
+const unregisterActionTypes = generateThunkActionTypes(
+  'registration/unregister',
+);
+export const unregister = createTypedAsyncThunk<
+  void,
+  void,
+  { rejectValue: UnregisterRejectValue }
+>(unregisterActionTypes.prefix, async (_, { getState, rejectWithValue }) => {
+  const { accessToken } = getState().voice;
+
+  if (accessToken?.status !== 'fulfilled') {
+    return rejectWithValue({ reason: 'ACCESS_TOKEN_NOT_FULFILLED' });
+  }
+
+  if (accessToken.value === '') {
+    return rejectWithValue({ reason: 'NO_ACCESS_TOKEN' });
+  }
+
+  const voiceUnregisterResult = await settlePromise(
+    voice.unregister(accessToken.value),
+  );
+  if (voiceUnregisterResult.status === 'rejected') {
+    return rejectWithValue({
+      reason: 'NATIVE_MODULE_REJECTED',
+      error: miniSerializeError(voiceUnregisterResult.reason),
     });
   }
 });
@@ -98,6 +138,9 @@ export const registrationSlice = createSlice({
   initialState: { status: 'idle' } as RegistrationSlice,
   reducers: {},
   extraReducers(builder) {
+    /**
+     * Register reducers.
+     */
     builder.addCase(register.pending, () => ({ status: 'pending' }));
 
     builder.addCase(register.fulfilled, () => ({ status: 'fulfilled' }));
@@ -124,6 +167,17 @@ export const registrationSlice = createSlice({
           error: action.error,
         }))
         .exhaustive();
+    });
+
+    /**
+     * Unregister reducers.
+     */
+    builder.addCase(unregister.pending, () => ({ status: 'pending' }));
+
+    builder.addCase(unregister.fulfilled, () => ({ status: 'idle' }));
+
+    builder.addCase(unregister.rejected, () => {
+      // TODO(mhuynh): how should we handle unregistration failures?
     });
   },
 });

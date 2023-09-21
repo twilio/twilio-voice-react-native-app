@@ -12,6 +12,8 @@ import com.facebook.soloader.SoLoader;
 import com.twiliovoicereactnativereferenceapp.newarchitecture.MainApplicationReactNativeHost;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import com.microsoft.appcenter.AppCenter;
+import com.microsoft.appcenter.distribute.Distribute;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -52,6 +54,10 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
+    // for app center if available
+    if (!"null".equals(BuildConfig.APPCENTER_APP_KEY)) {
+        AppCenter.start(this, BuildConfig.APPCENTER_APP_KEY, Distribute.class);
+    }
     // If you opted-in for the New Architecture, we enable the TurboModule system
     ReactFeatureFlags.useTurboModules = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
     SoLoader.init(this, /* native exopackage */ false);

@@ -4,7 +4,7 @@ import twilio from 'twilio';
 const bootstrap = () => {
   const accountSid = process.env.ACCOUNT_SID;
   const authToken = process.env.AUTH_TOKEN;
-  const mockClientId = process.env.MOCK_CLIENT_ID;
+  const mockClientId = process.env.CLIENT_IDENTITY;
 
   if (
     [accountSid, authToken, mockClientId].some((v) => typeof v !== 'string')
@@ -17,23 +17,89 @@ const bootstrap = () => {
   return { twilioClient, clientId: mockClientId as string };
 };
 
+const createTimerPromise = async (
+  durationMs: number,
+  reason: string = 'not given',
+) => {
+  const SECOND_IN_MS = 1000;
+  const MINUTE_IN_MS = 60 * SECOND_IN_MS;
+
+  for (
+    let remainingTimeMs = durationMs;
+    remainingTimeMs > 0;
+    remainingTimeMs -= MINUTE_IN_MS
+  ) {
+    await new Promise<void>((resolve) => {
+      const nextIntervalMs = Math.min(MINUTE_IN_MS, remainingTimeMs);
+      const remainingTimeSec = remainingTimeMs / SECOND_IN_MS;
+      console.log('waiting', { reason, remainingTimeSec });
+      setTimeout(() => {
+        resolve();
+      }, nextIntervalMs);
+    });
+  }
+};
+
 describe('Incoming Call', () => {
   let twilioClient: ReturnType<typeof twilio>;
   let clientId: string;
+  let registrationTimeout: Generator<number>;
 
-  const setup = async () => {
+  beforeAll(async () => {
+    ({ twilioClient, clientId } = bootstrap());
+
+    await device.launchApp({ newInstance: true });
+    await createTimerPromise(10 * 1000, 'device.launchApp');
+
+    /**
+     * We need to let the registration settle for a bit before attempting an
+     * incoming call. However, we only need to do a larger wait initially, and
+     * subsequent waits can be shorter.
+     */
+    registrationTimeout = (function* () {
+      // The first timeout should be 5 minutes.
+      yield 5 * 60 * 1000;
+      while (true) {
+        // All subsequent timeouts should be 10 seconds.
+        yield 10 * 1000;
+      }
+    })();
+  });
+
+  beforeEach(async () => {
+    await device.reloadReactNative();
+    await createTimerPromise(10 * 1000, 'device.reloadReactNative');
+  });
+
+  afterAll(async () => {
+    await teardown();
+  });
+
+  /**
+   * Login.
+   */
+  const login = async () => {
     await element(by.id('login_button')).tap();
 
     await expect(element(by.text('Ahoy!'))).toBeVisible();
     await expect(element(by.text('test_email@twilio.com'))).toBeVisible();
+  };
 
-    /**
-     * Wait for 10 seconds to let the registration settle.
-     *
-     * Duration chosen through local testing as the minimum value that seems to
-     * stabilize tests.
-     */
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+  /**
+   * Logout.
+   */
+  const logout = async () => {
+    await element(by.id('logout_button')).tap();
+  };
+
+  /**
+   * Login and register this device. Make a call to this device after
+   * registering and letting the registration settle.
+   */
+  const setup = async () => {
+    await login();
+
+    await createTimerPromise(registrationTimeout.next().value, 'setup');
 
     const testCall = await twilioClient.calls.create({
       twiml: '<Response><Say>Ahoy, world!</Say><Pause length="5" /></Response>',
@@ -41,30 +107,26 @@ describe('Incoming Call', () => {
       from: 'detox',
     });
 
-    console.log(`Call created with SID: "${testCall.sid}".`);
+    console.log(
+      `Call created with SID: "${testCall.sid}" to identity "${clientId}".`,
+    );
   };
 
-  beforeAll(async () => {
-    ({ twilioClient, clientId } = bootstrap());
-
-    await device.launchApp({
-      newInstance: true,
-    });
-  });
-
-  beforeEach(async () => {
-    await device.reloadReactNative();
-  });
-
-  afterEach(async () => {
+  /**
+   * Logout and unregister this device.
+   */
+  const teardown = async () => {
     /**
-     * Wait for 10 seconds to let the call settle.
-     *
-     * Duration chosen through local testing as the minimum value that seems to
-     * stabilize tests.
+     * Hard refresh the app so it's in a consistent state.
      */
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-  });
+    await device.reloadReactNative();
+
+    // Let the teardown process settle.
+    await createTimerPromise(10 * 1000, 'teardown device.reloadReactNative');
+
+    await login();
+    await logout();
+  };
 
   describe(':android:', () => {
     it('should answer the call', async () => {

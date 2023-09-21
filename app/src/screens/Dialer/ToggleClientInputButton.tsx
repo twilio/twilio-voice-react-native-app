@@ -14,7 +14,11 @@ const ToggleClientInputButton: React.FC<Props> = ({
   onPress,
   recipientType,
 }) => (
-  <Button disabled={disabled} size={96} onPress={onPress}>
+  <Button
+    disabled={disabled}
+    size={96}
+    onPress={onPress}
+    testID="client_button">
     <Image source={TypeSource} resizeMode="contain" style={styles.image} />
     <Text style={styles.text}>
       {recipientType === 'number' ? 'Client' : 'Number'}

@@ -1,14 +1,26 @@
 import { type Middleware } from '@reduxjs/toolkit';
 import { createStore, Store } from '../app';
-import { bootstrapUser, bootstrapCallInvites } from '../bootstrap';
+import {
+  bootstrapPushRegistry,
+  bootstrapUser,
+  bootstrapCallInvites,
+  bootstrapCalls,
+  bootstrapNavigation,
+} from '../bootstrap';
 import { checkLoginStatus } from '../user';
 import { getAccessToken } from '../voice/accessToken';
 import { receiveCallInvite, setCallInvite } from '../voice/call/callInvite';
 import { register } from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
+import * as asyncStorage from '../../../__mocks__/@react-native-async-storage/async-storage';
+import * as voiceUtil from '../../../src/util/voice';
+import * as navigationUtil from '../../../src/util/navigation';
 
 let fetchMock: jest.Mock;
+let mockPlatform: {
+  OS: string;
+};
 
 jest.mock('../../../src/util/fetch', () => ({
   fetch: (fetchMock = jest.fn().mockResolvedValue({
@@ -17,11 +29,19 @@ jest.mock('../../../src/util/fetch', () => ({
   })),
 }));
 
+jest.mock('react-native', () => {
+  return {
+    Platform: (mockPlatform = { OS: 'ios' }),
+  };
+});
+
 describe('bootstrap', () => {
   let store: Store;
   const dispatchedActions: any[] = [];
 
   beforeEach(() => {
+    jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValue(jest.fn());
+
     dispatchedActions.splice(0);
     const logAction: Middleware = () => (next) => (action) => {
       dispatchedActions.push(action);
@@ -45,6 +65,45 @@ describe('bootstrap', () => {
       }
     }
   };
+
+  describe('bootstrapPushRegistry', () => {
+    it('succeeds', async () => {
+      const { type, payload } = await store.dispatch(bootstrapPushRegistry());
+      expect(type).toStrictEqual('bootstrap/pushRegistry/fulfilled');
+      expect(payload).toBeUndefined();
+
+      expect(voiceSdk.voiceInitializePushRegistry.mock.calls).toStrictEqual([
+        [],
+      ]);
+    });
+
+    it('handles the voice module rejecting', async () => {
+      const error = new Error('foobar');
+      delete error.stack;
+      voiceSdk.voiceInitializePushRegistry.mockRejectedValueOnce(error);
+
+      const { type, payload } = await store.dispatch(bootstrapPushRegistry());
+      expect(type).toStrictEqual('bootstrap/pushRegistry/rejected');
+      expect(payload?.error).toStrictEqual({
+        name: error.name,
+        message: error.message,
+      });
+
+      expect(voiceSdk.voiceInitializePushRegistry.mock.calls).toStrictEqual([
+        [],
+      ]);
+    });
+
+    it('does nothing on platforms other than ios', async () => {
+      mockPlatform.OS = 'android';
+
+      const { type, payload } = await store.dispatch(bootstrapPushRegistry());
+      expect(type).toStrictEqual('bootstrap/pushRegistry/fulfilled');
+      expect(payload).toBeUndefined();
+
+      expect(voiceSdk.voiceInitializePushRegistry.mock.calls).toStrictEqual([]);
+    });
+  });
 
   describe('bootstrapUser', () => {
     it('succeeds', async () => {
@@ -195,6 +254,112 @@ describe('bootstrap', () => {
         receiveCallInvite.fulfilled,
         bootstrapCallInvites.fulfilled,
       ]);
+    });
+  });
+
+  describe('bootstrapCalls', () => {
+    // TODO(mhuynh): [VBLOCKS-2078] Increase coverage.
+
+    beforeEach(() => {
+      voiceSdk.voiceGetCalls.mockImplementationOnce(() => {
+        return Promise.resolve(new Map([['1', voiceSdk.createMockCall('1')]]));
+      });
+      asyncStorage.keyValueStore.clear();
+      const mockAsyncStorage = [
+        [
+          'mock sid 1',
+          JSON.stringify({ to: 'foo to', recipientType: 'client' }),
+        ],
+        [
+          'mock sid 2',
+          JSON.stringify({ to: 'bar to', recipientType: 'client' }),
+        ],
+        [
+          'mock sid 3',
+          JSON.stringify({ to: 'biff to', recipientType: 'number' }),
+        ],
+      ];
+      for (const [k, v] of mockAsyncStorage) {
+        asyncStorage.keyValueStore.set(k, v);
+      }
+    });
+
+    it('should read from async storage for an outgoing call', async () => {
+      const { type, payload } = await store.dispatch(bootstrapCalls());
+      expect(type).toMatch(/fulfilled/);
+      expect(payload).toBeUndefined();
+
+      expect(asyncStorage.getAllKeys.mock.calls).toStrictEqual([[]]);
+      expect(asyncStorage.getItem.mock.calls).toStrictEqual([['mock sid 1']]);
+
+      const { ids, entities } = store.getState().voice.call.activeCall;
+      const callEntity = entities[ids[0]];
+
+      if (callEntity?.status !== 'fulfilled') {
+        throw new Error('call entity not fulfilled');
+      }
+      if (callEntity?.direction !== 'outgoing') {
+        throw new Error('call direction should be outgoing');
+      }
+      expect(callEntity?.params).toStrictEqual({
+        to: 'foo to',
+        recipientType: 'client',
+      });
+    });
+
+    it('should clear values out of async storage if not active', async () => {
+      const { type, payload } = await store.dispatch(bootstrapCalls());
+      expect(type).toMatch(/fulfilled/);
+      expect(payload).toBeUndefined();
+
+      expect(asyncStorage.multiRemove.mock.calls).toStrictEqual([
+        [['mock sid 2', 'mock sid 3']],
+      ]);
+      expect(Array.from(asyncStorage.keyValueStore.entries())).toStrictEqual([
+        [
+          'mock sid 1',
+          JSON.stringify({
+            to: 'foo to',
+            recipientType: 'client',
+          }),
+        ],
+      ]);
+    });
+  });
+
+  describe('bootstrapNavigation', () => {
+    // TODO(mhuynh): increase coverage. See JIRA VBLOCKS-2078.
+
+    it('listens for call invite notification tapped events', async () => {
+      const onSpy = jest.spyOn(voiceUtil.voice, 'on');
+      jest
+        .spyOn(navigationUtil, 'getNavigate')
+        .mockResolvedValueOnce(jest.fn());
+
+      const { type, payload } = await store.dispatch(bootstrapNavigation());
+
+      expect(type).toMatch(/fulfilled/);
+      expect(payload).toBeUndefined();
+
+      expect(onSpy.mock.calls).toHaveLength(1);
+      const [[event]] = onSpy.mock.calls;
+      expect(event).toStrictEqual('callInviteNotificationTapped');
+    });
+
+    it('navigates to the call invite screen', async () => {
+      const navigateSpy = jest.fn();
+      jest
+        .spyOn(navigationUtil, 'getNavigate')
+        .mockResolvedValueOnce(navigateSpy);
+
+      const { type, payload } = await store.dispatch(bootstrapNavigation());
+
+      expect(type).toMatch(/fulfilled/);
+      expect(payload).toBeUndefined();
+
+      voiceUtil.voice.emit('callInviteNotificationTapped' as any);
+
+      expect(navigateSpy.mock.calls).toStrictEqual([['Incoming Call']]);
     });
   });
 });

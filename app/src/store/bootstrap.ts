@@ -1,9 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { miniSerializeError, type SerializedError } from '@reduxjs/toolkit';
 import {
   Voice,
   Call as TwilioCall,
   CallInvite as TwilioCallInvite,
 } from '@twilio/voice-react-native-sdk';
+import { Platform } from 'react-native';
 import { createTypedAsyncThunk, generateThunkActionTypes } from './common';
 import { checkLoginStatus } from './user';
 import { getAccessToken } from './voice/accessToken';
@@ -14,6 +16,37 @@ import { register } from './voice/registration';
 import { getNavigate } from '../util/navigation';
 import { settlePromise } from '../util/settlePromise';
 import { voice } from '../util/voice';
+
+const sliceName = 'bootstrap';
+
+/**
+ * Bootstrap push registration. This action is applicable only to the iOS
+ * platform. This action is a no-op on all other platforms.
+ */
+type BootstrapPushRegistryRejectValue = {
+  reason: 'INITIALIZE_PUSH_REGISTRY_REJECTED';
+  error: SerializedError;
+};
+const bootstrapPushRegistryActionTypes = generateThunkActionTypes(
+  `${sliceName}/pushRegistry`,
+);
+export const bootstrapPushRegistry = createTypedAsyncThunk<
+  void,
+  void,
+  { rejectValue: BootstrapPushRegistryRejectValue }
+>(bootstrapPushRegistryActionTypes.prefix, async (_, { rejectWithValue }) => {
+  if (Platform.OS !== 'ios') {
+    return;
+  }
+
+  const initializeResult = await settlePromise(voice.initializePushRegistry());
+  if (initializeResult.status === 'rejected') {
+    return rejectWithValue({
+      reason: 'INITIALIZE_PUSH_REGISTRY_REJECTED',
+      error: miniSerializeError(initializeResult.reason),
+    });
+  }
+});
 
 /**
  * Bootstrap user action. Gets the login-state of the user, and if logged in
@@ -72,6 +105,8 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 >(
   bootstrapCallInvitesActionTypes.prefix,
   async (_, { dispatch, getState, rejectWithValue }) => {
+    const navigate = await getNavigate();
+
     /**
      * Handle an incoming, pending, call invite.
      */
@@ -109,10 +144,6 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
         dispatch(handleCall({ call }));
         handleSettledCallInvite(callInvite);
 
-        const navigate = getNavigate();
-        if (!navigate) {
-          return;
-        }
         const callSid = callInvite.getCallSid();
         navigate('Call', { callSid });
       },
@@ -177,9 +208,25 @@ export const bootstrapCalls = createTypedAsyncThunk<
     }
 
     const calls = callsResult.value;
+    // Get all the call sids stored in async storage.
+    const storedCallSids = new Set(await AsyncStorage.getAllKeys());
     for (const call of calls.values()) {
       await dispatch(handleCall({ call }));
+
+      // If the call is still active, the native layer will still have it
+      // cached.
+      const callSid = call.getSid();
+      if (callSid) {
+        // Mark a call as still active, and therefore keep it in async storage.
+        storedCallSids.delete(callSid);
+      }
     }
+
+    /**
+     * Free the AsyncStorage if there are some calls in AsyncStorage that are
+     * no longer tracked by the native layer.
+     */
+    await AsyncStorage.multiRemove(Array.from(storedCallSids.values()));
   },
 );
 
@@ -194,13 +241,18 @@ export const bootstrapNavigationActionTypes = generateThunkActionTypes(
 );
 export const bootstrapNavigation = createTypedAsyncThunk(
   bootstrapNavigationActionTypes.prefix,
-  (_, { getState }) => {
+  async (_, { getState }) => {
+    const navigate = await getNavigate();
+
     const state = getState();
 
-    const navigate = getNavigate();
-    if (typeof navigate === 'undefined') {
-      return;
-    }
+    /**
+     * If the call invite notification body is tapped, navigate to the call
+     * invite screen.
+     */
+    voice.on(Voice.Event.CallInviteNotificationTapped, () => {
+      navigate('Incoming Call');
+    });
 
     if (state.voice.call.activeCall.ids.length) {
       navigate('Call', {});

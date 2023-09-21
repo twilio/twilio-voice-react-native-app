@@ -1,10 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { miniSerializeError, type SerializedError } from '@reduxjs/toolkit';
 import { Call as TwilioCall } from '@twilio/voice-react-native-sdk';
 import { voice, callMap } from '../../../util/voice';
 import { settlePromise } from '../../../util/settlePromise';
 import { createTypedAsyncThunk, generateThunkActionTypes } from '../../common';
 import { type CallInfo, getCallInfo, type RecipientType } from './';
-import { connectEvent, setActiveCallInfo } from './activeCall';
+import { setActiveCallInfo } from './activeCall';
 
 export type MakeOutgoingCallRejectValue =
   | {
@@ -62,6 +63,12 @@ export const makeOutgoingCall = createTypedAsyncThunk<
       if (error) {
         console.error('Disconnected:', error);
       }
+
+      const callSid = outgoingCall.getSid();
+      if (typeof callSid !== 'string') {
+        return;
+      }
+      AsyncStorage.removeItem(callSid);
     });
 
     Object.values(TwilioCall.Event).forEach((callEvent) => {
@@ -73,7 +80,17 @@ export const makeOutgoingCall = createTypedAsyncThunk<
     });
 
     outgoingCall.once(TwilioCall.Event.Connected, () => {
-      dispatch(connectEvent({ id: requestId, timestamp: Date.now() }));
+      const callSid = outgoingCall.getSid();
+      if (typeof callSid !== 'string') {
+        return;
+      }
+      AsyncStorage.setItem(callSid, JSON.stringify({ to, recipientType }));
+
+      const info = getCallInfo(outgoingCall);
+      if (typeof info.initialConnectedTimestamp === 'undefined') {
+        info.initialConnectedTimestamp = Date.now();
+      }
+      dispatch(setActiveCallInfo({ id: requestId, info }));
     });
 
     return callInfo;

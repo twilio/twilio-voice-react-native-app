@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 import StackNavigator from './screens/StackNavigator';
 import { defaultStore } from './store/app';
@@ -7,8 +8,9 @@ import {
   bootstrapAudioDevices,
   bootstrapCalls,
   bootstrapCallInvites,
-  bootstrapUser,
   bootstrapNavigation,
+  bootstrapPushRegistry,
+  bootstrapUser,
 } from './store/bootstrap';
 import { navigationRef } from './util/navigation';
 
@@ -26,6 +28,7 @@ const App = () => {
    */
   React.useEffect(() => {
     const bootstrap = async () => {
+      await defaultStore.dispatch(bootstrapPushRegistry());
       await defaultStore.dispatch(bootstrapAudioDevices());
       await defaultStore.dispatch(bootstrapUser());
       await defaultStore.dispatch(bootstrapCalls());
@@ -38,9 +41,11 @@ const App = () => {
 
   return (
     <Provider store={defaultStore}>
-      <NavigationContainer ref={navigationRef}>
-        <StackNavigator />
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer ref={navigationRef}>
+          <StackNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
     </Provider>
   );
 };
