@@ -5,11 +5,13 @@ The Twilio Voice React Native Reference App is an example implementation of the 
 ## Incoming call notifications
 
 ### Android
+
 On Android platforms, the Twilio Voice Android SDK uses Firebase Cloud Messaging (FCM) to deliver call notifications to users. FCM requires a `google-services.json` file that can be generated in a Firebase project. Once the `google-services.json` file is generated, it must be placed in the `app/android/app` folder before any Android build can be completed.
 
 See the Twilio Voice Android SDK [Quickstart](https://github.com/twilio/voice-quickstart-android#bullet1) for more information.
 
 ### iOS
+
 On iOS platforms, the Twilio Voice iOS SDK does not need an equivalent file.
 
 Please follow the Twilio Voice iOS SDK [Quickstart](https://github.com/twilio/voice-quickstart-ios#6-create-a-push-credential-with-your-voip-service-certificate) for more information.
@@ -100,3 +102,35 @@ Please be sure to read the style guides and best practices within the above docu
 React Navigation is used to provide "native"-feeling navigation for the application.
 
 See the React Navigation documentation [here](https://reactnavigation.org/docs/getting-started/).
+
+### Deploying Android and iOS to AppCenter
+
+The Twilio Voice React Native App uses github tags to deploy both Android and iOS apps to AppCenter. The github tags contain options for either a "rc" or "release". "rc" and "release" options can also contain "preview" and "beta" filters. Append "-android" or "-ios" to the end of tags for platform specific release.
+
+#### iOS and Android example release
+
+```
+0.0.0.0-rc0
+0.0.0-beta.0-rc0
+0.0.0-preview.0-rc0
+```
+
+```
+0.0.0
+0.0.0-beta
+0.0.0-preview
+```
+
+#### iOS example release
+
+```
+0.0.0.0-rc0-ios
+0.0.0-beta.0-rc0-ios
+0.0.0-preview.0-rc0-ios
+```
+
+```
+0.0.0-ios
+0.0.0-beta.0-ios
+0.0.0-preview.0-ios
+```
