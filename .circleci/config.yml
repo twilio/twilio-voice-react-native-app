@@ -59,9 +59,11 @@ aliases:
     resource-class: large
     tag: 2023.07.1
 
-  - &app-package-json-key app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+  - &app-package-json-key
+    app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
-  - &server-package-json-key server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+  - &server-package-json-key 
+    server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
 
   - &save-app-package-json
     name: Save App Javascript Dependencies
@@ -409,6 +411,7 @@ jobs:
           memory: 8192
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
+          wait-for-emulator: true
       - app-detox-build:
           configuration: android.emu.release
       - app-expose-port

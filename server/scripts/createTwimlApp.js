@@ -1,6 +1,5 @@
 /* eslint-disable */
 'use strict';
-require('dotenv').config({ path: __dirname + '/../.env' });
 const axios = require('axios');
 const process = require('node:process');
 const NGROK_URL = 'http://localhost:4040/api/tunnels';
