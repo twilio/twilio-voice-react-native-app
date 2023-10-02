@@ -105,20 +105,20 @@ See the React Navigation documentation [here](https://reactnavigation.org/docs/g
 
 ### Deploying Android and iOS to AppCenter
 
-The Twilio Voice React Native App uses github tags to deploy both Android and iOS apps to AppCenter. The github tags contain options for either a "rc" or "release". "rc" and "release" options can also contain "preview" and "beta" filters. Append "-android" or "-ios" to the end of tags for platform specific release.
+The Twilio Voice React Native App uses github tags to deploy both Android and iOS apps to AppCenter. The github tags contain options for either a "rc" or "release". "rc" and "release" options can also contain "preview" and "beta" filters. Releases are **PLATFORM SPECIFIC**, thus append "-android" or "-ios" to the end of tags for desired platform release.
 
-#### iOS and Android example release
-
-```
-0.0.0.0-rc0
-0.0.0-beta.0-rc0
-0.0.0-preview.0-rc0
-```
+#### Android example release
 
 ```
-0.0.0
-0.0.0-beta
-0.0.0-preview
+0.0.0.0-rc0-android
+0.0.0-beta.0-rc0-android
+0.0.0-preview.0-rc0-android
+```
+
+```
+0.0.0-android
+0.0.0-beta-android
+0.0.0-preview-android
 ```
 
 #### iOS example release
