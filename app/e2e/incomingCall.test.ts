@@ -45,7 +45,7 @@ describe('Incoming Call', () => {
   let clientId: string;
   let registrationTimeout: Generator<number>;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     ({ twilioClient, clientId } = bootstrap());
 
     await device.launchApp({ newInstance: true });
@@ -64,11 +64,6 @@ describe('Incoming Call', () => {
         yield 10 * 1000;
       }
     })();
-  });
-
-  beforeEach(async () => {
-    await device.reloadReactNative();
-    await createTimerPromise(10 * 1000, 'device.reloadReactNative');
   });
 
   afterAll(async () => {

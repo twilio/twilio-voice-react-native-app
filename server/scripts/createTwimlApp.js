@@ -1,13 +1,12 @@
 /* eslint-disable */
 'use strict';
-require('dotenv').config({ path: __dirname + '/../.env' });
 const axios = require('axios');
 const process = require('node:process');
 const NGROK_URL = 'http://localhost:4040/api/tunnels';
 const ACCOUNT_SID = process.env.ACCOUNT_SID;
-const TWIML_APP_SID = process.env.TWIML_APP_SID;
 const AUTH_TOKEN = process.env.AUTH_TOKEN;
 const client = require('twilio')(ACCOUNT_SID, AUTH_TOKEN);
+const fs = require('fs');
 
 async function getNgrokTunnel() {
   const { data: ngrokResponse } = await axios.get(NGROK_URL);
@@ -33,9 +32,16 @@ async function getNgrokTunnel() {
 async function main() {
   const tunnel = await getNgrokTunnel();
 
-  const twimlApp = await client
-    .applications(TWIML_APP_SID)
-    .update({ voiceUrl: `${tunnel.public_url}/twiml` });
+  const twimlApp = await client.applications.create({
+    voiceUrl: `${tunnel.public_url}/twiml`,
+  });
+
+  fs.appendFile('../.env', `CURRENT_TWIML_APP_SID=${twimlApp.sid}\n`, (err) => {
+    if (err) {
+      console.log(err);
+      process.exitCode = 1;
+    }
+  });
 
   console.log(JSON.stringify(twimlApp, null, 2));
 }

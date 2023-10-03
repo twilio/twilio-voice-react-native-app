@@ -252,7 +252,16 @@ commands:
             cd server
             yarn start
 
-  ###
+  server-delete-twiml-app:
+    steps:
+      - run:
+          name: "Server: delete twiml app"
+          when: always
+          command: |
+            cd server/scripts
+            node deleteTwimlApp.js
+
+  ##
   # Ngrok Commands
   ###
   ngrok-install:
@@ -274,10 +283,10 @@ commands:
             sleep 30
             curl http://127.0.0.1:4040/api/tunnels
       - run:
-          name: "ngrok: update twiML app with ngrok public_url"
+          name: "ngrok: create twiML app with ngrok public_url"
           command: |
             cd server/scripts
-            node updateTwimlApp.js
+            node createTwimlApp.js
 
   ngrok-install-mac:
     steps:
@@ -295,15 +304,20 @@ commands:
           command: |
             sleep 30
             curl http://127.0.0.1:4040/api/tunnels
+      - run:
+          name: "ngrok: create twiML app with ngrok public_url"
+          command: |
+            cd server/scripts
+            node createTwimlApp.js
 
   configure-git-user:
     description: "Configures the git user for committing"
     steps:
       - run:
-         name: Git User Config
-         command: |
-           git config --global user.email "${GITHUB_EMAIL_SDK_BUILD}"
-           git config --global user.name "${GITHUB_USERNAME_SDK_BUILD}"
+          name: Git User Config
+          command: |
+            git config --global user.email "${GITHUB_EMAIL_SDK_BUILD}"
+            git config --global user.name "${GITHUB_USERNAME_SDK_BUILD}"
 
 jobs:
   ###
@@ -391,21 +405,19 @@ jobs:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           install: true
           system-image: system-images;android-29;google_apis;x86_64
+          additional-args: --device pixel_4
       - android/start-emulator:
           avd-name: TwilioVoiceReactNativeReferenceApp_AVD
           memory: 8192
           post-emulator-launch-assemble-command: ""
           restore-gradle-cache-post-emulator-launch: false
-          wait-for-emulator: false
+          wait-for-emulator: true
       - app-detox-build:
           configuration: android.emu.release
       - app-expose-port
-      - run:
-          name: "Wait for emulator to settle"
-          command: |
-            sleep 150
       - app-detox-test:
           configuration: android.emu.release
+      - server-delete-twiml-app
       - run:
           name: "Save Android logs"
           when: always
@@ -444,6 +456,10 @@ jobs:
           configuration: ios.sim.release
       - app-detox-test:
           configuration: ios.sim.release
+      - server-delete-twiml-app
+      - store_artifacts:
+          when: always
+          path: app/detox_artifacts
 
   ###
   # Server jobs
@@ -488,7 +504,7 @@ jobs:
       - store_artifacts:
           path: server/coverage
 
-# Publish the android app
+  # Publish the android app
   publish-android-app-appcenter:
     executor:
       <<: *android-executor
@@ -581,8 +597,7 @@ jobs:
         # Use this flag to control the app distrubution audience
         type: string
     steps:
-      - run:
-          sudo npm install -g appcenter-cli
+      - run: sudo npm install -g appcenter-cli
       - checkout
       - attach_workspace:
           at: app/ios/temp
@@ -632,8 +647,6 @@ workflows:
           context:
             - vblocks-js
       - app-detox-ios:
-          requires:
-            - app-detox-android
           context:
             - vblocks-js
 
@@ -692,4 +705,3 @@ workflows:
             - build-archive-android-app
           context:
             - vblocks-dogfood-reference-app
-
