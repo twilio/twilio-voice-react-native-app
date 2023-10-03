@@ -39,6 +39,7 @@ async function main() {
   fs.appendFile('../.env', `CURRENT_TWIML_APP_SID=${twimlApp.sid}\n`, (err) => {
     if (err) {
       console.log(err);
+      process.exitCode = 1;
     }
   });
 
