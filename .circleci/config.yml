@@ -37,6 +37,15 @@ aliases:
     branches:
       ignore: /.*/
 
+  - &rc-filter-server
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-rc\d+-server$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-rc\d+-server$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-rc\d+-server$/
+    branches:
+      ignore: /.*/
+
   - &release-filter-ios
     tags:
       only:
@@ -52,6 +61,15 @@ aliases:
         - /^\d+\.\d+\.\d+-android$/
         - /^\d+\.\d+\.\d+-preview\.\d+-android$/
         - /^\d+\.\d+\.\d+-beta\.\d+-android$/
+    branches:
+      ignore: /.*/
+
+  - &release-filter-server
+    tags:
+      only:
+        - /^\d+\.\d+\.\d+-server$/
+        - /^\d+\.\d+\.\d+-preview\.\d+-server$/
+        - /^\d+\.\d+\.\d+-beta\.\d+-server$/
     branches:
       ignore: /.*/
 
@@ -658,14 +676,7 @@ workflows:
       - server-build:
           requires:
             - server-cache-install-dependencies
-      - deploy-server:
-          context:
-            - vblocks-js
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
+
       # e2e jobs
       - app-detox-android:
           context:
@@ -701,6 +712,10 @@ workflows:
             - vblocks-dogfood-reference-app
           requires:
             - build-archive-android-app
+      - deploy-server:
+          filters: *rc-filter-server
+          context:
+            - vblocks-dogfood-reference-app
 
   ###
   # Release workflow
@@ -727,5 +742,9 @@ workflows:
           filters: *release-filter-android
           requires:
             - build-archive-android-app
+          context:
+            - vblocks-dogfood-reference-app
+      - deploy-server:
+          filters: *release-filter-server
           context:
             - vblocks-dogfood-reference-app

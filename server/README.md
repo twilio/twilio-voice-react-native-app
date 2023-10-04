@@ -29,3 +29,19 @@ See [example.env](example.env) for information on Auth0 environment variables re
   ```sh
   yarn watch
   ```
+
+### Deploying Server to Google Cloud
+
+The Twilio Voice React Native Reference Server uses github tags to deploy to Google Cloud. The github tags contain options for either a "rc" or "release". "rc" and "release" options can also contain "preview" and "beta" filters. 
+
+```
+0.0.0.0-rc0-server
+0.0.0-beta.0-rc0-server
+0.0.0-preview.0-rc0-server
+```
+
+```
+0.0.0-server
+0.0.0-beta-server
+0.0.0-preview-server
+```
