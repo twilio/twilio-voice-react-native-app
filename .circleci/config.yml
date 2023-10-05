@@ -522,7 +522,7 @@ jobs:
           path: server/coverage
 
   deploy-server:
-    executor: gcp-cli/default
+    executor: default
     steps:
       - checkout
       - server-install-dependencies
@@ -536,7 +536,6 @@ jobs:
           command: |
             cd server
             gcloud app deploy --no-promote
-            cd ..
 
   # Publish the android app
   publish-android-app-appcenter:
