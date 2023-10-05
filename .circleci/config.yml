@@ -78,11 +78,9 @@ aliases:
     resource-class: large
     tag: 2023.07.1
 
-  - &app-package-json-key
-    app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+  - &app-package-json-key app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
-  - &server-package-json-key
-    server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+  - &server-package-json-key server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
 
   - &save-app-package-json
     name: Save App Javascript Dependencies
@@ -524,7 +522,7 @@ jobs:
           path: server/coverage
 
   deploy-server:
-    executor: default
+    executor: gcp-cli/default
     steps:
       - checkout
       - server-install-dependencies
