@@ -78,9 +78,11 @@ aliases:
     resource-class: large
     tag: 2023.07.1
 
-  - &app-package-json-key app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
+  - &app-package-json-key
+    app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
 
-  - &server-package-json-key server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
+  - &server-package-json-key
+    server-dependencies-{{ arch }}-{{ checksum "server/package.json" }}
 
   - &save-app-package-json
     name: Save App Javascript Dependencies
@@ -675,7 +677,7 @@ workflows:
             - server-cache-install-yarn-dependencies
       - server-build:
           requires:
-            - server-cache-install-dependencies
+            - server-cache-install-yarn-dependencies
 
       # e2e jobs
       - app-detox-android:
