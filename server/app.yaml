@@ -1,4 +1,1 @@
-runtime: nodejs
-
-runtime_config:
-  runtime_version: '16'
+runtime: nodejs16
