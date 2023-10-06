@@ -2,8 +2,8 @@ import '@testing-library/jest-native/extend-expect';
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import React from 'react';
 import { Provider } from 'react-redux';
-import About from '..';
-import { createStore } from '../../../store/app';
+import About from '../About';
+import { createStore } from '../../store/app';
 import { Linking } from 'react-native';
 
 describe('<About />', () => {

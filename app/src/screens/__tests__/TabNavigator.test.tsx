@@ -13,6 +13,7 @@ jest.mock(
   'react-native-safe-area-context',
   () => require('react-native-safe-area-context/jest/mock').default,
 );
+jest.unmock('@react-navigation/native');
 
 describe('<TabNavigator />', () => {
   let wrapper: React.ComponentType<any>;

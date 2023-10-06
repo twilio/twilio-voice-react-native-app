@@ -6,15 +6,20 @@ export const navigationRef = createNavigationContainerRef<StackParamList>();
 
 export async function getNavigate() {
   await new Promise<void>((resolve) => {
-    const poll = () => {
+    const poll = (): boolean => {
       if (navigationRef.isReady()) {
         clearInterval(intervalId);
         resolve();
+        return false;
       }
+      return true;
     };
-    const intervalId = setInterval(poll, 500);
-    poll();
+
+    let intervalId: number | undefined;
+    if (poll()) {
+      intervalId = setInterval(poll, 500);
+    }
   });
 
-  return navigationRef.navigate;
+  return navigationRef;
 }

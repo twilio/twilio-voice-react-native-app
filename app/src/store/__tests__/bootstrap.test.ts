@@ -40,7 +40,11 @@ describe('bootstrap', () => {
   const dispatchedActions: any[] = [];
 
   beforeEach(() => {
-    jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValue(jest.fn());
+    jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValue({
+      navigate: jest.fn(),
+      reset: jest.fn(),
+      dispatch: jest.fn(),
+    } as any);
 
     dispatchedActions.splice(0);
     const logAction: Middleware = () => (next) => (action) => {
@@ -109,7 +113,7 @@ describe('bootstrap', () => {
     it('succeeds', async () => {
       const { type, payload } = await store.dispatch(bootstrapUser());
       expect(type).toStrictEqual('bootstrap/user/fulfilled');
-      expect(payload).toStrictEqual('LOGGED_IN');
+      expect(payload).toBeUndefined();
 
       expect(store.getState().user).toStrictEqual({
         action: 'checkLoginStatus',
@@ -332,14 +336,13 @@ describe('bootstrap', () => {
 
     it('listens for call invite notification tapped events', async () => {
       const onSpy = jest.spyOn(voiceUtil.voice, 'on');
-      jest
-        .spyOn(navigationUtil, 'getNavigate')
-        .mockResolvedValueOnce(jest.fn());
+      jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValueOnce({
+        navigate: jest.fn(),
+        reset: jest.fn(),
+      } as any);
 
-      const { type, payload } = await store.dispatch(bootstrapNavigation());
-
+      const { type } = await store.dispatch(bootstrapNavigation());
       expect(type).toMatch(/fulfilled/);
-      expect(payload).toBeUndefined();
 
       expect(onSpy.mock.calls).toHaveLength(1);
       const [[event]] = onSpy.mock.calls;
@@ -348,14 +351,14 @@ describe('bootstrap', () => {
 
     it('navigates to the call invite screen', async () => {
       const navigateSpy = jest.fn();
-      jest
-        .spyOn(navigationUtil, 'getNavigate')
-        .mockResolvedValueOnce(navigateSpy);
+      const resetSpy = jest.fn();
+      jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValueOnce({
+        navigate: navigateSpy,
+        reset: resetSpy,
+      } as any);
 
-      const { type, payload } = await store.dispatch(bootstrapNavigation());
-
+      const { type } = await store.dispatch(bootstrapNavigation());
       expect(type).toMatch(/fulfilled/);
-      expect(payload).toBeUndefined();
 
       voiceUtil.voice.emit('callInviteNotificationTapped' as any);
 

@@ -219,18 +219,27 @@ const useActiveCallScreen = (callSid?: string) => {
    */
   React.useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let onNavStateChanged: () => void;
     if (
       activeCall?.status === 'fulfilled' &&
       activeCall.info.state === 'disconnected'
     ) {
+      onNavStateChanged = () => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+        }
+        navigation.removeListener('state', onNavStateChanged);
+      };
       timeoutId = setTimeout(() => {
-        navigation.navigate('App');
+        navigation.goBack();
       }, 1000);
+      navigation.addListener('state', onNavStateChanged);
     }
     return () => {
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
+      navigation.removeListener('state', onNavStateChanged);
     };
   }, [activeCall, navigation]);
 
