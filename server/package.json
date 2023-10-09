@@ -8,8 +8,7 @@
     "start": "node build/src/",
     "watch": "nodemon",
     "test": "jest",
-    "lint": "eslint .",
-    "gcp-build": ""
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@babel/core": "^7.20.5",
