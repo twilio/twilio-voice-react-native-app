@@ -5,6 +5,7 @@
 ### Changes
 * Refactored and simplified navigators. Now, movement between screens is more
 explicit and has finer control.
+* Upgraded Twilio Voice SDK to `1.0.0-rc8`.
 
 # 1.0.0-beta.1 (Aug 23, 2023)
 
