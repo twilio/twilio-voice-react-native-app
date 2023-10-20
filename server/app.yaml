@@ -1,5 +1,2 @@
 runtime: nodejs
 env: flex
-
-runtime_config:
-  runtime_version: '16'
