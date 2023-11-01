@@ -34,9 +34,12 @@ See [example.env](example.env) for information on Auth0 environment variables re
 This `/server` folder is designed to be deployed to Google Cloud App Engine instance. It
 can be deployed from a local machine after configured.
 
+Make sure you have Node ^16.0.0
+
 Using the `gcloud` CLI, you can deploy using
 ```
 npm install
 npm run build
+gcloud init
 gcloud app deploy
 ```
