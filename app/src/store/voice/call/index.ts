@@ -30,7 +30,6 @@ export const getCallInfo = (call: TwilioCall): CallInfo => {
     Platform.OS,
   ])
     .with([undefined, P._], () => undefined)
-    .with([P.not(undefined), 'ios'], ([timestamp]) => Number(timestamp) * 1000)
     .with([P.not(undefined), P._], ([timestamp]) => Number(timestamp))
     .exhaustive();
 
