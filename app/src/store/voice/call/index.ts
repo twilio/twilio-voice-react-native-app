@@ -3,7 +3,6 @@ import {
   type CallInvite as TwilioCallInvite,
   type CustomParameters,
 } from '@twilio/voice-react-native-sdk';
-import { Platform } from 'react-native';
 import { match, P } from 'ts-pattern';
 import { type AsyncStoreSlice } from '../../app';
 
@@ -25,13 +24,9 @@ export const getCallInfo = (call: TwilioCall): CallInfo => {
   const to = call.getTo();
   const from = call.getFrom();
 
-  const initialConnectedTimestamp = match([
-    call.getInitialConnectedTimestamp(),
-    Platform.OS,
-  ])
-    .with([undefined, P._], () => undefined)
-    .with([P.not(undefined), 'ios'], ([timestamp]) => Number(timestamp) * 1000)
-    .with([P.not(undefined), P._], ([timestamp]) => Number(timestamp))
+  const initialConnectedTimestamp = match(call.getInitialConnectedTimestamp())
+    .with(undefined, () => undefined)
+    .with(P._, (timestamp) => Number(timestamp))
     .exhaustive();
 
   const isMuted = Boolean(call.isMuted());
