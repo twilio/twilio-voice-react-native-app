@@ -24,9 +24,9 @@ export const getCallInfo = (call: TwilioCall): CallInfo => {
   const to = call.getTo();
   const from = call.getFrom();
 
-  const initialConnectedTimestamp = match([call.getInitialConnectedTimestamp()])
-    .with([undefined], () => undefined)
-    .with([P.not(undefined)], ([timestamp]) => Number(timestamp))
+  const initialConnectedTimestamp = match(call.getInitialConnectedTimestamp())
+    .with(undefined, () => undefined)
+    .with(P._, (timestamp) => Number(timestamp))
     .exhaustive();
 
   const isMuted = Boolean(call.isMuted());
