@@ -8,7 +8,8 @@ explicit and has finer control.
 * Upgraded Twilio Voice SDK to `1.0.0-rc8`.
 
 ### Fixes
-* Call timer for iOS, no longer shows negative numbers
+* iOS call timer, no longer shows negative numbers
+* iOS splash screen centered for larger screens
 
 # 1.0.0-beta.1 (Aug 23, 2023)
 
