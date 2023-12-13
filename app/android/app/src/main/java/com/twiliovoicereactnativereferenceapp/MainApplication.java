@@ -14,7 +14,6 @@ import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.distribute.Distribute;
 import com.twiliovoicereactnativereferenceapp.newarchitecture.MainApplicationReactNativeHost;
 
-
 public class MainApplication extends Application implements ReactApplication {
     private final MainApplicationReactNativeHost mNewArchitectureNativeHost =
             new MainApplicationReactNativeHost(this);
@@ -51,7 +50,7 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     public void onTerminate() {
-        // Note: this method is not called when running on device, devies just kill the process.
+        // Note: this method is not called when running on device, devices just kill the process.
         voiceApplicationProxy.onTerminate();
         super.onTerminate();
     }

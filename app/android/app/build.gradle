@@ -261,7 +261,7 @@ android {
 
 dependencies {
     androidTestImplementation('com.wix:detox:+')
-    
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"
