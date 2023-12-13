@@ -4,7 +4,6 @@ import android.app.Application;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactPackage;
-import com.twiliovoicereactnative.BuildConfig;
 import com.twiliovoicereactnative.VoiceApplicationProxy;
 
 import java.util.List;

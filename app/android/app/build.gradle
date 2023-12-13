@@ -335,7 +335,7 @@ def getLocalPropertyOrEnv(key) {
     return return_value;
 }
 
-def stringifyNull(var) {
+static def stringifyNull(var) {
     if (null == var) {
         return "\"null\""
     }
