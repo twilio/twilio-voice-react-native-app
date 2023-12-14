@@ -1,15 +1,13 @@
 package com.twiliovoicereactnativereferenceapp;
 
+import java.lang.reflect.InvocationTargetException;
 import android.app.Application;
 import android.content.Context;
-
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.soloader.SoLoader;
 import com.twiliovoicereactnative.VoiceApplicationProxy;
-import java.lang.reflect.InvocationTargetException;
-
 import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.distribute.Distribute;
 import com.twiliovoicereactnativereferenceapp.newarchitecture.MainApplicationReactNativeHost;
