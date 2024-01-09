@@ -4,7 +4,6 @@ apply plugin: "com.android.application"
 apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile
-import org.apache.tools.ant.taskdefs.condition.Os
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -262,15 +261,11 @@ android {
 
 dependencies {
     androidTestImplementation('com.wix:detox:+')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
-
     //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:+"  // From node_modules
-
+    implementation "com.facebook.react:react-native:+"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
-
     implementation "com.microsoft.appcenter:appcenter-distribute:4.3.1"
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
@@ -339,7 +334,7 @@ def getLocalPropertyOrEnv(key) {
     return return_value;
 }
 
-def stringifyNull(var) {
+static def stringifyNull(var) {
     if (null == var) {
         return "\"null\""
     }

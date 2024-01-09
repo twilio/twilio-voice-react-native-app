@@ -377,10 +377,7 @@ jobs:
       - app-install-dependencies
       - app-save-google-services-json
       - android/install-ndk:
-          version: "21.4.7075529"
-      # for aarch64
-      - android/install-ndk:
-          version: "24.0.8215888"
+          version: "25.2.9519653"
       - app-android-build
 
   app-detox-android:

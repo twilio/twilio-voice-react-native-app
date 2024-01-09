@@ -3,37 +3,58 @@ package com.twiliovoicereactnativereferenceapp;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
+import com.twiliovoicereactnative.VoiceActivityProxy;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import android.widget.Toast;
 
 public class MainActivity extends ReactActivity {
-  private static final String TAG = "MainActivity";
-  private static final int MIC_PERMISSION_REQUEST_CODE = 1;
+  public static class MainActivityDelegate extends ReactActivityDelegate {
+    public MainActivityDelegate(ReactActivity activity, String mainComponentName) {
+      super(activity, mainComponentName);
+    }
 
-  private boolean checkPermissionForMicrophone() {
-    int resultMic = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
-    return resultMic == PackageManager.PERMISSION_GRANTED;
-  }
+    @Override
+    protected ReactRootView createRootView() {
+      ReactRootView reactRootView = new ReactRootView(getContext());
+      // If you opted-in for the New Architecture, we enable the Fabric Renderer.
+      reactRootView.setIsFabric(BuildConfig.IS_NEW_ARCHITECTURE_ENABLED);
+      return reactRootView;
+    }
 
-  private void requestPermissionForMicrophone() {
-    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
-      Log.d(TAG, "Microphone permissions needed. Please allow in your application settings.");
-    } else {
-      ActivityCompat.requestPermissions(
-        this,
-        new String[]{Manifest.permission.RECORD_AUDIO},
-        MIC_PERMISSION_REQUEST_CODE);
+    @Override
+    protected boolean isConcurrentRootEnabled() {
+      // If you opted-in for the New Architecture, we enable Concurrent Root (i.e. React 18).
+      // More on this on https://reactjs.org/blog/2022/03/29/react-v18.html
+      return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
     }
   }
 
+  private final VoiceActivityProxy activityProxy = new VoiceActivityProxy(
+          this,
+          permission -> {
+            if (Manifest.permission.RECORD_AUDIO.equals(permission)) {
+              Toast.makeText(
+                      MainActivity.this,
+                      "Microphone permissions needed. Please allow in your application settings.",
+                      Toast.LENGTH_LONG).show();
+            } else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) &&
+                    Manifest.permission.BLUETOOTH_CONNECT.equals(permission)) {
+              Toast.makeText(
+                      MainActivity.this,
+                      "Bluetooth permissions needed. Please allow in your application settings.",
+                      Toast.LENGTH_LONG).show();
+            } else if ((Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) &&
+                    Manifest.permission.POST_NOTIFICATIONS.equals(permission)) {
+              Toast.makeText(
+                      MainActivity.this,
+                      "Notification permissions needed. Please allow in your application settings.",
+                      Toast.LENGTH_LONG).show();
+            }
+          });
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
    * rendering of the component.
@@ -56,30 +77,18 @@ public class MainActivity extends ReactActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    if (!checkPermissionForMicrophone()) {
-      requestPermissionForMicrophone();
-    }
+    activityProxy.onCreate(savedInstanceState);
   }
 
-  public static class MainActivityDelegate extends ReactActivityDelegate {
-    public MainActivityDelegate(ReactActivity activity, String mainComponentName) {
-      super(activity, mainComponentName);
-    }
+  @Override
+  public void onDestroy() {
+    activityProxy.onDestroy();
+    super.onDestroy();
+  }
 
-    @Override
-    protected ReactRootView createRootView() {
-      ReactRootView reactRootView = new ReactRootView(getContext());
-      // If you opted-in for the New Architecture, we enable the Fabric Renderer.
-      reactRootView.setIsFabric(BuildConfig.IS_NEW_ARCHITECTURE_ENABLED);
-      return reactRootView;
-    }
-
-    @Override
-    protected boolean isConcurrentRootEnabled() {
-      // If you opted-in for the New Architecture, we enable Concurrent Root (i.e. React 18).
-      // More on this on https://reactjs.org/blog/2022/03/29/react-v18.html
-      return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
-    }
+  @Override
+  public void onNewIntent(Intent intent) {
+    super.onNewIntent(intent);
+    activityProxy.onNewIntent(intent);
   }
 }
