@@ -1566,6 +1566,13 @@
     "@twilio/voice-errors" "^1.2.2"
     eventemitter3 "^4.0.7"
 
+"@twilio/voice-react-native-sdk@https://github.com/twilio/twilio-voice-react-native.git#1.0.0-rc19":
+  version "1.0.0-rc19"
+  resolved "https://github.com/twilio/twilio-voice-react-native.git#0fc36325f4843b88d4000f001ff0364e2057cb50"
+  dependencies:
+    "@twilio/voice-errors" "^1.2.2"
+    eventemitter3 "^4.0.7"
+
 "@types/babel__core@^7.1.14":
   version "7.20.0"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.20.0.tgz#61bc5a4cae505ce98e1e36c5445e4bee060d8891"
