@@ -5,7 +5,7 @@
 ### Changes
 * Refactored and simplified navigators. Now, movement between screens is more
 explicit and has finer control.
-* Upgraded Twilio Voice SDK to `1.0.0-rc17`.
+* Upgraded Twilio Voice SDK to `1.0.0-beta.4`.
 * Refactored Android implementation to use newly refactored Android Voice React Native SDK
 
 ### Fixes
