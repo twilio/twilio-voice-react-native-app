@@ -1559,9 +1559,9 @@
   resolved "https://registry.yarnpkg.com/@twilio/voice-errors/-/voice-errors-1.4.0.tgz#0ab954085a32a00442814e56c95936908871ff6e"
   integrity sha512-7BCg9MPz+KQ0JJ6Rl5W3Zw3E+i3Tt77VZw3/2i3Z+IPZITmCOQLu1nKx/0Nlj505Xtfr7eY9Mcern5PfIoBW0w==
 
-"@twilio/voice-react-native-sdk@https://github.com/twilio/twilio-voice-react-native.git#1.0.0-rc17":
-  version "1.0.0-rc17"
-  resolved "https://github.com/twilio/twilio-voice-react-native.git#fe1f41fb3d85afe7cccc5c4f184d77f8800847e6"
+"@twilio/voice-react-native-sdk@https://github.com/twilio/twilio-voice-react-native.git#1.0.0-beta.4":
+  version "1.0.0-beta.4"
+  resolved "https://github.com/twilio/twilio-voice-react-native.git#8dab0f2f674b25ea238d567c442bd2f7fd5afec4"
   dependencies:
     "@twilio/voice-errors" "^1.2.2"
     eventemitter3 "^4.0.7"
