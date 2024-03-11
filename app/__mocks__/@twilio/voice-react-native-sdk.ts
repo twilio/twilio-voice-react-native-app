@@ -102,25 +102,44 @@ export const createMockCall = jest.fn((id: string) => {
   return mockCall;
 });
 
-export const createMockCallInvite = jest.fn((id: string) => ({
-  _uuid: `mock uuid ${id}`,
-  accept: jest.fn(async () => createMockCall(id)),
-  getCallSid: jest.fn().mockReturnValue(`mock call sid ${id}`),
-  getCustomParameters: jest
-    .fn()
-    .mockReturnValue(`mock custom parameters ${id}`),
-  getFrom: jest.fn().mockReturnValue(`mock from ${id}`),
-  getState: jest.fn().mockReturnValue(`mock state ${id}`),
-  getTo: jest.fn().mockReturnValue(`mock to ${id}`),
-  reject: jest.fn(async () => createMockCall(id)),
-}));
+export const createMockCallInvite = jest
+  .fn()
+  .mockImplementation((id: string) => {
+    const callInviteEventEmitter = new BasicEventEmitter();
+    const emit = callInviteEventEmitter.emit.bind(callInviteEventEmitter);
+    const on = callInviteEventEmitter.on.bind(callInviteEventEmitter);
 
-export const voiceGetCallInvites = jest.fn().mockResolvedValue(
-  new Map([
+    const _uuid = `mock uuid ${id}`;
+    const accept = jest.fn(async () => createMockCall(id));
+    const getCallSid = jest.fn().mockReturnValue(`mock call sid ${id}`);
+    const getCustomParameters = jest
+      .fn()
+      .mockReturnValue(`mock custom parameters ${id}`);
+    const getFrom = jest.fn().mockReturnValue(`mock from ${id}`);
+    const getState = jest.fn().mockReturnValue(`mock state ${id}`);
+    const getTo = jest.fn().mockReturnValue(`mock to ${id}`);
+    const reject = jest.fn(async () => createMockCall(id));
+
+    return {
+      _uuid,
+      accept,
+      emit,
+      getCallSid,
+      getCustomParameters,
+      getFrom,
+      getState,
+      getTo,
+      on,
+      reject,
+    };
+  });
+
+export const voiceGetCallInvites = jest.fn().mockImplementation(async () => {
+  return new Map([
     ['mock uuid 1', createMockCallInvite('1')],
     ['mock uuid 2', createMockCallInvite('2')],
-  ]),
-);
+  ]);
+});
 
 export const voiceInitializePushRegistry = jest
   .fn()
@@ -159,6 +178,16 @@ export const Call = {
     Reconnected: 'reconnected',
     Ringing: 'ringing',
     QualityWarningsChanged: 'qualityWarningsChanged',
+  },
+};
+
+export const CallInvite = {
+  Event: {
+    Accepted: 'accepted',
+    Rejected: 'rejected',
+    Cancelled: 'cancelled',
+    NotificationTapped: 'notificationTapped',
+    MessageReceived: 'messageReceived',
   },
 };
 
