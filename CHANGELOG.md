@@ -17,6 +17,7 @@ explicit and has finer control.
   ```
   pod install
   ```
+  See [docs/known-issues.md](./docs/known-issues.md) for more information.
 
 ### Fixes
 * iOS call timer, no longer shows negative numbers
