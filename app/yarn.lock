@@ -1559,16 +1559,16 @@
   resolved "https://registry.yarnpkg.com/@twilio/voice-errors/-/voice-errors-1.4.0.tgz#0ab954085a32a00442814e56c95936908871ff6e"
   integrity sha512-7BCg9MPz+KQ0JJ6Rl5W3Zw3E+i3Tt77VZw3/2i3Z+IPZITmCOQLu1nKx/0Nlj505Xtfr7eY9Mcern5PfIoBW0w==
 
-"@twilio/voice-react-native-sdk@https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc21.tar.gz":
-  version "1.0.0-rc21"
-  resolved "https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc21.tar.gz#59ef713a313335caefdec31bfd62d7f2d6092f3e"
+"@twilio/voice-react-native-sdk@https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc22.tar.gz":
+  version "1.0.0-rc22"
+  resolved "https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc22.tar.gz#a754112bfe0b275b51e75a2284c21ff35c2f9f85"
   dependencies:
     "@twilio/voice-errors" "^1.2.2"
     eventemitter3 "^4.0.7"
 
-"@twilio/voice-react-native-sdk@https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc22.tar.gz":
-  version "1.0.0-rc22"
-  resolved "https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc22.tar.gz#a754112bfe0b275b51e75a2284c21ff35c2f9f85"
+"@twilio/voice-react-native-sdk@https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc23.tar.gz":
+  version "1.0.0-rc23"
+  resolved "https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc23.tar.gz#f57417480345aa32be8eae1effb55bcb209c4fbf"
   dependencies:
     "@twilio/voice-errors" "^1.2.2"
     eventemitter3 "^4.0.7"

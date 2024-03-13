@@ -18,7 +18,7 @@
     "@react-navigation/native": "^6.1.2",
     "@react-navigation/native-stack": "^6.9.8",
     "@reduxjs/toolkit": "^1.9.1",
-    "@twilio/voice-react-native-sdk": "https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc22.tar.gz",
+    "@twilio/voice-react-native-sdk": "https://github.com/twilio/twilio-voice-react-native/archive/refs/tags/1.0.0-rc23.tar.gz",
     "react": "18.1.0",
     "react-native": "0.70.9",
     "react-native-auth0": "^3.0.0",
