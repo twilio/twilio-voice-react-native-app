@@ -114,8 +114,74 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
     /**
      * Handle an incoming, pending, call invite.
      */
-    const handlePendingCallInvite = async (callInvite: TwilioCallInvite) => {
-      await dispatch(receiveCallInvite(callInvite));
+    const handlePendingCallInvite = (callInvite: TwilioCallInvite) => {
+      /**
+       * Handle the call invite accepted event.
+       */
+      const handleCallInviteAccepted = (call: TwilioCall) => {
+        // dispatch the new call
+        dispatch(handleCall({ call }));
+        handleSettledCallInvite(callInvite);
+
+        const callSid = callInvite.getCallSid();
+        const currentRoute = getCurrentRoute();
+        if (currentRoute?.name !== 'Incoming Call') {
+          navigate('Call', { callSid });
+        } else {
+          navDispatch(StackActions.replace('Call', { callSid }));
+        }
+      };
+      callInvite.on(TwilioCallInvite.Event.Accepted, handleCallInviteAccepted);
+
+      /**
+       * Return to the previous screen if a call invite is cancelled/rejected
+       * and there are no more call invites.
+       */
+      const maybeGoBack = () => {
+        const shouldGoBack = getState().voice.call.callInvite.ids.length === 0;
+        const currentRoute = getCurrentRoute();
+        if (
+          shouldGoBack &&
+          currentRoute?.name === 'Incoming Call' &&
+          canGoBack()
+        ) {
+          goBack();
+        }
+      };
+
+      /**
+       * Handle the call invite rejected event.
+       */
+      const handleCallInviteRejected = () => {
+        handleSettledCallInvite(callInvite);
+        maybeGoBack();
+      };
+      callInvite.on(TwilioCallInvite.Event.Rejected, handleCallInviteRejected);
+
+      /**
+       * Handle the call invite cancelled event.
+       */
+      const handleCallInviteCancelled = () => {
+        handleSettledCallInvite(callInvite);
+        maybeGoBack();
+      };
+      callInvite.on(
+        TwilioCallInvite.Event.Cancelled,
+        handleCallInviteCancelled,
+      );
+
+      /**
+       * Handle the call invite notification tapped event.
+       */
+      const handleCallInviteNotificationTapped = () => {
+        navigate('Incoming Call');
+      };
+      callInvite.on(
+        TwilioCallInvite.Event.NotificationTapped,
+        handleCallInviteNotificationTapped,
+      );
+
+      dispatch(receiveCallInvite(callInvite));
     };
     voice.on(Voice.Event.CallInvite, handlePendingCallInvite);
 
@@ -140,38 +206,6 @@ export const bootstrapCallInvites = createTypedAsyncThunk<
 
       dispatch(removeCallInvite(callInviteEntity.id));
     };
-
-    voice.on(
-      Voice.Event.CallInviteAccepted,
-      (callInvite: TwilioCallInvite, call: TwilioCall) => {
-        // dispatch the new call
-        dispatch(handleCall({ call }));
-        handleSettledCallInvite(callInvite);
-
-        const callSid = callInvite.getCallSid();
-        const currentRoute = getCurrentRoute();
-        if (currentRoute?.name !== 'Incoming Call') {
-          navigate('Call', { callSid });
-        } else {
-          navDispatch(StackActions.replace('Call', { callSid }));
-        }
-      },
-    );
-
-    voice.on(Voice.Event.CallInviteRejected, (callInvite: TwilioCallInvite) => {
-      handleSettledCallInvite(callInvite);
-      const currentRoute = getCurrentRoute();
-      if (currentRoute?.name === 'Incoming Call' && canGoBack()) {
-        goBack();
-      }
-    });
-
-    voice.on(
-      Voice.Event.CancelledCallInvite,
-      (callInvite: TwilioCallInvite) => {
-        handleSettledCallInvite(callInvite);
-      },
-    );
 
     /**
      * Handle existing pending call invites.
@@ -261,15 +295,7 @@ export const bootstrapNavigation =
   createTypedAsyncThunk<BootstrapNavigationReturnValue>(
     bootstrapNavigationActionTypes.prefix,
     async (_, { getState }) => {
-      const { reset, navigate } = await getNavigate();
-
-      /**
-       * If the call invite notification body is tapped, navigate to the call
-       * invite screen.
-       */
-      voice.on(Voice.Event.CallInviteNotificationTapped, () => {
-        navigate('Incoming Call');
-      });
+      const { reset } = await getNavigate();
 
       const state = getState();
 

@@ -5,8 +5,19 @@
 ### Changes
 * Refactored and simplified navigators. Now, movement between screens is more
 explicit and has finer control.
-* Upgraded Twilio Voice SDK to `1.0.0-beta.4`.
+* Upgraded Twilio Voice SDK to `1.0.0-rc23`.
 * Refactored Android implementation to use newly refactored Android Voice React Native SDK
+* Flipper is causing some build issues on Xcode version 15.3.
+  An option to disable Flipper during `pod install` has been added to the Podfile of this project.
+  To disable Flipper:
+  ```
+  NO_FLIPPER=1 pod install
+  ```
+  To continue using Flipper as normal, no changes are necessary to your workflow:
+  ```
+  pod install
+  ```
+  See [docs/known-issues.md](./docs/known-issues.md) for more information.
 
 ### Fixes
 * iOS call timer, no longer shows negative numbers

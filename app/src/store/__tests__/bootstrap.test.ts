@@ -5,7 +5,6 @@ import {
   bootstrapUser,
   bootstrapCallInvites,
   bootstrapCalls,
-  bootstrapNavigation,
 } from '../bootstrap';
 import { checkLoginStatus } from '../user';
 import { getAccessToken } from '../voice/accessToken';
@@ -14,7 +13,6 @@ import { register } from '../voice/registration';
 import * as auth0 from '../../../__mocks__/react-native-auth0';
 import * as voiceSdk from '../../../__mocks__/@twilio/voice-react-native-sdk';
 import * as asyncStorage from '../../../__mocks__/@react-native-async-storage/async-storage';
-import * as voiceUtil from '../../../src/util/voice';
 import * as navigationUtil from '../../../src/util/navigation';
 
 let fetchMock: jest.Mock;
@@ -259,6 +257,25 @@ describe('bootstrap', () => {
         bootstrapCallInvites.fulfilled,
       ]);
     });
+
+    it('listens for call invite notification tapped events', async () => {
+      const createCallInviteSpy = jest.spyOn(voiceSdk, 'createMockCallInvite');
+      const navigate = jest.fn();
+      jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValueOnce({
+        navigate,
+        reset: jest.fn(),
+      } as any);
+
+      const { type } = await store.dispatch(bootstrapCallInvites());
+      expect(type).toMatch(/fulfilled/);
+
+      const mockCallInvites = createCallInviteSpy.mock.results;
+      expect(mockCallInvites).toHaveLength(2);
+      const [{ value: mockCallInvite }] = mockCallInvites;
+      mockCallInvite.emit('notificationTapped');
+
+      expect(navigate.mock.calls).toEqual([['Incoming Call']]);
+    });
   });
 
   describe('bootstrapCalls', () => {
@@ -331,38 +348,7 @@ describe('bootstrap', () => {
     });
   });
 
-  describe('bootstrapNavigation', () => {
-    // TODO(mhuynh): increase coverage. See JIRA VBLOCKS-2078.
-
-    it('listens for call invite notification tapped events', async () => {
-      const onSpy = jest.spyOn(voiceUtil.voice, 'on');
-      jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValueOnce({
-        navigate: jest.fn(),
-        reset: jest.fn(),
-      } as any);
-
-      const { type } = await store.dispatch(bootstrapNavigation());
-      expect(type).toMatch(/fulfilled/);
-
-      expect(onSpy.mock.calls).toHaveLength(1);
-      const [[event]] = onSpy.mock.calls;
-      expect(event).toStrictEqual('callInviteNotificationTapped');
-    });
-
-    it('navigates to the call invite screen', async () => {
-      const navigateSpy = jest.fn();
-      const resetSpy = jest.fn();
-      jest.spyOn(navigationUtil, 'getNavigate').mockResolvedValueOnce({
-        navigate: navigateSpy,
-        reset: resetSpy,
-      } as any);
-
-      const { type } = await store.dispatch(bootstrapNavigation());
-      expect(type).toMatch(/fulfilled/);
-
-      voiceUtil.voice.emit('callInviteNotificationTapped' as any);
-
-      expect(navigateSpy.mock.calls).toStrictEqual([['Incoming Call']]);
-    });
-  });
+  // TODO(mhuynh): increase coverage. See JIRA VBLOCKS-2078.
+  // describe('bootstrapNavigation', () => {
+  // });
 });
