@@ -57,7 +57,7 @@ aliases:
   - &android-executor
     name: android/android-machine
     resource-class: large
-    tag: 2023.07.1
+    tag: 2024.01.1
 
   - &app-package-json-key
     app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
