@@ -1,4 +1,7 @@
-# 1.0.0-beta.2 (In Progress)
+# 1.0.0 (Mar 25, 2024)
+
+The Twilio Voice React Native Reference App has reached milestone `1.0.0` and is
+considered Generally Available (GA). Included in this release are the following.
 
 ## App
 
