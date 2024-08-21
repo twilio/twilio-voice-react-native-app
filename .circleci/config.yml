@@ -158,7 +158,7 @@ commands:
           name: "App: install Pods"
           command: |
             cd app/ios
-            pod install
+            NO_FLIPPER=1 pod install
 
   app-install-applesimutils:
     steps:
