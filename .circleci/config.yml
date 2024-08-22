@@ -152,13 +152,20 @@ commands:
           command: |
             sudo gem install cocoapods -v 1.11.3
 
+  app-install-rosetta:
+    steps:
+      - run:
+          name: "App: install rosetta"
+          command: |
+            /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+
   app-install-pods:
     steps:
       - run:
           name: "App: install Pods"
           command: |
             cd app/ios
-            pod install
+            NO_FLIPPER=1 pod install
 
   app-install-applesimutils:
     steps:
@@ -439,6 +446,7 @@ jobs:
       # - save_cache:
       #     key: app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
       #     paths: app/node_modules
+      - app-install-rosetta
       - app-install-applesimutils
       - app-install-pods
       - restore_cache: *restore-server-package-json

@@ -1,3 +1,13 @@
+# 1.1.0 (Aug 21, 2024)
+
+## App
+
+### Changes
+* Now using `1.1.0` of the `@twilio/voice-react-native-sdk` package. This fixes
+  several issues, please see the release notes of that project for more details.
+  See the `@twilio/voice-react-native-sdk` changelog
+  [here](https://github.com/twilio/twilio-voice-react-native/blob/8e6530f4a79b514931f6474c0c601c65eafb8cf7/CHANGELOG.md#110-aug-20-2024).
+
 # 1.0.0 (Mar 25, 2024)
 
 The Twilio Voice React Native Reference App has reached milestone `1.0.0` and is
