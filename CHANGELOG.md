@@ -7,6 +7,7 @@
   several issues, please see the release notes of that project for more details.
   See the `@twilio/voice-react-native-sdk` changelog
   [here](https://github.com/twilio/twilio-voice-react-native/blob/8e6530f4a79b514931f6474c0c601c65eafb8cf7/CHANGELOG.md#110-aug-20-2024).
+* The compile and target SDK versions for Android have been set to 34.
 
 # 1.0.0 (Mar 25, 2024)
 
