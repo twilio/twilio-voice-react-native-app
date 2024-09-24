@@ -238,8 +238,7 @@ commands:
       - run:
           name: "Server: install dependencies"
           command: |
-            cat $BASH_ENV
-            echo $PATH
+            echo $FOOBAR_TEST
             which node
             node -v
             cd server
@@ -283,10 +282,10 @@ commands:
             nvm install 18
             corepack enable
             # echo "export PATH=$(dirname $(which node)):\$PATH"
-            # echo "export PATH=$(dirname $(which node)):\$PATH" >> "$BASH_ENV"
+            echo "export FOOBAR_TEST=$(dirname $(which node)):\$PATH" >> "$BASH_ENV"
             # echo "echo \$PATH" >> "$BASH_ENV"
             # echo "nvm use 18" >> "$BASH_ENV"
-            echo 'export PATH="$(dirname $(which node))":"$PATH"' >> "$BASH_ENV"
+            # echo 'export PATH="$(dirname $(which node))":"$PATH"' >> "$BASH_ENV"
 
   ###
   # Ngrok Commands
