@@ -4,7 +4,7 @@ version: 2.1
 # Orbs
 ###
 orbs:
-  android: circleci/android@2.3.0
+  android: circleci/android@2.5.0
 
 ###
 # Parameters
@@ -57,7 +57,7 @@ aliases:
   - &android-executor
     name: android/android-machine
     resource-class: large
-    tag: 2023.07.1
+    tag: 2024.04.1
 
   - &app-package-json-key
     app-dependencies-{{ arch }}-{{ checksum "app/package.json" }}
@@ -89,7 +89,7 @@ aliases:
 executors:
   default:
     docker:
-      - image: cimg/node:16.19
+      - image: cimg/node:18.19
     working_directory: ~/project
   ios-executor:
     macos:
@@ -379,6 +379,8 @@ jobs:
       <<: *android-executor
     steps:
       - checkout
+      - android/change-java-version:
+          java-version: 17
       - app-save-env-file
       - restore_cache: *restore-app-package-json
       - app-install-dependencies
@@ -392,6 +394,8 @@ jobs:
       <<: *android-executor
     steps:
       - checkout
+      - android/change-java-version:
+          java-version: 17
       - app-save-env-file
       - restore_cache: *restore-app-package-json
       - app-install-dependencies
