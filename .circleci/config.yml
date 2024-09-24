@@ -405,9 +405,9 @@ jobs:
       <<: *android-executor
     steps:
       - checkout
+      - set-nodejs-version
       - android/change-java-version:
           java-version: 17
-      - set-nodejs-version
       - app-save-env-file
       - restore_cache: *restore-app-package-json
       - app-install-dependencies
@@ -421,9 +421,9 @@ jobs:
       <<: *android-executor
     steps:
       - checkout
-      - android/change-java-version:
-          java-version: 17
       - set-nodejs-version
+      # - android/change-java-version:
+      #     java-version: 17
       - app-save-env-file
       # - restore_cache: *restore-app-package-json
       - app-install-dependencies
