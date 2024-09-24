@@ -424,13 +424,13 @@ jobs:
           java-version: 17
       - set-nodejs-version
       - app-save-env-file
-      - restore_cache: *restore-app-package-json
+      # - restore_cache: *restore-app-package-json
       - app-install-dependencies
-      - save_cache: *save-app-package-json
+      # - save_cache: *save-app-package-json
       - app-save-google-services-json
-      - restore_cache: *restore-server-package-json
+      # - restore_cache: *restore-server-package-json
       - server-install-dependencies
-      - save_cache: *save-server-package-json
+      # - save_cache: *save-server-package-json
       - ngrok-install
       - generate-client-identity
       - display-client-identity
