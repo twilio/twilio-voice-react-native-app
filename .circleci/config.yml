@@ -238,8 +238,13 @@ commands:
       - run:
           name: "Server: install dependencies"
           command: |
+            echo FOOBAR_TEST
             echo $FOOBAR_TEST
+            echo PATH
+            echo $PATH
+            echo 'which node'
             which node
+            echo 'node -v'
             node -v
             cd server
             yarn cache clean
@@ -283,7 +288,8 @@ commands:
             corepack enable
             # echo "export PATH=$(dirname $(which node)):\$PATH"
             echo "export FOOBAR_TEST=$(dirname $(which node)):\$PATH" >> "$BASH_ENV"
-            # echo "echo \$PATH" >> "$BASH_ENV"
+            echo "export PATH=$(dirname $(which node)):\$PATH" >> "$BASH_ENV"
+            echo 'echo "$PATH"' >> "$BASH_ENV"
             # echo "nvm use 18" >> "$BASH_ENV"
             # echo 'export PATH="$(dirname $(which node))":"$PATH"' >> "$BASH_ENV"
 
