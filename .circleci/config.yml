@@ -238,8 +238,6 @@ commands:
       - run:
           name: "Server: install dependencies"
           command: |
-            nvm use 18
-            corepack enable
             node -v
             cd server
             yarn cache clean
@@ -280,9 +278,10 @@ commands:
           name: "Set nodejs version to 18"
           command: |
             nvm install 18
+            corepack enable
             # echo "export PATH=$(dirname $(which node)):\$PATH"
-            echo "export PATH=$(dirname $(which node)):\$PATH" >> $BASH_ENV
-            # echo "nvm use 18" >> $BASH_ENV
+            # echo "export PATH=$(dirname $(which node)):\$PATH" >> $BASH_ENV
+            echo "nvm use 18" >> $BASH_ENV
 
   ###
   # Ngrok Commands
