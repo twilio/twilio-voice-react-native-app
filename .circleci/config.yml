@@ -238,6 +238,8 @@ commands:
       - run:
           name: "Server: install dependencies"
           command: |
+            echo $PATH
+            which node
             node -v
             cd server
             yarn cache clean
