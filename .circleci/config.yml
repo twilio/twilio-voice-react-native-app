@@ -238,7 +238,7 @@ commands:
       - run:
           name: "Server: install dependencies"
           command: |
-            echo $FOOBAR_TEST
+            cat $BASH_ENV
             which node
             node -v
             cd server
