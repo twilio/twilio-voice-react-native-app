@@ -268,7 +268,18 @@ commands:
             cd server/scripts
             node deleteTwimlApp.js
 
-  ##
+  ###
+  # nvm commands
+  ###
+  set-nodejs-version:
+    steps:
+      - run:
+          name: "Set nodejs version to 18"
+          command: |
+            nvm install 18
+            echo "export PATH=$(dirname $(which node)):\$PATH" >> $BASH_ENV
+
+  ###
   # Ngrok Commands
   ###
   ngrok-install:
@@ -381,11 +392,7 @@ jobs:
       - checkout
       - android/change-java-version:
           java-version: 17
-      - run:
-          name: "Change node version to 18"
-          command: |
-            nvm install 18
-            nvm use 18
+      - set-nodejs-version
       - app-save-env-file
       - restore_cache: *restore-app-package-json
       - app-install-dependencies
@@ -401,11 +408,7 @@ jobs:
       - checkout
       - android/change-java-version:
           java-version: 17
-      - run:
-          name: "Change node version to 18"
-          command: |
-            nvm install 18
-            nvm use 18
+      - set-nodejs-version
       - app-save-env-file
       - restore_cache: *restore-app-package-json
       - app-install-dependencies
