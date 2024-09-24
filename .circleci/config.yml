@@ -238,6 +238,7 @@ commands:
       - run:
           name: "Server: install dependencies"
           command: |
+            node -v
             cd server
             yarn cache clean
             yarn install --immutable
@@ -277,9 +278,9 @@ commands:
           name: "Set nodejs version to 18"
           command: |
             nvm install 18
-            echo "export PATH=$(dirname $(which node)):\$PATH"
+            # echo "export PATH=$(dirname $(which node)):\$PATH"
             echo "export PATH=$(dirname $(which node)):\$PATH" >> $BASH_ENV
-            echo "nvm use 18" >> $BASH_ENV
+            # echo "nvm use 18" >> $BASH_ENV
 
   ###
   # Ngrok Commands
