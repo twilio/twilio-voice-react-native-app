@@ -238,14 +238,6 @@ commands:
       - run:
           name: "Server: install dependencies"
           command: |
-            echo FOOBAR_TEST
-            echo $FOOBAR_TEST
-            echo PATH
-            echo $PATH
-            echo 'which node'
-            which node
-            echo 'node -v'
-            node -v
             cd server
             yarn cache clean
             yarn install --immutable
