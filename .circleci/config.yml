@@ -239,6 +239,7 @@ commands:
           name: "Server: install dependencies"
           command: |
             nvm use 18
+            corepack enable
             node -v
             cd server
             yarn cache clean
