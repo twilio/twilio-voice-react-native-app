@@ -384,6 +384,7 @@ jobs:
       - run:
           name: "Change node version to 18"
           command: |
+            nvm install 18
             nvm use 18
       - app-save-env-file
       - restore_cache: *restore-app-package-json
@@ -403,6 +404,7 @@ jobs:
       - run:
           name: "Change node version to 18"
           command: |
+            nvm install 18
             nvm use 18
       - app-save-env-file
       - restore_cache: *restore-app-package-json
