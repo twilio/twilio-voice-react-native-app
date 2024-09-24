@@ -381,6 +381,10 @@ jobs:
       - checkout
       - android/change-java-version:
           java-version: 17
+      - run:
+          name: "Change node version to 18"
+          command: |
+            nvm use 18
       - app-save-env-file
       - restore_cache: *restore-app-package-json
       - app-install-dependencies
