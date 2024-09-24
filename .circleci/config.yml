@@ -286,12 +286,6 @@ commands:
           command: |
             nvm install 18
             corepack enable
-            # echo "export PATH=$(dirname $(which node)):\$PATH"
-            # echo "export FOOBAR_TEST=$(dirname $(which node)):\$PATH" >> "$BASH_ENV"
-            # echo "export PATH=/foobar/:\$PATH" >> "$BASH_ENV"
-            # echo 'echo "$PATH"' >> "$BASH_ENV"
-            # echo "nvm use 18" >> "$BASH_ENV"
-            # echo 'export PATH="$(dirname $(which node))":"$PATH"' >> "$BASH_ENV"
             echo 'nvm use 18' >> "$BASH_ENV"
 
   ###
@@ -425,13 +419,13 @@ jobs:
       - android/change-java-version:
           java-version: 17
       - app-save-env-file
-      # - restore_cache: *restore-app-package-json
+      - restore_cache: *restore-app-package-json
       - app-install-dependencies
-      # - save_cache: *save-app-package-json
+      - save_cache: *save-app-package-json
       - app-save-google-services-json
-      # - restore_cache: *restore-server-package-json
+      - restore_cache: *restore-server-package-json
       - server-install-dependencies
-      # - save_cache: *save-server-package-json
+      - save_cache: *save-server-package-json
       - ngrok-install
       - generate-client-identity
       - display-client-identity
