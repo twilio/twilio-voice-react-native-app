@@ -292,7 +292,7 @@ commands:
             # echo 'echo "$PATH"' >> "$BASH_ENV"
             # echo "nvm use 18" >> "$BASH_ENV"
             # echo 'export PATH="$(dirname $(which node))":"$PATH"' >> "$BASH_ENV"
-            echo 'nvm use 18 && nvm alias default 18' >> "$BASH_ENV"
+            echo 'nvm use 18' >> "$BASH_ENV"
 
   ###
   # Ngrok Commands
@@ -422,8 +422,8 @@ jobs:
     steps:
       - checkout
       - set-nodejs-version
-      # - android/change-java-version:
-      #     java-version: 17
+      - android/change-java-version:
+          java-version: 17
       - app-save-env-file
       # - restore_cache: *restore-app-package-json
       - app-install-dependencies
