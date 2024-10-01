@@ -1,5 +1,6 @@
 # node.js
 node_modules/
+.yarn/
 
 # project
 build/
@@ -9,4 +10,3 @@ coverage/
 # logs
 combined.log
 error.log
-

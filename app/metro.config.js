@@ -1,14 +1,13 @@
-/**
- * Metro configuration for React Native
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 const defaultSourceExts =
   require('metro-config/src/defaults/defaults').sourceExts;
 
-module.exports = {
+/**
+ * Metro configuration
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
+const config = {
   resolver: {
     sourceExts:
       process.env.MY_APP_MODE === 'mocked'
@@ -24,3 +23,4 @@ module.exports = {
     }),
   },
 };
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);
