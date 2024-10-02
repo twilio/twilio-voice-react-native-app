@@ -12,10 +12,12 @@ class MainReactNativeHost extends VoiceApplicationProxy.VoiceReactNativeHost {
     public MainReactNativeHost(Application application) {
         super(application);
     }
+
     @Override
     public boolean getUseDeveloperSupport() {
         return BuildConfig.DEBUG;
     }
+
     @Override
     protected List<ReactPackage> getPackages() {
         List<ReactPackage> packages = new PackageList(this).getPackages();
@@ -23,8 +25,17 @@ class MainReactNativeHost extends VoiceApplicationProxy.VoiceReactNativeHost {
         // packages.add(new MyReactNativePackage());
         return packages;
     }
+
     @Override
     protected String getJSMainModuleName() {
         return "index";
+    }
+
+    protected boolean isNewArchEnabled() {
+        return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
+    }
+
+    protected Boolean isHermesEnabled() {
+        return BuildConfig.IS_HERMES_ENABLED;
     }
 }
