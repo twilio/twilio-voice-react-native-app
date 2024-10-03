@@ -112,7 +112,9 @@ describe('<Dialer />', () => {
         const clientButton = screen.getByTestId('client_button');
         expect(clientButton).toBeOnTheScreen();
         expect(clientButton.props.accessibilityState.disabled).toBe(false);
-        expect(clientButton.findByType(Text).props.children).toBe('Client');
+        expect(clientButton.findByType(Text as any).props.children).toBe(
+          'Client',
+        );
       });
 
       it('should hide the backspace button', () => {
@@ -236,7 +238,9 @@ describe('<Dialer />', () => {
         const clientButton = screen.getByTestId('client_button');
         expect(clientButton).toBeOnTheScreen();
         expect(clientButton.props.accessibilityState.disabled).toBe(false);
-        expect(clientButton.findByType(Text).props.children).toBe('Number');
+        expect(clientButton.findByType(Text as any).props.children).toBe(
+          'Number',
+        );
       });
 
       it('should hide the backspace button', () => {

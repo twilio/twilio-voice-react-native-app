@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
   loginText: {
     color: '#FFFFFF',
     textAlign: 'center',
-    weight: 600,
-    size: 14,
+    fontWeight: '600',
+    fontSize: 14,
   },
   arrowForward: {
     width: 20,

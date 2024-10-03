@@ -173,7 +173,7 @@ describe('<ActiveCall />', () => {
         expect(button).toBeOnTheScreen();
         expect(button.props.accessibilityState.disabled).toBe(disabled);
         if (name === 'mute') {
-          expect(button.findByType(Image).props.accessibilityLabel).toBe(
+          expect(button.findByType(Image as any).props.accessibilityLabel).toBe(
             'mute_passive',
           );
         }
@@ -220,7 +220,7 @@ describe('<ActiveCall />', () => {
       screen = render(activeCallScreen(store, Stack));
 
       expect(
-        screen.getByTestId('mute_button').findByType(Image).props
+        screen.getByTestId('mute_button').findByType(Image as any).props
           .accessibilityLabel,
       ).toBe('mute_active');
     });
@@ -255,7 +255,7 @@ describe('<ActiveCall />', () => {
 
       it('should de-activate the mute button', () => {
         expect(
-          screen.getByTestId('mute_button').findByType(Image).props
+          screen.getByTestId('mute_button').findByType(Image as any).props
             .accessibilityLabel,
         ).toBe('mute_passive');
       });
