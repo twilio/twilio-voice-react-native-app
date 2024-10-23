@@ -145,6 +145,13 @@ commands:
             cd app
             echo $GOOGLE_SERVICES_JSON | base64 -d > android/app/google-services.json
 
+  app-save-gcloud-service-key:
+    steps:
+      - run:
+          name: "App: save service account key"
+          command: |
+            echo $GCLOUD_SERVICE_KEY | base64 -d > ~/GOOGLE_APPLICATION_CREDENTIALS.json
+
   app-setup-cocoapods:
     steps:
       - run:
@@ -528,28 +535,19 @@ jobs:
           path: server/coverage
 
   # Publish the android app
-  publish-android-app-appcenter:
+  publish-android-app-firebase:
     executor:
       <<: *android-executor
-    parameters:
-      distribution-audience:
-        # Use this flag to control the app distrubution audience
-        type: string
     steps:
       - checkout
       - attach_workspace:
           at: .
+      - app-save-gcloud-service-key
       - run:
-          name: "Publishing Android app to AppCenter"
+          name: "Publishing Android app to Firebase App Distribution"
           command: |
-            echo no | npm install -g appcenter-cli
-            appcenter login --token ${APP_CENTER_API_TOKEN}
-            appcenter distribute release \
-              -f app/android/app/build/outputs/apk/release/app-release.apk \
-              -g << parameters.distribution-audience >> \
-              --app ${APP_CENTER_ORG_NAME}/${APP_CENTER_APP_NAME_ANDROID} \
-              -b ${CIRCLE_TAG} \
-              --disable-telemetry
+            cd app/android/
+            GOOGLE_APPLICATION_CREDENTIALS=~/GOOGLE_APPLICATION_CREDENTIALS.json ./gradlew app:appDistributionUploadRelease
 
   build-archive-ios-app:
     executor: ios-executor
@@ -693,8 +691,7 @@ workflows:
           filters: *rc-filter-android
           context:
             - vblocks-dogfood-reference-app
-      - publish-android-app-appcenter:
-          distribution-audience: ${APP_CENTER_RC_AUDIENCE}
+      - publish-android-app-firebase:
           filters: *rc-filter-android
           context:
             - vblocks-dogfood-reference-app
