@@ -553,6 +553,7 @@ jobs:
           name: "Publishing Android app to Firebase App Distribution"
           command: |
             cd app/android/
+            ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release
             GOOGLE_APPLICATION_CREDENTIALS=~/GOOGLE_APPLICATION_CREDENTIALS.json ./gradlew app:appDistributionUploadRelease
 
   build-archive-ios-app:
@@ -720,13 +721,7 @@ workflows:
             - vblocks-dogfood-reference-app
           requires:
             - build-archive-ios-app
-      - build-archive-android-app:
-          filters: *release-filter-android
-          context:
-            - vblocks-dogfood-reference-app
       - publish-android-app-firebase:
           filters: *release-filter-android
-          requires:
-            - build-archive-android-app
           context:
             - vblocks-dogfood-reference-app
