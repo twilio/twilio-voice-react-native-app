@@ -543,11 +543,11 @@ jobs:
       - set-nodejs-version
       - android/change-java-version:
           java-version: 17
+      - app-save-env-file
       - app-install-dependencies
+      - app-save-google-services-json
       - android/install-ndk:
           version: "25.2.9519653"
-      - attach_workspace:
-          at: .
       - app-save-gcloud-service-key
       - run:
           name: "Publishing Android app to Firebase App Distribution"
