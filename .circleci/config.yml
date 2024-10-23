@@ -543,6 +543,8 @@ jobs:
       - attach_workspace:
           at: .
       - app-save-gcloud-service-key
+      - android/change-java-version:
+          java-version: 17
       - run:
           name: "Publishing Android app to Firebase App Distribution"
           command: |
