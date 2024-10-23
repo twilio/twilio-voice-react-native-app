@@ -718,8 +718,7 @@ workflows:
           filters: *release-filter-android
           context:
             - vblocks-dogfood-reference-app
-      - publish-android-app-appcenter:
-          distribution-audience: ${APP_CENTER_RELEASE_AUDIENCE}
+      - publish-android-app-firebase:
           filters: *release-filter-android
           requires:
             - build-archive-android-app
