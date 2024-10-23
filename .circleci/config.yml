@@ -540,11 +540,15 @@ jobs:
       <<: *android-executor
     steps:
       - checkout
+      - set-nodejs-version
+      - android/change-java-version:
+          java-version: 17
+      - app-install-dependencies
+      - android/install-ndk:
+          version: "25.2.9519653"
       - attach_workspace:
           at: .
       - app-save-gcloud-service-key
-      - android/change-java-version:
-          java-version: 17
       - run:
           name: "Publishing Android app to Firebase App Distribution"
           command: |
