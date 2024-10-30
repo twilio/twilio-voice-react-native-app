@@ -2573,10 +2573,10 @@
   resolved "https://registry.yarnpkg.com/@twilio/voice-errors/-/voice-errors-1.8.0.tgz#ab13ae8ee9bd53dc62acffa9631be4f391b8c695"
   integrity sha512-Mh3CCCNOZ+OCFNv90ibml1VrsXiJy/1+/FP6382tUQuqZztndp41eqnJhsnM44UBkMAtlvVUSd1HuK8iCdHM/A==
 
-"@twilio/voice-react-native-sdk@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@twilio/voice-react-native-sdk/-/voice-react-native-sdk-1.1.0.tgz#584caa1f7d7df6f64ed3b46665b29644dec12ba1"
-  integrity sha512-j2AtaTezpd1eXHt5paJwuOOAEKoxvp3vajD7/F832y5hZ8/uEJ6Dy63bLqevDsaxvIWYevFyu16n7O1g3xfOeQ==
+"@twilio/voice-react-native-sdk@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@twilio/voice-react-native-sdk/-/voice-react-native-sdk-1.2.0.tgz#1b9d4b18a27cd9f4fd86e9063f25f9242e1b3876"
+  integrity sha512-K0PtACUd4DarkytcH3UV7qJfH+hdwyfralhfco3ruXYg1vlVjvDRO6AlSwCblJbyMAtkZjn9IoRIMsKDrSKmHQ==
   dependencies:
     "@twilio/voice-errors" "1.8.0"
     eventemitter3 "^4.0.7"
