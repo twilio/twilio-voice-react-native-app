@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.firebase.appdistribution"
 
 react {}
 
@@ -65,6 +66,13 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
+
+            firebaseAppDistribution {
+                appId = "${getAppId()}"
+                artifactType = "APK"
+                releaseNotes = "Twilio Voice React Native SDK Reference App - Dogfooding"
+                groups = "QE"
+            }
         }
     }
 }
@@ -106,4 +114,8 @@ static def stringifyNull(var) {
         return "\"null\""
     }
     return "\"" + var + "\"";
+}
+
+static def getAppId() {
+    return System.getenv("FIREBASE_APP_ID")
 }
