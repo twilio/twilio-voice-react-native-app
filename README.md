@@ -1,6 +1,6 @@
 # Twilio Voice React Native Reference App
 
-This project consists of a backend server and a React Native app that demonstrate best practices for developing a Twilio Programmable Voice application.
+This project consists of a backend server and a React Native app that demonstrate best practices for developing a Twilio Programmable Voice application using the [Twilio Voice React Native SDK](https://github.com/twilio/twilio-voice-react-native)
 
 ## Features
 
@@ -16,6 +16,7 @@ This project consists of a backend server and a React Native app that demonstrat
 ## Prerequisites
 
 * Understanding of [Twilio Programmable Voice](https://www.twilio.com/docs/voice/sdks).
+* Familiarity with the [Twilio Voice React Native SDK](https://github.com/twilio/twilio-voice-react-native)
 * A [React Native Development Environment](https://reactnative.dev/docs/0.72/environment-setup).
 * An LTS version of [NodeJS](https://nodejs.org/en/) as specified [here](app/.node-version).
 * A Node package manager. Examples in this project have been tested using Yarn `1.x`.
