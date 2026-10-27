@@ -1,116 +1,74 @@
 # Contributing
 
+This repository is publicly available and maintained by Twilio under a limited external contribution model.
+
+## Pull requests
+
+Due to limited maintenance capacity, external pull requests are not currently accepted.
+
+## GitHub Issues
+
+GitHub Issues may be used to report reproducible bugs or provide feature feedback about this application. Issues are reviewed on a best-effort basis, with no SLA or guaranteed response.
+
+GitHub Issues are not an official Twilio support channel. For production issues, general usage questions, or account-specific assistance, please contact [Twilio Support](https://help.twilio.com/). If you have a Twilio account manager, you may also escalate through them.
+
+Do not share [Personally Identifiable Information (PII)](https://www.twilio.com/docs/glossary/what-is-personally-identifiable-information-pii) or sensitive account information, including access tokens, API keys, and credentials, in issues, logs, or screenshots.
+
+## Security vulnerabilities
+
+Report security vulnerabilities privately through [Twilio's Vulnerability Disclosure Program](https://www.twilio.com/en-us/security/vulnerability-disclosure-program), rather than public GitHub Issues.
+
 We want this community to be friendly and respectful to each other. Please follow it in all your interactions with the project.
 
 > All third-party contributors acknowledge that any contributions they provide will be made under the same open-source license that the open-source project is provided under.
 
 ## Development workflow
 
-To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
+This repository has two separate projects: the React Native application in
+`app/` and the backend in `server/`. Install dependencies and run commands from
+the relevant directory; there is no root package.json.
+
+Follow the [repository setup](README.md) for prerequisites and Auth0 configuration,
+the [app guide](app/README.md) for native builds and incoming call notifications,
+and the [server guide](server/README.md) for backend configuration.
+
+### Application
+
+From `app/`, install dependencies with `yarn install`. For iOS, also run
+`pod install` from `app/ios/`. Run `yarn android` or `yarn ios` from `app/`
+to build and launch the application; `yarn start` starts Metro separately.
+
+Validate application changes from `app/`:
 
 ```sh
-yarn
-```
-
-> While it's possible to use [`npm`](https://github.com/npm/cli), the tooling is built around [`yarn`](https://classic.yarnpkg.com/), so you'll have an easier time if you use `yarn` for development.
-
-While developing, you can run the [example app](/example/) to test your changes. Any changes you make in your library's JavaScript code will be reflected in the example app without a rebuild. If you change any native code, then you'll need to rebuild the example app.
-
-To start the packager:
-
-```sh
-yarn example start
-```
-
-To run the example app on Android:
-
-```sh
-yarn example android
-```
-
-To run the example app on iOS:
-
-```sh
-yarn example ios
-```
-
-Make sure your code passes TypeScript and ESLint. Run the following to verify:
-
-```sh
-yarn typescript
+yarn typecheck
 yarn lint
-```
-
-To fix formatting errors, run the following:
-
-```sh
-yarn lint --fix
-```
-
-Remember to add tests for your change if possible. Run the unit tests by:
-
-```sh
 yarn test
 ```
 
-To edit the Objective-C files, open `example/ios/TwilioVoiceReactNativeExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > twilio-voice-react-native`.
+For end-to-end tests, follow the [Detox setup](docs/e2e-testing.md) and use the
+`detox:build` and `detox:test` scripts in `app/package.json` with the appropriate
+configuration. Review [known issues](docs/known-issues.md) before investigating a
+build failure.
 
-To edit the Kotlin files, open `example/android` in Android studio and find the source files at `twiliovoicereactnative` under `Android`.
+### Server
 
-### Commit message convention
+From `server/`, install dependencies with `yarn install`. Run `yarn watch`
+for local development, following the configuration steps in the server guide.
 
-We follow the [conventional commits specification](https://www.conventionalcommits.org/en) for our commit messages:
-
-- `fix`: bug fixes, e.g. fix crash due to deprecated method.
-- `feat`: new features, e.g. add new method to the module.
-- `refactor`: code refactor, e.g. migrate from class components to hooks.
-- `docs`: changes into documentation, e.g. add usage example for the module..
-- `test`: adding or updating tests, e.g. add integration tests using detox.
-- `chore`: tooling changes, e.g. change CI config.
-
-Our pre-commit hooks verify that your commit message matches this format when committing.
-
-### Linting and tests
-
-[ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [TypeScript](https://www.typescriptlang.org/)
-
-We use [TypeScript](https://www.typescriptlang.org/) for type checking, [ESLint](https://eslint.org/) with [Prettier](https://prettier.io/) for linting and formatting the code, and [Jest](https://jestjs.io/) for testing.
-
-Our pre-commit hooks verify that the linter and tests pass when committing.
-
-### Publishing to npm
-
-We use [release-it](https://github.com/release-it/release-it) to make it easier to publish new versions. It handles common tasks like bumping version based on semver, creating tags and releases etc.
-
-To publish new versions, run the following:
+Validate backend changes from `server/`:
 
 ```sh
-yarn release
+yarn build
+yarn lint
+yarn test
 ```
 
-### Scripts
+### Collaborator pull requests
 
-The `package.json` file contains various scripts for common tasks:
-
-- `yarn bootstrap`: setup project by installing all dependencies and pods.
-- `yarn typescript`: type-check files with TypeScript.
-- `yarn lint`: lint files with ESLint.
-- `yarn test`: run unit tests with Jest.
-- `yarn example start`: start the Metro server for the example app.
-- `yarn example android`: run the example app on Android.
-- `yarn example ios`: run the example app on iOS.
-
-### Sending a pull request
-
-> **Working on your first pull request?** You can learn how from this _free_ series: [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github).
-
-When you're sending a pull request:
-
-- Prefer small pull requests focused on one change.
-- Verify that linters and tests are passing.
-- Review the documentation to make sure it looks good.
-- Follow the pull request template when opening a pull request.
-- For pull requests that change the API or implementation, discuss with maintainers first by opening an issue.
+Keep changes focused, update affected documentation, and describe the checks
+performed in the pull request. Follow the repository's pull request template.
+For application changes, include screenshots when they help explain the behavior.
 
 ## Code of Conduct
 
@@ -153,7 +111,7 @@ This Code of Conduct applies within all community spaces, and also applies when 
 
 ### Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at [INSERT CONTACT METHOD]. All complaints will be reviewed and investigated promptly and fairly.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at [open-source@twilio.com](mailto:open-source@twilio.com). All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the reporter of any incident.
 
